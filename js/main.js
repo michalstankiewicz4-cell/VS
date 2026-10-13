@@ -277,7 +277,7 @@ function loop(now) {
     $('hpbar').firstElementChild.style.width = (S.maxHp ? S.hp / S.maxHp * 100 : 0) + '%';
     const m = Math.floor(S.time / 60), s = String(Math.floor(S.time % 60)).padStart(2, '0');
     $('run').textContent = mode === 'play'
-      ? `HP ${Math.ceil(S.hp)}/${S.maxHp} · pkt ${S.pts} · zabójstwa ${S.kills} · ${m}:${s} · bank ${bank}`
+      ? `HP ${Math.ceil(S.hp)}/${S.maxHp} · pkt ${S.pts} · zabójstwa ${S.kills} · ${m}:${s} · ${S.night > 0.5 ? 'noc' : 'dzień'} · bank ${bank}`
       : `bank ${bank} pkt`;
     const c = input.counts;
     $('stats').textContent = `ruch ${c.move} · kliknięcia ${c.click}\nuniki ${c.dash} · interakcje ${c.interact} · budowa ${c.build}`;

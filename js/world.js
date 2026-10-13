@@ -75,6 +75,30 @@ export function createWorld(scene) {
   const torch = new THREE.PointLight(0xff8a44, 30, 16, 2);
   scene.add(torch);
 
+  /* ---- cykl dnia i nocy: 5 min dnia + 5 min nocy (okres 600 s), przejścia ok. 40 s ---- */
+  const DAY_LEN = 300, CYCLE = DAY_LEN * 2, T0 = 40;     // T0: bieg zaczyna się już za dnia
+  const hemi = scene.children.find((c) => c.isHemisphereLight);
+  const sk = {
+    bgD: new THREE.Color(0x8d9aa4), bgN: new THREE.Color(0x07040b),
+    hsD: new THREE.Color(0xc2ccd6), hsN: new THREE.Color(0x6a6080),
+    hgD: new THREE.Color(0x5a4a3c), hgN: new THREE.Color(0x2a1410),
+    dlD: new THREE.Color(0xfff0d0), dlN: new THREE.Color(0x7f8fff),
+  };
+  const nightAt = (time) => {            // 0 = dzień, 1 = noc (gładko)
+    const v = -Math.sin(2 * Math.PI * (time + T0) / CYCLE), e0 = -0.2, e1 = 0.2;
+    const x = Math.min(1, Math.max(0, (v - e0) / (e1 - e0)));
+    return x * x * (3 - 2 * x);
+  };
+  function applySky(n) {
+    scene.background.copy(sk.bgD).lerp(sk.bgN, n);
+    scene.fog.color.copy(scene.background);
+    scene.fog.far = 74 - 28 * n; scene.fog.near = 30 - 10 * n;
+    hemi.color.copy(sk.hsD).lerp(sk.hsN, n); hemi.groundColor.copy(sk.hgD).lerp(sk.hgN, n);
+    hemi.intensity = 3.4 - 2.1 * n;
+    moon.color.copy(sk.dlD).lerp(sk.dlN, n); moon.intensity = 3.6 - 2.0 * n;
+    S.night = n;
+  }
+
   /* ---- gruz (instancje, zawijany wokół gracza, bez kolizji) ---- */
   const gm = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshLambertMaterial({ color: 0xffffff }), GRAVES);
   gm.castShadow = gm.receiveShadow = true;
@@ -412,7 +436,7 @@ export function createWorld(scene) {
   function reset() {
     state.pos.set(0, 0, 0); state.face = 0;
     S.maxHp = 100 + 25 * countType('crypt'); S.hp = S.maxHp;
-    S.kills = 0; S.pts = 0; S.time = 0; S.fireCd = 0; S.active = 0;
+    S.kills = 0; S.pts = 0; S.time = 0; S.night = 0; S.fireCd = 0; S.active = 0;
     for (let i = 0; i < ENEMIES; i++) park(i);
     for (let i = 0; i < PN; i++) { pl[i] = 0; hideP(i); }
     em.instanceMatrix.needsUpdate = true; pm.instanceMatrix.needsUpdate = true;
@@ -420,6 +444,8 @@ export function createWorld(scene) {
   const setMode = (m) => { S.mode = m; };
 
   function update(dt, t, mv, aim, firing) {
+    const nightN = S.mode === 'play' ? nightAt(S.time) : 0;
+    applySky(nightN);
     if (S.mode !== 'play') return;
     S.time += dt;
 
@@ -451,8 +477,8 @@ export function createWorld(scene) {
 
     // światła
     torch.position.set(px, 2.6, pz);
-    torch.intensity = 30 + Math.sin(t * 13) * 3 + Math.sin(t * 7.3) * 2;
-    moon.position.set(px - 10, 18, pz + 8);
+    torch.intensity = (30 + Math.sin(t * 13) * 3 + Math.sin(t * 7.3) * 2) * (0.15 + 0.85 * S.night);
+    moon.position.set(px - 10 + 8 * S.night, 18, pz + 8 - 4 * S.night);
     moon.target.position.set(px, 0, pz);
     ground.position.set(Math.round(px / TILE) * TILE, 0, Math.round(pz / TILE) * TILE);
 
@@ -539,5 +565,5 @@ export function createWorld(scene) {
     pm.instanceMatrix.needsUpdate = true;
   }
 
-  return { player: state, S, update, reset, setMode, place, remove, canPlace, list, load, count: countType, setGhost, setGhostBox, map, fade, enemyCount: ENEMIES };
+  return { player: state, S, nightAt, DAY_LEN, update, reset, setMode, place, remove, canPlace, list, load, count: countType, setGhost, setGhostBox, map, fade, enemyCount: ENEMIES };
 }

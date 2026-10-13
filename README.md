@@ -30,3 +30,6 @@ Esc wraca do menu (tam też ustawienia). Menu → „Edytor map": stawianie/usuw
 
 ## Atrybucje
 - Pałac Kultury i Nauki: uproszczony model oparty na modelu SketchUp (BezNazwy6.skp), autor wg metadanych pliku: **kon.kp**, licencja [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). W grze użyto tylko brył wyznaczonych z obrysów kondygnacji (zmieniono: uproszczenie, skala, obrót).
+
+## Cykl dnia i nocy
+Czas biegu: ~5 min dnia, ~5 min nocy, naprzemiennie (menu, budowa i edytor zawsze za dnia).

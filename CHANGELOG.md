@@ -4,6 +4,10 @@ Wersjonowanie: `MAJOR.MINOR.PATCH`. Każda wysyłka do repozytorium to nowa wers
 Tagi `vX.Y.Z` zakłada właściciel na GitHubie (Releases) na commitach z tej historii; push tagów z sesji Claude jest blokowany.
 Poprawka błędu = PATCH, nowa funkcja = MINOR, duża zmiana rozgrywki lub zapisu = MAJOR.
 
+## [0.7.0] - 2026-10-13
+### Dodano
+- Cykl dnia i nocy: ok. 5 min dnia i 5 min nocy (okres 10 min, płynne przejścia ok. 40 s). Bieg zaczyna się za dnia; zmieniają się niebo, mgła, światło i latarka postaci. W HUD widać „dzień/noc".
+
 ## [0.6.0] - 2026-10-13
 ### Zmieniono
 - Pałac Kultury odtworzony z modelu SketchUp użytkownika: wieża ze schodkowymi kondygnacjami, narożne baszty i skrzydła (ok. 40 j. wysokości, kolizje przy skrzydłach).
