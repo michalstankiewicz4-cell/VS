@@ -202,7 +202,6 @@ export function createWorld(scene) {
   const bounds = (o) => o.t === 'b' ? { x: o.x, z: o.z, hw: o.w / 2, hd: o.d / 2, h: o.h }
     : o.t === 'c' ? (o.r ? { x: o.x, z: o.z, hw: 1.95, hd: 0.95, h: 1.4 } : { x: o.x, z: o.z, hw: 0.95, hd: 1.95, h: 1.4 })
     : { x: o.x, z: o.z, hw: 12, hd: 12, h: 46 };
-  const overlaps = (a, b) => Math.abs(a.x - b.x) < a.hw + b.hw && Math.abs(a.z - b.z) < a.hd + b.hd;
   const inBase = (b) => Math.abs(b.x) - b.hw < BASE_ZONE && Math.abs(b.z) - b.hd < BASE_ZONE;
   const inWorld = (b) => Math.abs(b.x) + b.hw <= EDGE && Math.abs(b.z) + b.hd <= EDGE;
 
@@ -270,7 +269,17 @@ export function createWorld(scene) {
       const c = clean(o);
       if (!c || c.t === 'p' || city.length >= MAP_MAX) return false;
       const b = bounds(c);
-      return inWorld(b) && !inBase(b) && !city.some((q) => overlaps(b, bounds(q)));
+      return inWorld(b) && !inBase(b);
+    },
+    why(o) {                         // powód odmowy (do podpowiedzi w edytorze)
+      const c = clean(o);
+      if (!c) return 'niepoprawny obiekt';
+      if (c.t === 'p') return 'Pałac Kultury jest stały';
+      if (city.length >= MAP_MAX) return 'limit obiektów';
+      const b = bounds(c);
+      if (!inWorld(b)) return 'poza granicą mapy';
+      if (inBase(b)) return 'strefa bazy (środek) musi zostać wolna';
+      return '';
     },
     add(o) {
       if (!map.canPlace(o)) return false;

@@ -135,13 +135,14 @@ function refreshBuild() {
 }
 function openEdit() {
   setHud(false);
-  world.reset(); world.setMode('idle'); mode = 'edit'; zoomT = 0.55; editCam.set(0, 0, 0);
+  world.reset(); world.setMode('idle'); mode = 'edit'; zoomT = 0.55; editCam.set(0, 0, 44);
   $('ui').hidden = true; $('build').hidden = true; $('ed').hidden = false; refreshEd();
 }
+let edWhy = '', edWhyShown = '';
 function refreshEd() {
   for (const b of document.querySelectorAll('#ed [data-e]')) b.classList.toggle('on', b.dataset.e === tool);
   $('eRot').classList.toggle('on', rot === 1);
-  $('eInfo').textContent = `Obiekty: ${world.map.count()}/${world.map.max} · LPM: ${tool === 'x' ? 'usuń' : 'postaw'} · WASD: przesuń widok · Q/E, PPM, kółko: kamera. Strefa bazy (środek) zostaje wolna.`;
+  $('eInfo').textContent = `Obiekty: ${world.map.count()}/${world.map.max} · LPM: ${tool === 'x' ? 'usuń' : 'postaw'} · WASD: przesuń widok · Q/E, PPM, kółko: kamera. Strefa bazy (środek) zostaje wolna.` + (edWhy ? `\nNie można tu postawić: ${edWhy}.` : '');
 }
 function curObj() {
   const p = ground(0);
@@ -235,13 +236,15 @@ function loop(now) {
     editCam.x = Math.max(-70, Math.min(70, editCam.x + mv.x * 28 * dt / userZoom));
     editCam.z = Math.max(-70, Math.min(70, editCam.z + mv.z * 28 * dt / userZoom));
     if (tool === 'x') {
+      edWhy = ''; if (edWhyShown) { edWhyShown = ''; refreshEd(); }
       const i = pickIdx();
       if (i >= 0) { const b = world.map.bounds(i); world.setGhostBox(true, b.x, b.h / 2, b.z, b.hw * 2 + 0.2, b.h + 0.2, b.hd * 2 + 0.2, false); }
       else world.setGhostBox(false, 0, 0, 0, 1, 1, 1, false);
     } else {
       const o = curObj();
-      if (o) { const b = world.map.boundsOf(o); world.setGhostBox(true, b.x, b.h / 2, b.z, b.hw * 2, b.h, b.hd * 2, world.map.canPlace(o)); }
-      else world.setGhostBox(false, 0, 0, 0, 1, 1, 1, false);
+      if (edWhy !== edWhyShown) { edWhyShown = edWhy; refreshEd(); }
+      if (o) { const b = world.map.boundsOf(o); world.setGhostBox(true, b.x, b.h / 2, b.z, b.hw * 2, b.h, b.hd * 2, world.map.canPlace(o)); edWhy = world.map.why(o); }
+      else { edWhy = ''; world.setGhostBox(false, 0, 0, 0, 1, 1, 1, false); }
     }
   } else if (mode === 'build') {
     const p = ground(0);
