@@ -20,3 +20,7 @@ Moduły ES wymagają serwera (nie działa z `file://`):
 - żadnych `eval`, `innerHTML` ani zapisu kluczy (API będzie dodane na końcu),
 - statystyki wejścia: zliczane są akcje gry, nie klawisze ani pozycja myszy; pola formularzy są pomijane; wszystko zostaje w pamięci strony,
 - pakiet dla AI (`Input.features()`) zawiera tylko zaokrąglone cechy.
+
+## Wersjonowanie
+Wersja jest w `js/version.js` (widać ją w grze), historia w `CHANGELOG.md`, a każda wysyłka ma tag `vX.Y.Z`.
+Przed każdym pushem: podbij wersję, dopisz wpis w changelogu i uruchom `node tools/check-version.mjs`.

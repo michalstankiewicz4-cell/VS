@@ -2,8 +2,10 @@ import * as THREE from '../vendor/three.module.js';
 import { PixelPipeline } from './render.js';
 import { createWorld, COST } from './world.js';
 import { Input } from './input.js';
+import { VERSION } from './version.js';
 
 const $ = (id) => document.getElementById(id);
+document.title = `Warszawa — Strefa Zero v${VERSION}`;
 
 const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance' });
 renderer.setPixelRatio(1);
@@ -97,7 +99,7 @@ function showUi(title, info) {
   $('uiT').textContent = title; $('uiP').textContent = info; $('ui').hidden = false; $('build').hidden = true;
 }
 function menuText() {
-  return `Bank: ${bank} pkt · rekord: ${best}\nCeluj myszą, trzymaj LPM, aby strzelać. Ruch: WASD.\nObrót kamery: Q / E albo PPM + przeciągnięcie. Zoom: kółko myszy.`;
+  return `Bank: ${bank} pkt · rekord: ${best}\nCeluj myszą, trzymaj LPM, aby strzelać. Ruch: WASD.\nObrót kamery: Q / E albo PPM + przeciągnięcie. Zoom: kółko myszy.\nwersja ${VERSION}`;
 }
 function startRun() {
   world.reset(); world.setMode('play'); mode = 'play'; zoomT = 1;
@@ -180,7 +182,7 @@ function loop(now) {
 
   frames++;
   if (now - fpsT > 500) {
-    $('fps').textContent = `${Math.round(frames * 1000 / (now - fpsT))} fps · render ${pipe.rt.width}×${pipe.rt.height}`;
+    $('fps').textContent = `v${VERSION} · ${Math.round(frames * 1000 / (now - fpsT))} fps · render ${pipe.rt.width}×${pipe.rt.height}`;
     frames = 0; fpsT = now;
   }
   hudT += dt;
