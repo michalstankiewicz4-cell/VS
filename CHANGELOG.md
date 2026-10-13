@@ -4,6 +4,11 @@ Wersjonowanie: `MAJOR.MINOR.PATCH`. Każda wysyłka do repozytorium to nowa wers
 Tagi `vX.Y.Z` zakłada właściciel na GitHubie (Releases) na commitach z tej historii; push tagów z sesji Claude jest blokowany.
 Poprawka błędu = PATCH, nowa funkcja = MINOR, duża zmiana rozgrywki lub zapisu = MAJOR.
 
+## [0.5.0] - 2026-10-13
+### Dodano
+- Budynki stają się częściowo przezroczyste (rozrzucony wzór), gdy zasłaniają postać.
+- Edytor map w grze (menu → „Edytor map"): budynki, kościoły/krzyże, usuwanie, obrót, rozmiar, eksport/import JSON, mapa domyślna; zapis lokalny. Strefa bazy pozostaje wolna.
+
 ## [0.4.3] - 2026-10-13
 - Skrypt kontrolny wykrywa niepodbitą wersję także przy niezatwierdzonych zmianach.
 

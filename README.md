@@ -24,3 +24,6 @@ Moduły ES wymagają serwera (nie działa z `file://`):
 ## Wersjonowanie
 Wersja jest w `js/version.js` (widać ją w grze), historia w `CHANGELOG.md`, a każda wysyłka to nowa wersja (tagi `vX.Y.Z` zakładasz w Releases na GitHubie).
 Przed każdym pushem: podbij wersję, dopisz wpis w changelogu i uruchom `node tools/check-version.mjs`.
+
+## Edytor map i przezroczystość
+Menu → „Edytor map": stawianie/usuwanie budynków i obiektów, rozmiar, obrót, eksport/import JSON (zapis lokalny w przeglądarce). Budynki zasłaniające postać robią się częściowo przezroczyste.

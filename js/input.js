@@ -18,7 +18,7 @@ const ACTIONS = {
 };
 const WINDOW_S = 60;
 
-const typing = (t) => !!(t && t.closest && t.closest('input,textarea,select,[contenteditable],#hud,#ui,#build,#top'));
+const typing = (t) => !!(t && t.closest && t.closest('input,textarea,select,[contenteditable],#hud,#ui,#build,#ed,#top'));
 const round = (x, step) => +(Math.round(x / step) * step).toFixed(2);
 
 export class Input {

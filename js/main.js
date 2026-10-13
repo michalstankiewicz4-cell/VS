@@ -24,7 +24,7 @@ const VIEW_H = 16;
 const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, -30, 90);
 const camOffset = new THREE.Vector3(0, 14, 10);
 const camLook = new THREE.Vector3();
-const camRot = new THREE.Vector3(), UP = new THREE.Vector3(0, 1, 0);
+const fwdTmp = new THREE.Vector3(), camRot = new THREE.Vector3(), UP = new THREE.Vector3(0, 1, 0);
 const YAW0 = 10 * Math.PI / 180;   // domyślny obrót kamery: 10° (jak po przesunięciu myszy w lewo)
 let yaw = YAW0, userZoom = 1;
 renderer.domElement.addEventListener('wheel', (e) => {
@@ -85,8 +85,14 @@ function load() {
 }
 load();
 
+/* ---- mapa miasta: zapis lokalny ---- */
+const MAPKEY = 'gra:map:v1';
+function saveMap() { try { localStorage.setItem(MAPKEY, JSON.stringify(world.map.list())); } catch (e) { /* brak zapisu */ } }
+try { const d = JSON.parse(localStorage.getItem(MAPKEY) || 'null'); if (Array.isArray(d)) world.map.set(d); } catch (e) { /* uszkodzona mapa – zostaje domyślna */ }
+
 /* ---- stany gry: menu / play / dead / build ---- */
-let mode = 'menu', sel = 'tower', zoomT = 1;
+let mode = 'menu', sel = 'tower', zoomT = 1, tool = 'b', rot = 0;
+const editCam = new THREE.Vector3();
 const ray = new THREE.Raycaster(), plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), hit = new THREE.Vector3();
 function ground(y) {
   plane.constant = -y;
@@ -96,18 +102,18 @@ function ground(y) {
 const cell = (p) => ({ gx: Math.round(p.x / 2), gz: Math.round(p.z / 2) });
 
 function showUi(title, info) {
-  $('uiT').textContent = title; $('uiP').textContent = info; $('ui').hidden = false; $('build').hidden = true;
+  $('uiT').textContent = title; $('uiP').textContent = info; $('ui').hidden = false; $('build').hidden = true; $('ed').hidden = true;
 }
 function menuText() {
   return `Bank: ${bank} pkt · rekord: ${best}\nCeluj myszą, trzymaj LPM, aby strzelać. Ruch: WASD.\nObrót kamery: Q / E albo PPM + przeciągnięcie. Zoom: kółko myszy.\nwersja ${VERSION}`;
 }
 function startRun() {
   world.reset(); world.setMode('play'); mode = 'play'; zoomT = 1;
-  $('ui').hidden = true; $('build').hidden = true;
+  $('ui').hidden = true; $('build').hidden = true; $('ed').hidden = true;
 }
 function openBuild() {
   world.reset(); world.setMode('idle'); mode = 'build'; zoomT = 0.7;
-  $('ui').hidden = true; $('build').hidden = false; refreshBuild();
+  $('ui').hidden = true; $('build').hidden = false; $('ed').hidden = true; refreshBuild();
 }
 function die() {
   mode = 'dead'; world.setMode('idle');
@@ -123,6 +129,54 @@ function refreshBuild() {
     : sel === 'crypt' ? 'Schron: +25 maks. HP w kolejnych rundach (max 3).'
     : 'Usuń: zwraca połowę kosztu.';
 }
+function openEdit() {
+  world.reset(); world.setMode('idle'); mode = 'edit'; zoomT = 0.55; editCam.set(0, 0, 0);
+  $('ui').hidden = true; $('build').hidden = true; $('ed').hidden = false; refreshEd();
+}
+function refreshEd() {
+  for (const b of document.querySelectorAll('#ed [data-e]')) b.classList.toggle('on', b.dataset.e === tool);
+  $('eRot').classList.toggle('on', rot === 1);
+  $('eInfo').textContent = `Obiekty: ${world.map.count()}/${world.map.max} · LPM: ${tool === 'x' ? 'usuń' : 'postaw'} · WASD: przesuń widok · Q/E, PPM, kółko: kamera. Strefa bazy (środek) zostaje wolna.`;
+}
+function curObj() {
+  const p = ground(0);
+  if (!p) return null;
+  const x = Math.round(p.x), z = Math.round(p.z);
+  return tool === 'b' ? { t: 'b', x, z, w: +$('eW').value, d: +$('eD').value, h: +$('eH').value, s: Math.random() }
+    : { t: 'c', x, z, r: rot, s: Math.random() };
+}
+function pickIdx() {
+  ray.setFromCamera(new THREE.Vector2(input.mouse.x, input.mouse.y), camera);
+  return world.map.pick(ray);
+}
+for (const b of document.querySelectorAll('#ed [data-e]')) b.addEventListener('click', () => { tool = b.dataset.e; refreshEd(); });
+$('eRot').addEventListener('click', () => { rot ^= 1; refreshEd(); });
+for (const k of ['eW', 'eD', 'eH']) $(k).addEventListener('input', () => { $(k + 'v').textContent = $(k).value; });
+addEventListener('keydown', (e) => { if (mode === 'edit' && e.code === 'KeyR' && !inForm(e.target)) { rot ^= 1; refreshEd(); } });
+renderer.domElement.addEventListener('mousedown', (e) => {
+  if (mode !== 'edit' || e.button !== 0) return;
+  if (tool === 'x') { const i = pickIdx(); if (i >= 0 && world.map.removeAt(i)) saveMap(); }
+  else { const o = curObj(); if (o && world.map.add(o)) saveMap(); }
+  refreshEd();
+});
+$('eDone').addEventListener('click', startRun);
+$('eDef').addEventListener('click', () => { world.map.reset(); saveMap(); $('eInfo').textContent = 'Przywrócono domyślną mapę.'; });
+$('eExp').addEventListener('click', async () => {
+  const txt = JSON.stringify(world.map.list());
+  $('eJson').hidden = false; $('eJson').value = txt;
+  let ok = false; try { await navigator.clipboard.writeText(txt); ok = true; } catch (e) { $('eJson').select(); }
+  $('eInfo').textContent = ok ? 'Skopiowano JSON mapy do schowka.' : 'Zaznaczone — skopiuj Ctrl+C.';
+});
+$('eImp').addEventListener('click', () => {
+  if ($('eJson').hidden) { $('eJson').hidden = false; $('eJson').value = ''; $('eInfo').textContent = 'Wklej JSON mapy i kliknij Import jeszcze raz.'; return; }
+  try {
+    const txt = $('eJson').value;
+    if (txt.length > 300000) throw new Error('za duży');
+    const n = world.map.set(JSON.parse(txt));
+    saveMap(); refreshEd(); $('eInfo').textContent = `Wczytano ${n} obiektów.`;
+  } catch (e) { $('eInfo').textContent = 'Niepoprawny JSON mapy.'; }
+});
+$('bEdit').addEventListener('click', openEdit);
 $('bPlay').addEventListener('click', startRun);
 $('bBuild').addEventListener('click', openBuild);
 $('bDone').addEventListener('click', startRun);
@@ -155,7 +209,7 @@ function loop(now) {
   const dt = Math.min(0.05, (now - last) / 1000);
   last = now;
   yaw += ((camKeys.KeyE ? 1 : 0) - (camKeys.KeyQ ? 1 : 0)) * 1.8 * dt;
-  const raw = mode === 'play' ? input.moveVector() : { x: 0, z: 0 };
+  const raw = (mode === 'play' || mode === 'edit') ? input.moveVector() : { x: 0, z: 0 };
   const cy = Math.cos(yaw), sy = Math.sin(yaw);
   const mv = { x: raw.x * cy + raw.z * sy, z: -raw.x * sy + raw.z * cy };
   let aim = null;
@@ -165,16 +219,33 @@ function loop(now) {
     input.tick(dt, raw.x !== 0 || raw.z !== 0);
     if (S.mode === 'dead') die();
   }
-  if (mode === 'build') {
+  if (mode === 'edit') {
+    editCam.x = Math.max(-70, Math.min(70, editCam.x + mv.x * 28 * dt / userZoom));
+    editCam.z = Math.max(-70, Math.min(70, editCam.z + mv.z * 28 * dt / userZoom));
+    if (tool === 'x') {
+      const i = pickIdx();
+      if (i >= 0) { const b = world.map.bounds(i); world.setGhostBox(true, b.x, b.h / 2, b.z, b.hw * 2 + 0.2, b.h + 0.2, b.hd * 2 + 0.2, false); }
+      else world.setGhostBox(false, 0, 0, 0, 1, 1, 1, false);
+    } else {
+      const o = curObj();
+      if (o) { const b = world.map.boundsOf(o); world.setGhostBox(true, b.x, b.h / 2, b.z, b.hw * 2, b.h, b.hd * 2, world.map.canPlace(o)); }
+      else world.setGhostBox(false, 0, 0, 0, 1, 1, 1, false);
+    }
+  } else if (mode === 'build') {
     const p = ground(0);
     if (p) { const { gx, gz } = cell(p); world.setGhost(sel !== 'remove', gx, gz, world.canPlace(sel, gx, gz) && bank >= COST[sel]); }
   } else world.setGhost(false, 0, 0, true);
 
   // kamera: w trybie budowy nad bazą, w grze za graczem
-  const target = mode === 'play' ? world.player.pos : new THREE.Vector3(0, 0, 0);
+  const target = mode === 'play' ? world.player.pos : mode === 'edit' ? editCam : new THREE.Vector3(0, 0, 0);
   camLook.lerp(target, 1 - Math.exp(-6 * dt));
   camera.position.copy(camLook).add(camRot.copy(camOffset).applyAxisAngle(UP, yaw));
   camera.lookAt(camLook);
+  camera.updateMatrixWorld();
+  camera.getWorldDirection(fwdTmp);
+  world.fade.fwd.copy(fwdTmp);
+  world.fade.player.set(world.player.pos.x, 1, world.player.pos.z);
+  world.fade.setOn(mode === 'play' ? 1 : 0);
   const zt = zoomT * userZoom;
   if (Math.abs(camera.zoom - zt) > 0.002) { camera.zoom += (zt - camera.zoom) * Math.min(1, dt * 8); camera.updateProjectionMatrix(); }
 

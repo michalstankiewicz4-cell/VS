@@ -10,7 +10,16 @@
 <body>
 <div id="app"></div>
 <div id="top"><div id="hpbar"><i></i></div><div id="run"></div></div>
-<div id="ui"><div class="box"><h1 id="uiT">Warszawa — Strefa Zero</h1><p id="uiP"></p><div class="btns"><button id="bPlay" type="button">Zagraj</button><button id="bBuild" type="button">Buduj bazę</button></div><button id="bWipe" type="button" class="tiny">Wyzeruj zapis</button></div></div>
+<div id="ui"><div class="box"><h1 id="uiT">Warszawa — Strefa Zero</h1><p id="uiP"></p><div class="btns"><button id="bPlay" type="button">Zagraj</button><button id="bBuild" type="button">Buduj bazę</button><button id="bEdit" type="button">Edytor map</button></div><button id="bWipe" type="button" class="tiny">Wyzeruj zapis</button></div></div>
+<div id="ed" hidden>
+ <div class="btns"><button type="button" data-e="b">Budynek</button><button type="button" data-e="c">Auto</button><button type="button" data-e="x">Usuń</button><button type="button" id="eRot">Obróć (R)</button></div>
+ <label class="row">Szerokość <input type="range" id="eW" min="4" max="14" step="1" value="8"><span id="eWv">8</span></label>
+ <label class="row">Głębokość <input type="range" id="eD" min="4" max="14" step="1" value="8"><span id="eDv">8</span></label>
+ <label class="row">Wysokość <input type="range" id="eH" min="2" max="9" step="0.5" value="4"><span id="eHv">4</span></label>
+ <div class="btns"><button type="button" id="eDone">Zagraj</button><button type="button" id="eDef">Domyślna mapa</button><button type="button" id="eExp">Eksport</button><button type="button" id="eImp">Import</button></div>
+ <textarea id="eJson" hidden rows="5" spellcheck="false" aria-label="JSON mapy"></textarea>
+ <p class="note" id="eInfo"></p>
+</div>
 <div id="build" hidden><div id="bank"></div><div class="btns"><button type="button" data-t="tower">Stanowisko (25)</button><button type="button" data-t="wall">Barykada (8)</button><button type="button" data-t="crypt">Schron (40)</button><button type="button" data-t="remove">Usuń</button><button type="button" id="bDone">Zagraj</button></div><p class="note" id="bInfo"></p></div>
 <aside id="hud">
  <div id="fps">–</div>

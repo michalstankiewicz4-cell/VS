@@ -128,11 +128,13 @@ export function createWorld(scene) {
   /* ---- stan rozgrywki ---- */
   const S = { hp: 100, maxHp: 100, kills: 0, pts: 0, time: 0, mode: 'idle', fireCd: 0, active: 0 };
   const blockers = [];
+  const cityBlk = [];
+  const blkLists = [blockers, cityBlk];
   const structs = new Map();
   const key = (gx, gz) => gx + ',' + gz;
   const countType = (t) => { let n = 0; for (const v of structs.values()) if (v.type === t) n++; return n; };
   const push = (x, z, rad) => {
-    for (const b of blockers) {
+    for (const L of blkLists) for (const b of L) {
       if (b.hw !== undefined) {
         const cx = Math.max(b.x - b.hw, Math.min(x.v, b.x + b.hw)), cz = Math.max(b.z - b.hd, Math.min(z.v, b.z + b.hd));
         const dx = x.v - cx, dz = z.v - cz, d = Math.hypot(dx, dz);
@@ -151,48 +153,153 @@ export function createWorld(scene) {
   };
   const hitsB = (b, x, z) => b.hw !== undefined ? Math.abs(x - b.x) < b.hw && Math.abs(z - b.z) < b.hd : Math.hypot(x - b.x, z - b.z) < b.r;
 
-  /* ---- zniszczona Warszawa: kwartały, wraki aut, Pałac Kultury ---- */
-  {
-    const cr = mulberry32(2026), cc = new THREE.Color();
-    const bm = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshLambertMaterial({ color: 0xffffff }), 600);
-    bm.castShadow = bm.receiveShadow = true; bm.frustumCulled = false;
-    let bn = 0;
-    const addBox = (x, y, z, sx, sy, sz, ry, h, sa, l) => {
+  /* ---- mapa miasta (edytowalna): lista obiektów -> instancje + kolizje ---- */
+  const MAP_MAX = 380, BASE_ZONE = 30, EDGE = 76;
+  const fade = { player: new THREE.Vector3(), fwd: new THREE.Vector3(0, -0.8, -0.6), on: { value: 0 }, setOn(v) { this.on.value = v; } };
+  const bmat = new THREE.MeshLambertMaterial({ color: 0xffffff });
+  // budynki między kamerą a graczem robią się "kratkowo" przezroczyste (dither jak w filtrze pixel-art)
+  bmat.onBeforeCompile = (sh) => {
+    sh.uniforms.uPlayer = { value: fade.player };
+    sh.uniforms.uFwd = { value: fade.fwd };
+    sh.uniforms.uOn = fade.on;
+    sh.uniforms.uR = { value: 2.8 };
+    sh.vertexShader = sh.vertexShader
+      .replace('#include <common>', '#include <common>\nvarying vec3 vWP;')
+      .replace('#include <project_vertex>', '#include <project_vertex>\nvWP = (modelMatrix * instanceMatrix * vec4(transformed, 1.0)).xyz;');
+    sh.fragmentShader = sh.fragmentShader
+      .replace('#include <common>', '#include <common>\nvarying vec3 vWP;\nuniform vec3 uPlayer, uFwd;\nuniform float uOn, uR;')
+      .replace('#include <clipping_planes_fragment>', `#include <clipping_planes_fragment>
+      if (uOn > 0.5) {
+        vec3 dd = vWP - uPlayer;
+        float al = dot(dd, uFwd);
+        if (al < -0.3) {
+          float k = smoothstep(uR * 0.55, uR, length(dd - uFwd * al));
+          float a = mix(0.1, 1.0, k);
+          vec2 pp = floor(mod(gl_FragCoord.xy, 4.0));
+          float v2 = mod(2.0 * mod(pp.x, 2.0) + 3.0 * mod(pp.y, 2.0), 4.0);
+          float v1 = mod(2.0 * floor(pp.x / 2.0) + 3.0 * floor(pp.y / 2.0), 4.0);
+          if (a < (v2 * 4.0 + v1) / 16.0 + 0.02) discard;
+        }
+      }`);
+  };
+  const bm = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), bmat, 1300);
+  bm.castShadow = bm.receiveShadow = true; bm.frustumCulled = false;
+  scene.add(bm);
+
+  let city = [];
+  const own = [];
+  const cc = new THREE.Color();
+  const num = (v, lo, hi, d) => { v = +v; return Number.isFinite(v) ? Math.min(hi, Math.max(lo, v)) : d; };
+  const r1 = (v) => Math.round(v * 10) / 10;
+  function clean(o) {
+    if (!o || typeof o !== 'object') return null;
+    const x = r1(num(o.x, -EDGE, EDGE, 0)), z = r1(num(o.z, -EDGE, EDGE, 0)), s = num(o.s, 0, 1, 0.5);
+    if (o.t === 'b') return { t: 'b', x, z, w: r1(num(o.w, 3, 16, 8)), d: r1(num(o.d, 3, 16, 8)), h: r1(num(o.h, 1.5, 9, 4)), s };
+    if (o.t === 'c') return { t: 'c', x, z, r: o.r ? 1 : 0, s };
+    if (o.t === 'p') return { t: 'p', x: 0, z: -46, s };
+    return null;
+  }
+  const bounds = (o) => o.t === 'b' ? { x: o.x, z: o.z, hw: o.w / 2, hd: o.d / 2, h: o.h }
+    : o.t === 'c' ? (o.r ? { x: o.x, z: o.z, hw: 1.95, hd: 0.95, h: 1.4 } : { x: o.x, z: o.z, hw: 0.95, hd: 1.95, h: 1.4 })
+    : { x: o.x, z: o.z, hw: 12, hd: 12, h: 46 };
+  const overlaps = (a, b) => Math.abs(a.x - b.x) < a.hw + b.hw && Math.abs(a.z - b.z) < a.hd + b.hd;
+  const inBase = (b) => Math.abs(b.x) - b.hw < BASE_ZONE && Math.abs(b.z) - b.hd < BASE_ZONE;
+  const inWorld = (b) => Math.abs(b.x) + b.hw <= EDGE && Math.abs(b.z) + b.hd <= EDGE;
+
+  function rebuildCity() {
+    let bn = 0; own.length = 0; cityBlk.length = 0;
+    const add = (i, x, y, z, sx, sy, sz, ry, h, sa, l) => {
       dummy.position.set(x, y, z); dummy.rotation.set(0, ry, 0); dummy.scale.set(sx, sy, sz); dummy.updateMatrix();
-      bm.setMatrixAt(bn, dummy.matrix); bm.setColorAt(bn, cc.setHSL(h, sa, l)); bn++;
+      bm.setMatrixAt(bn, dummy.matrix); bm.setColorAt(bn, cc.setHSL(h, sa, l)); own[bn] = i; bn++;
     };
+    city.forEach((o, i) => {
+      const r = mulberry32(Math.floor(o.s * 1e9) + 1);
+      if (o.t === 'b') {
+        const hue = 0.05 + r() * 0.06, li = 0.2 + r() * 0.14, { w, d, h } = o;
+        add(i, o.x, h / 2, o.z, w, h, d, 0, hue, 0.1, li);
+        add(i, o.x, h * 0.55, o.z + d * 0.51, w * 0.7, h * 0.5, 0.15, 0, 0, 0, 0.05);   // ciemne wybite okna
+        const roof = r() < 0.6, ax = (r() - 0.5) * w * 0.4, az = (r() - 0.5) * d * 0.4, ry = r() * 3;
+        if (roof) add(i, o.x + ax, h + 0.3, o.z + az, w * 0.5, 0.6, d * 0.5, ry, hue, 0.08, li * 0.8);  // zawalony strop
+      } else if (o.t === 'c') {
+        const hue = r() < 0.5 ? 0.04 : 0.6, sa = 0.25 + r() * 0.25, ry = o.r ? Math.PI / 2 : 0;
+        add(i, o.x, 0.5, o.z, 1.8, 0.9, 3.8, ry, hue, sa, 0.18 + r() * 0.1);
+        add(i, o.x, 1.15, o.z, 1.5, 0.5, 2.0, ry, hue, sa, 0.12);
+      } else {   // Pałac Kultury i Nauki: schodkowa wieża ze szpilą
+        add(i, o.x, 5, o.z, 24, 10, 24, 0, 0.08, 0.1, 0.24);
+        add(i, o.x, 16, o.z, 15, 12, 15, 0, 0.08, 0.1, 0.27);
+        add(i, o.x, 27, o.z, 9, 10, 9, 0, 0.08, 0.1, 0.3);
+        add(i, o.x, 35, o.z, 5, 6, 5, 0, 0.08, 0.1, 0.32);
+        add(i, o.x, 43, o.z, 0.8, 10, 0.8, 0, 0.1, 0.05, 0.4);
+      }
+      const bd = bounds(o);
+      cityBlk.push({ x: bd.x, z: bd.z, hw: bd.hw, hd: bd.hd });
+    });
+    bm.count = bn;
+    bm.instanceMatrix.needsUpdate = true;
+    if (bm.instanceColor) bm.instanceColor.needsUpdate = true;
+    bm.boundingSphere = null; bm.boundingBox = null;
+  }
+
+  function defaultMap() {
+    const cr = mulberry32(2026), out = [];
     for (let i = -5; i <= 5; i++) for (let j = -5; j <= 5; j++) {
       const cx = i * 14, cz = j * 14;
       if (Math.abs(cx) <= 28 && Math.abs(cz) <= 28) continue;      // strefa bazy
       if (Math.abs(cx) <= 14 && cz <= -42 && cz >= -56) continue;   // miejsce na Pałac
       if (cr() < 0.2) continue;
       const w = 5.5 + cr() * 3.5, d = 5.5 + cr() * 3.5, h = 2.5 + cr() * 4;
-      const x = cx + (cr() - 0.5) * 1.5, z = cz + (cr() - 0.5) * 1.5, hue = 0.05 + cr() * 0.06, li = 0.2 + cr() * 0.14;
-      addBox(x, h / 2, z, w, h, d, 0, hue, 0.1, li);
-      addBox(x, h * 0.55, z + d * 0.51, w * 0.7, h * 0.5, 0.15, 0, 0.0, 0.0, 0.05);   // ciemne wybite okna
-      if (cr() < 0.6) addBox(x + (cr() - 0.5) * w * 0.4, h + 0.3, z + (cr() - 0.5) * d * 0.4, w * 0.5, 0.6, d * 0.5, cr() * 3, hue, 0.08, li * 0.8); // zawalony strop
-      blockers.push({ x, z, hw: w / 2, hd: d / 2 });
+      out.push({ t: 'b', x: cx + (cr() - 0.5) * 1.5, z: cz + (cr() - 0.5) * 1.5, w, d, h, s: cr() });
     }
     for (let k = 0; k < 44; k++) {
       const along = cr() < 0.5, line = (Math.floor(cr() * 10) - 5) * 14 + 7, t = (cr() * 2 - 1) * 68;
       const x = along ? line + (cr() - 0.5) * 2 : t, z = along ? t : line + (cr() - 0.5) * 2;
       if (Math.abs(x) < 32 && Math.abs(z) < 32) continue;
-      const ry = along ? 0 : Math.PI / 2, hue = cr() < 0.5 ? 0.04 : 0.6, sa = 0.25 + cr() * 0.25;
-      addBox(x, 0.5, z, 1.8, 0.9, 3.8, ry, hue, sa, 0.18 + cr() * 0.1);
-      addBox(x, 1.15, z, 1.5, 0.5, 2.0, ry, hue, sa, 0.12);
-      blockers.push(along ? { x, z, hw: 0.95, hd: 1.95 } : { x, z, hw: 1.95, hd: 0.95 });
+      out.push({ t: 'c', x, z, r: along ? 0 : 1, s: cr() });
     }
-    // Pałac Kultury i Nauki: schodkowa wieża ze szpilą
-    const pz = -46;
-    addBox(0, 5, pz, 24, 10, 24, 0, 0.08, 0.1, 0.24);
-    addBox(0, 16, pz, 15, 12, 15, 0, 0.08, 0.1, 0.27);
-    addBox(0, 27, pz, 9, 10, 9, 0, 0.08, 0.1, 0.3);
-    addBox(0, 35, pz, 5, 6, 5, 0, 0.08, 0.1, 0.32);
-    addBox(0, 43, pz, 0.8, 10, 0.8, 0, 0.1, 0.05, 0.4);
-    blockers.push({ x: 0, z: pz, hw: 12, hd: 12 });
-    bm.count = bn; bm.instanceMatrix.needsUpdate = true; bm.instanceColor.needsUpdate = true;
-    scene.add(bm);
+    out.push({ t: 'p', x: 0, z: -46, s: 0.5 });
+    return out;
   }
+
+  const map = {
+    list: () => city.map((o) => ({ ...o })),
+    count: () => city.length,
+    max: MAP_MAX,
+    bounds: (i) => bounds(city[i]),
+    boundsOf: (o) => bounds(o),
+    canPlace(o) {
+      const c = clean(o);
+      if (!c || c.t === 'p' || city.length >= MAP_MAX) return false;
+      const b = bounds(c);
+      return inWorld(b) && !inBase(b) && !city.some((q) => overlaps(b, bounds(q)));
+    },
+    add(o) {
+      if (!map.canPlace(o)) return false;
+      city.push(clean(o)); rebuildCity(); return true;
+    },
+    removeAt(i) {
+      if (!city[i]) return false;
+      city.splice(i, 1); rebuildCity(); return true;
+    },
+    pick(raycaster) {
+      const hit = raycaster.intersectObject(bm)[0];
+      return hit && hit.instanceId !== undefined && own[hit.instanceId] !== undefined ? own[hit.instanceId] : -1;
+    },
+    set(arr) {                       // walidacja: nic spoza schematu nie przechodzi, strefa bazy zawsze wolna
+      const out = []; let palace = false;
+      for (const o of Array.isArray(arr) ? arr : []) {
+        if (out.length >= MAP_MAX) break;
+        const c = clean(o);
+        if (!c) continue;
+        if (c.t === 'p') { if (palace) continue; palace = true; }
+        const b = bounds(c);
+        if (!inWorld(b) || inBase(b)) continue;
+        out.push(c);
+      }
+      city = out; rebuildCity(); return out.length;
+    },
+    reset() { return map.set(defaultMap()); }
+  };
+  map.reset();
 
   /* ---- wrogowie ---- */
   const em = new THREE.InstancedMesh(zombieGeo(), new THREE.MeshLambertMaterial({ color: 0xffffff }), ENEMIES);
@@ -280,7 +387,14 @@ export function createWorld(scene) {
   scene.add(ghost);
   function setGhost(show, gx, gz, ok) {
     ghost.visible = show;
+    ghost.scale.set(1, 1, 1);
     ghost.position.set(gx * CELL, 0.6, gz * CELL);
+    ghost.material.color.setHex(ok ? 0x40ff80 : 0xff4050);
+  }
+  function setGhostBox(show, x, y, z, sx, sy, sz, ok) {
+    ghost.visible = show;
+    ghost.scale.set(sx / 1.8, sy / 1.2, sz / 1.8);
+    ghost.position.set(x, y, z);
     ghost.material.color.setHex(ok ? 0x40ff80 : 0xff4050);
   }
 
@@ -393,7 +507,9 @@ export function createWorld(scene) {
     for (let i = 0; i < PN; i++) {
       if (pl[i] <= 0) { hideP(i); continue; }
       pl[i] -= dt; ppx[i] += pvx[i] * dt; ppz[i] += pvz[i] * dt;
-      for (const b of blockers) if (hitsB(b, ppx[i], ppz[i])) { pl[i] = 0; break; }
+      let wall = false;
+      for (const L of blkLists) { for (const b of L) if (hitsB(b, ppx[i], ppz[i])) { wall = true; break; } if (wall) break; }
+      if (wall) pl[i] = 0;
       for (let j = 0; j < S.active && pl[i] > 0; j++) {
         const dx = ppx[i] - ex[j], dz = ppz[i] - ez[j];
         if (dx * dx + dz * dz < 0.55) {
@@ -412,5 +528,5 @@ export function createWorld(scene) {
     pm.instanceMatrix.needsUpdate = true;
   }
 
-  return { player: state, S, update, reset, setMode, place, remove, canPlace, list, load, count: countType, setGhost, enemyCount: ENEMIES };
+  return { player: state, S, update, reset, setMode, place, remove, canPlace, list, load, count: countType, setGhost, setGhostBox, map, fade, enemyCount: ENEMIES };
 }
