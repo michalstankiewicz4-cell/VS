@@ -13,7 +13,7 @@ const UP = new THREE.Vector3(0, 1, 0);
 export const DRIVE_VIEWS = ['iso', 'chase', 'cockpit'];
 
 export function createCameraRig({ scene, settings, input }) {
-  const ortho = new THREE.OrthographicCamera(-1, 1, 1, -1, -30, 90);
+  const ortho = new THREE.OrthographicCamera(-1, 1, 1, -1, -60, 90);
   const persp = new THREE.PerspectiveCamera(70, 1, 0.1, 150);
   scene.add(persp);                             // so the cockpit dash (child of the camera) renders
   let camera = ortho;

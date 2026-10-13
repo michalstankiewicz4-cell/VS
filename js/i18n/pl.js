@@ -59,6 +59,7 @@ export default {
   'act.interact': 'Wsiądź / wysiądź z auta',
   'act.cameraView': 'Widok kamery (w aucie)',
   'act.editRotate': 'Obróć obiekt (edytor map)',
+  'act.bend': 'Zegnij miasto (efekt Incepcji)',
 
   'mouse.rot': 'Szybkość obrotu kamery',
   'mouse.zoom': 'Szybkość zoomu',
@@ -92,7 +93,7 @@ export default {
   'hud.carIn': ' · auto {kmh} km/h · {exit}: wysiądź · {view}: kamera',
   'hud.carNear': ' · {key}: wsiądź do auta',
   'hud.fps': 'v{version} · {fps} fps · render {w}×{h}',
-  'hud.hint': 'Ruch: {move} · strzał: {fire} · kamera: {cam} lub {drag}+przeciągnięcie · zoom: kółko · {interact}: auto · Esc: pauza',
+  'hud.hint': 'Ruch: {move} · strzał: {fire} · kamera: {cam} lub {drag}+przeciągnięcie · zoom: kółko · {interact}: auto · {bend}: zegnij miasto · Esc: pauza',
 
   'build.bank': 'Bank: {bank} pkt · schrony: {n}/3',
   'build.tower': 'Stanowisko (25)',

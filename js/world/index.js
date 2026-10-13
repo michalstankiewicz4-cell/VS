@@ -8,6 +8,7 @@ import { createTerrain } from './terrain.js';
 import { createSky, DAY_LEN } from './sky.js';
 import { createPlayer } from './player.js';
 import { createVehicles } from './vehicles.js';
+import { createRoads } from './roads.js';
 import { createCity } from './city.js';
 import { createEnemies } from './enemies.js';
 import { createProjectiles } from './projectiles.js';
@@ -24,6 +25,7 @@ export function createWorld(scene) {
   const col = createCollision();
   const sky = createSky({ scene });
   const terrain = createTerrain({ scene, rnd, dummy });
+  createRoads({ scene });
   const player = createPlayer({ scene });
   const vehicles = createVehicles({ scene, dummy, col, S, player });
   const city = createCity({ scene, dummy, col, vehicles, nightU: sky.nightU });
@@ -95,7 +97,7 @@ export function createWorld(scene) {
   return {
     player: player.state, S, fade: city.fade, map: city.map, enemyCount: ENEMIES,
     nightAt: sky.nightAt, DAY_LEN,
-    reset, update, driveState,
+    reset, update, driveState, setShadows: sky.setShadows,
     setMode: (m) => { S.mode = m; },
     toggleCar: vehicles.toggle,
     place: base.place, remove: base.remove, canPlace: base.canPlace, list: base.list, load: base.load, count: base.count,

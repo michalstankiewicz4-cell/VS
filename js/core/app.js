@@ -6,6 +6,7 @@ import { createWorld } from '../world/index.js';
 import { Input } from '../input/input.js';
 import { moveLabel, camLabel, firstKey, BUTTON_NAMES } from '../input/bindings.js';
 import { createSettings } from './settings.js';
+import { createBend } from '../render/bend.js';
 import { createCameraRig } from './cameras.js';
 import { read, write, KEYS } from './storage.js';
 import { setLang, onLang, t } from '../i18n/index.js';
@@ -35,6 +36,7 @@ export function createApp({ appEl, uiEl }) {
   const input = new Input(canvas, settings);
   const pipe = new PixelPipeline(renderer);
   const rig = createCameraRig({ scene, settings, input });
+  const bend = createBend();
 
   /* ---- persistent progress (points bank, best run, built structures) ---- */
   const progress = {
@@ -83,7 +85,7 @@ export function createApp({ appEl, uiEl }) {
 
   function enter(m, worldMode) {
     mode = m; paused = false;
-    world.reset(worldMode); input.clear();
+    world.reset(worldMode); input.clear(); bend.off();
     builder.close(); editor.close();
     hud.showTop(m === 'play'); menu.hide();
   }
@@ -115,6 +117,7 @@ export function createApp({ appEl, uiEl }) {
     if (act === 'interact' && mode === 'play') world.toggleCar();
     else if (act === 'cameraView' && mode === 'play' && S.driving) rig.cycleView();
     else if (act === 'editRotate' && mode === 'edit') editor.rotate();
+    else if (act === 'bend' && mode === 'play') bend.toggle();
   };
 
   /* ---- settings -> systems ---- */
@@ -165,12 +168,15 @@ export function createApp({ appEl, uiEl }) {
     }
 
     const target = mode === 'play' || mode === 'dead' ? world.player.pos : mode === 'edit' ? editor.pan : origin;
-    const view = rig.update(sdt, t0, { mode, target, zoomT: ZOOM[mode], car: mode === 'play' ? world.driveState() : null });
+    const view = rig.update(sdt, t0, { mode, target, zoomT: ZOOM[mode] * (1 - 0.45 * bend.state.amount), car: mode === 'play' ? world.driveState() : null });
     rig.camera.getWorldDirection(fwd);
     world.fade.fwd.copy(fwd);
     world.fade.player.set(world.player.pos.x, 1, world.player.pos.z);
     world.fade.setOn(mode === 'play' && view === 'iso' ? 1 : 0);
 
+    bend.update(sdt, world.player.pos, fwd);
+    world.setShadows(!bend.active);
+    bend.patchScene(scene);
     pipe.render(scene, rig.camera);
 
     frames++;
@@ -193,10 +199,10 @@ export function createApp({ appEl, uiEl }) {
     if (S.driving) s += t('hud.carIn', { kmh: Math.round(S.speed * 3.6), exit: firstKey(k, 'interact'), view: firstKey(k, 'cameraView') });
     else if (S.carNear) s += t('hud.carNear', { key: firstKey(k, 'interact') });
     hud.setRun(s);
-    hud.setHint(t('hud.hint', { move: moveLabel(k), fire: BUTTON_NAMES[m.fireButton], cam: camLabel(k), drag: BUTTON_NAMES[m.dragButton], interact: firstKey(k, 'interact') }));
+    hud.setHint(t('hud.hint', { move: moveLabel(k), fire: BUTTON_NAMES[m.fireButton], cam: camLabel(k), drag: BUTTON_NAMES[m.dragButton], interact: firstKey(k, 'interact'), bend: firstKey(k, 'bend') }));
   }
 
   goMenu();
   requestAnimationFrame(frame);
-  return { world, settings, input, pipe, rig, menu, progress, get mode() { return mode; }, get paused() { return paused; }, goMenu, startRun, openBuild, openEdit, pause, resume };
+  return { world, settings, input, pipe, rig, menu, progress, bend, get mode() { return mode; }, get paused() { return paused; }, goMenu, startRun, openBuild, openEdit, pause, resume };
 }

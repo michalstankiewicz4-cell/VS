@@ -10,6 +10,7 @@ export const ACTIONS = [
   { id: 'interact', keys: ['KeyF', null], stat: 'interact' },
   { id: 'cameraView', keys: ['KeyC', null], stat: 'camera' },
   { id: 'editRotate', keys: ['KeyR', null], stat: null },
+  { id: 'bend', keys: ['Space', null], stat: null },
 ];
 export const RESERVED = new Set(['Escape']);
 

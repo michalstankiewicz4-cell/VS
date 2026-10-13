@@ -22,6 +22,7 @@ Published at: repo <https://github.com/michalstankiewicz4-cell/VS>, site <https:
 | `js/world/index.js` | World facade (`createWorld`) composing the modules below |
 | `js/world/{terrain,sky,city,city-material,default-map,player,vehicles,enemies,projectiles,structures,collision,constants}.js` | World systems (see below) |
 | `js/world/data/palace.js` | Palace of Culture boxes — simplified model from a SketchUp file, CC BY 4.0 |
+| `js/render/bend.js` | Inception fold: vertex-shader patch (`bendWorld`) chained onto every material; `toggle()` (Space), eased amount, arc radius 9; world is bent ahead of the player along the camera's horizontal forward. Visual only; shadows off while active |
 | `js/render/pixel-pipeline.js` | `PixelPipeline`: low-res target + final shader (palette, dither, depth outline, vignette) |
 | `js/input/bindings.js`, `input.js` | Rebindable actions and key labels; input + local action statistics |
 | `js/i18n/{index,en,pl}.js` | `t()`, `bind()`, `setLang()`; English (default/fallback) and Polish dictionaries |
@@ -57,10 +58,10 @@ Key actions (`js/input/bindings.js`): moveUp/Down/Left/Right, camLeft/camRight, 
 - The building see-through fade (`world.fade`) is only enabled in the iso view during a run.
 
 ## World (`js/world/`)
-- Ground `GROUND = 200`, movement limit ±76 (`EDGE`). Base zone: centre, `BASE_ZONE = 30` (kept free of city objects). Constants in `constants.js`. Start: `START = (0, −36.5)` (courtyard in front of the Palace) and `START_CAR = (3, −36.5)`.
+- Ground `GROUND = 260` (subdivided 130×130 for the fold), movement limit ±110 (`EDGE`), map limit 560 objects. `roads.js`: two avenues (x = 7, z = 7). Buildings taller than 9 are skyscrapers (shader facade kind 2, up to 30 units). Base zone: centre, `BASE_ZONE = 30` (kept free of city objects). Constants in `constants.js`. Start: `START = (0, −36.5)` (courtyard in front of the Palace) and `START_CAR = (3, −36.5)`.
 - **Instances**: enemies (`ENEMIES = 110`, shared geometry via `mergeBoxes`), bullets (`PN = 96`), rubble (`GRAVES = 260`), city (one `InstancedMesh`, capacity 3000, per-instance attribute `aK` = (facade kind, top height)).
 - **Collisions** (`collision.js`): AABBs and circles in `blockers` (base structures) and `cityBlk` (city + parked cars); `push()` moves actors out, `hitsAny()` stops bullets.
-- **City = editable map** (`world.map`, `city.js`): objects `{t:'b',x,z,w,d,h,s}` (building), `{t:'c',x,z,r,s}` (car), `{t:'p',x:0,z:-46,s}` (Palace, fixed). Limits: 380 objects, w/d 3–16, h 1.5–9, nothing inside the base zone. Validation in `clean()`/`set()` — nothing outside the schema passes (JSON import is safe). `map.why()` returns reason codes (`invalid`, `palace`, `limit`, `edge`, `base`) that the editor translates (`ed.why.*`).
+- **City = editable map** (`world.map`, `city.js`): objects `{t:'b',x,z,w,d,h,s}` (building), `{t:'c',x,z,r,s}` (car), `{t:'p',x:0,z:-46,s}` (Palace, fixed). Limits: 560 objects, w/d 3–16, h 1.5–30, nothing inside the base zone. Validation in `clean()`/`set()` — nothing outside the schema passes (JSON import is safe). `map.why()` returns reason codes (`invalid`, `palace`, `limit`, `edge`, `base`) that the editor translates (`ed.why.*`).
 - **Building transparency**: shader in `city-material.js` — dither-discard of fragments between camera and player within `uR = 2.8`.
 - **Palace facade**: same material, kinds 1–5 in the shader (windows, arcades, slits, clock faces); windows glow at night (`uNight`).
 - **Base structures** (`structures.js`, `COST`): `tower` sentry gun 25, `wall` barricade 8, `crypt` bunker 40 (+25 max HP, max 3). Build grid 2 units, range ±14 cells; removing refunds half.
@@ -75,7 +76,7 @@ Key actions (`js/input/bindings.js`): moveUp/Down/Left/Right, camLeft/camRight, 
 Storage errors are swallowed (private mode etc.).
 
 ## Map editor (`js/modes/editor.js`)
-Tools Building/Car/Remove, rotate (editRotate key), size sliders, JSON export/import, "Default map". Editor camera: move keys pan (±70), start outside the base at (0, 44). Buildings may overlap; the base zone is blocked and the reason is shown. No point cost.
+Tools Building/Car/Remove, rotate (editRotate key), size sliders, JSON export/import, "Default map". Editor camera: move keys pan (±100), start outside the base at (0, 44). Buildings may overlap; the base zone is blocked and the reason is shown. No point cost.
 
 ## Privacy and security
 - CSP in `index.html`: `script-src 'self'`, no external scripts/CDNs, no `eval`/`innerHTML`, no API keys in the repo.
