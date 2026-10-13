@@ -1,7 +1,9 @@
-# Warszawa — Strefa Zero (prototyp, three.js + filtr pixel-art)
+# Warszawa — Strefa Zero / Warsaw Zero Zone
 
-Pierwszy prototyp renderu: scena 3D w niskiej rozdzielczości, powiększona bez wygładzania, z paletą, ditheringiem i obrysem.
-Ruch: WASD / strzałki. Panel po lewej: statystyki wejścia i ustawienia filtra.
+Postapokaliptyczna Warszawa: człowiek z karabinem kontra zombie, widok z góry, 3D w niskiej rozdzielczości z filtrem pixel-art (three.js). Za punkty po śmierci budujesz bazę. Grasz: <https://michalstankiewicz4-cell.github.io/VS/>
+Sterowanie: WASD ruch, LPM strzał, Q/E lub PPM+przeciągnięcie obrót kamery, kółko zoom, Esc menu.
+
+**Dokumentacja:** [`docs/ARCHITEKTURA.md`](docs/ARCHITEKTURA.md) (kontekst i pliki) · [`TODO.md`](TODO.md) · [`docs/MULTIPLAYER.md`](docs/MULTIPLAYER.md) · [`CLAUDE.md`](CLAUDE.md) (zasady pracy asystenta) · [`CHANGELOG.md`](CHANGELOG.md)
 
 ## Uruchomienie
 Moduły ES wymagają serwera (nie działa z `file://`):
@@ -10,7 +12,8 @@ Moduły ES wymagają serwera (nie działa z `file://`):
 
 ## Struktura
 - `js/render.js` – render do małego bufora + shader końcowy (kwantyzacja, dither, obrys z głębi),
-- `js/world.js` – teren, nagrobki, gracz, wrogowie (instancje), światła,
+- `js/world.js` – teren, miasto i Pałac, gracz, wrogowie (instancje), struktury bazy, światła i cykl dnia/nocy,
+- `js/palace.js` – dane brył Pałacu Kultury,
 - `js/input.js` – wejście i statystyki (patrz niżej),
 - `js/main.js` – pętla, kamera, panel,
 - `vendor/` – three.js 0.186.1 (MIT) wgrany lokalnie; sumy SHA-256 w `vendor/SHA256.txt`.
