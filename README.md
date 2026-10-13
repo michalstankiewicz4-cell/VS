@@ -22,5 +22,5 @@ Moduły ES wymagają serwera (nie działa z `file://`):
 - pakiet dla AI (`Input.features()`) zawiera tylko zaokrąglone cechy.
 
 ## Wersjonowanie
-Wersja jest w `js/version.js` (widać ją w grze), historia w `CHANGELOG.md`, a każda wysyłka ma tag `vX.Y.Z`.
+Wersja jest w `js/version.js` (widać ją w grze), historia w `CHANGELOG.md`, a każda wysyłka to nowa wersja (tagi `vX.Y.Z` zakładasz w Releases na GitHubie).
 Przed każdym pushem: podbij wersję, dopisz wpis w changelogu i uruchom `node tools/check-version.mjs`.

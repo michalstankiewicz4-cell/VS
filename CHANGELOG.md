@@ -1,7 +1,11 @@
 # Historia zmian
 
-Wersjonowanie: `MAJOR.MINOR.PATCH`. Każda wysyłka do repozytorium to nowa wersja i tag `vX.Y.Z`.
+Wersjonowanie: `MAJOR.MINOR.PATCH`. Każda wysyłka do repozytorium to nowa wersja (numer w `js/version.js` + wpis tutaj).
+Tagi `vX.Y.Z` zakłada właściciel na GitHubie (Releases) na commitach z tej historii; push tagów z sesji Claude jest blokowany.
 Poprawka błędu = PATCH, nowa funkcja = MINOR, duża zmiana rozgrywki lub zapisu = MAJOR.
+
+## [0.4.1] - 2026-10-13
+- Kontrola wersji porównuje z ostatnio wysłanym `origin/main` (tagi nie są wymagane).
 
 ## [0.4.0] - 2026-10-13
 - Dodano wersjonowanie: numer wersji w grze, ten plik, tagi gita i skrypt kontrolny `tools/check-version.mjs`.
