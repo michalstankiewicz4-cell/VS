@@ -33,3 +33,6 @@ Esc wraca do menu (tam też ustawienia). Menu → „Edytor map": stawianie/usuw
 
 ## Cykl dnia i nocy
 Czas biegu: ~5 min dnia, ~5 min nocy, naprzemiennie (menu, budowa i edytor zawsze za dnia).
+
+## SEO
+Tagi w `index.html` (EN + PL), miniatura `assets/og-image.png`, `sitemap.xml`. Po wdrożeniu dodaj stronę w Google Search Console (typ „Prefiks adresu URL") i wyślij sitemapę.

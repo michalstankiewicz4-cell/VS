@@ -4,6 +4,11 @@ Wersjonowanie: `MAJOR.MINOR.PATCH`. Każda wysyłka do repozytorium to nowa wers
 Tagi `vX.Y.Z` zakłada właściciel na GitHubie (Releases) na commitach z tej historii; push tagów z sesji Claude jest blokowany.
 Poprawka błędu = PATCH, nowa funkcja = MINOR, duża zmiana rozgrywki lub zapisu = MAJOR.
 
+## [0.8.2] - 2026-10-13
+### Dodano
+- SEO: tytuł, opis i słowa kluczowe po angielsku (i po polsku), canonical, hreflang, Open Graph, Twitter Card, dane strukturalne JSON-LD (VideoGame), blok noscript, robots.txt, sitemap.xml.
+- Miniatura (assets/og-image.png, 1200×630): start gracza pod Pałacem Kultury; ikona strony.
+
 ## [0.8.1] - 2026-10-13
 ### Zmieniono
 - Punkt startu gracza: dziedziniec przed Pałacem Kultury (0, -36,5). Nic więcej.

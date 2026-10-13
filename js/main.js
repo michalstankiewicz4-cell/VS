@@ -5,7 +5,7 @@ import { Input } from './input.js';
 import { VERSION } from './version.js';
 
 const $ = (id) => document.getElementById(id);
-document.title = `Warszawa — Strefa Zero v${VERSION}`;
+document.title = `Warsaw Zero Zone — Free Zombie Survival Browser Game | Warszawa Strefa Zero v${VERSION}`;
 
 const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance' });
 renderer.setPixelRatio(1);
