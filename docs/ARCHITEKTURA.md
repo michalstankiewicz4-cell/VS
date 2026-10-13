@@ -1,6 +1,6 @@
 # Architektura i kontekst projektu
 
-Gra przeglądarkowa **Warsaw Zero Zone / Warszawa — Strefa Zero**: postapokaliptyczna Warszawa, człowiek z karabinem kontra zombie, widok z góry (rzut izometryczny), 3D renderowane w niskiej rozdzielczości z filtrem pixel-art. Zero zależności poza three.js (wgrany lokalnie), zero zapytań sieciowych.
+Gra przeglądarkowa **Warsaw Quarantine**: postapokaliptyczna Warszawa, człowiek z karabinem kontra zombie, widok z góry (rzut izometryczny), 3D renderowane w niskiej rozdzielczości z filtrem pixel-art. Zero zależności poza three.js (wgrany lokalnie), zero zapytań sieciowych.
 
 Publikacja: repo <https://github.com/michalstankiewicz4-cell/VS>, strona <https://michalstankiewicz4-cell.github.io/VS/> (GitHub Pages, workflow `.github/workflows/static.yml`).
 

@@ -5,7 +5,7 @@ import { Input } from './input.js';
 import { VERSION } from './version.js';
 
 const $ = (id) => document.getElementById(id);
-document.title = `Warsaw Zero Zone — Free Zombie Survival Browser Game | Warszawa Strefa Zero v${VERSION}`;
+document.title = `Warsaw Quarantine — Free Zombie Survival Browser Game v${VERSION}`;
 
 const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance' });
 renderer.setPixelRatio(1);
@@ -185,7 +185,7 @@ $('eImp').addEventListener('click', () => {
 });
 function openMenu() {
   world.reset(); world.setMode('idle'); mode = 'menu'; zoomT = 1;
-  showUi('Warszawa — Strefa Zero', menuText());
+  showUi('Warsaw Quarantine', menuText());
 }
 addEventListener('keydown', (e) => {
   if (e.code === 'Escape' && mode !== 'menu' && mode !== 'dead') openMenu();
@@ -213,7 +213,7 @@ renderer.domElement.addEventListener('mousedown', (e) => {
   }
   refreshBuild();
 });
-showUi('Warszawa — Strefa Zero', menuText());
+showUi('Warsaw Quarantine', menuText());
 
 /* ---- pętla ---- */
 let last = performance.now(), frames = 0, fpsT = last, hudT = 0;

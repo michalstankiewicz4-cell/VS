@@ -1,6 +1,6 @@
 # Wskazówki dla asystenta (Claude Code) pracującego w tym repo
 
-Projekt: gra przeglądarkowa „Warsaw Zero Zone / Warszawa — Strefa Zero” (three.js, filtr pixel-art). Pełny kontekst: `docs/ARCHITEKTURA.md`; plan: `TODO.md`, `docs/MULTIPLAYER.md`.
+Projekt: gra przeglądarkowa „Warsaw Quarantine” (three.js, filtr pixel-art). Pełny kontekst: `docs/ARCHITEKTURA.md`; plan: `TODO.md`, `docs/MULTIPLAYER.md`.
 
 ## Zasady stałe (od właściciela)
 - **Każda wysyłka = nowa wersja**: podbij `js/version.js`, dopisz wpis na górze `CHANGELOG.md`, uruchom `node tools/check-version.mjs`, potem push na `main`; w odpowiedzi podaj numer wersji.

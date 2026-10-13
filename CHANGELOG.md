@@ -4,6 +4,10 @@ Wersjonowanie: `MAJOR.MINOR.PATCH`. Każda wysyłka do repozytorium to nowa wers
 Tagi `vX.Y.Z` zakłada właściciel na GitHubie (Releases) na commitach z tej historii; push tagów z sesji Claude jest blokowany.
 Poprawka błędu = PATCH, nowa funkcja = MINOR, duża zmiana rozgrywki lub zapisu = MAJOR.
 
+## [0.9.0] - 2026-10-13
+### Zmieniono
+- Nazwa gry: **Warsaw Quarantine** (dawniej „Warszawa — Strefa Zero” / „Warsaw Zero Zone”) w menu, tytule karty, SEO (meta, Open Graph, JSON-LD, noscript), README i dokumentacji. Klucze zapisu bez zmian.
+
 ## [0.8.3] - 2026-10-13
 ### Dodano
 - Dokumentacja: `docs/ARCHITEKTURA.md` (kontekst, pliki, systemy, zasady), `docs/MULTIPLAYER.md` (plan), `TODO.md`, `CLAUDE.md` (zasady dla asystenta); odświeżony README. Bez zmian w grze.

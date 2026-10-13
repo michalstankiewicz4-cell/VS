@@ -1,4 +1,4 @@
-# Warszawa — Strefa Zero / Warsaw Zero Zone
+# Warsaw Quarantine
 
 Postapokaliptyczna Warszawa: człowiek z karabinem kontra zombie, widok z góry, 3D w niskiej rozdzielczości z filtrem pixel-art (three.js). Za punkty po śmierci budujesz bazę. Grasz: <https://michalstankiewicz4-cell.github.io/VS/>
 Sterowanie: WASD ruch, LPM strzał, Q/E lub PPM+przeciągnięcie obrót kamery, kółko zoom, Esc menu.
