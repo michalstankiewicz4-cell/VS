@@ -15,6 +15,7 @@ if (!ver) fail('nie znaleziono VERSION w js/version.js');
 const log = /^## \[(\d+\.\d+\.\d+)\]/m.exec(readFileSync(new URL('../CHANGELOG.md', import.meta.url), 'utf8'))?.[1];
 if (log !== ver) fail(`js/version.js = ${ver}, a pierwszy wpis w CHANGELOG.md = ${log}`);
 
+sh('git fetch -q origin +refs/heads/main:refs/remotes/origin/main');   // odśwież punkt odniesienia (best-effort)
 const head = sh('git rev-parse HEAD'), remote = sh('git rev-parse origin/main');
 if (head && head === remote) { console.log(`OK: wersja ${ver}, HEAD == origin/main (nic nowego do wysłania)`); process.exit(0); }
 if (sh('git status --porcelain')) console.log('Uwaga: są niezatwierdzone zmiany.');
