@@ -94,9 +94,9 @@ export function createWorld(scene) {
     scene.fog.color.copy(scene.background);
     scene.fog.far = 74 - 28 * n; scene.fog.near = 30 - 10 * n;
     hemi.color.copy(sk.hsD).lerp(sk.hsN, n); hemi.groundColor.copy(sk.hgD).lerp(sk.hgN, n);
-    hemi.intensity = 3.4 - 2.1 * n;
-    moon.color.copy(sk.dlD).lerp(sk.dlN, n); moon.intensity = 3.6 - 2.0 * n;
-    S.night = n;
+    hemi.intensity = 3.0 - 1.7 * n;
+    moon.color.copy(sk.dlD).lerp(sk.dlN, n); moon.intensity = 2.8 - 1.2 * n;
+    S.night = n; nightU.value = n;
   }
 
   /* ---- gruz (instancje, zawijany wokół gracza, bez kolizji) ---- */
@@ -181,6 +181,7 @@ export function createWorld(scene) {
   /* ---- mapa miasta (edytowalna): lista obiektów -> instancje + kolizje ---- */
   const MAP_MAX = 380, BASE_ZONE = 30, EDGE = 76;
   const fade = { player: new THREE.Vector3(), fwd: new THREE.Vector3(0, -0.8, -0.6), on: { value: 0 }, setOn(v) { this.on.value = v; } };
+  const nightU = { value: 0 };
   const bmat = new THREE.MeshLambertMaterial({ color: 0xffffff });
   // budynki między kamerą a graczem robią się "kratkowo" przezroczyste (dither jak w filtrze pixel-art)
   bmat.onBeforeCompile = (sh) => {
@@ -188,11 +189,50 @@ export function createWorld(scene) {
     sh.uniforms.uFwd = { value: fade.fwd };
     sh.uniforms.uOn = fade.on;
     sh.uniforms.uR = { value: 2.8 };
+    sh.uniforms.uNight = nightU;
     sh.vertexShader = sh.vertexShader
-      .replace('#include <common>', '#include <common>\nvarying vec3 vWP;')
-      .replace('#include <project_vertex>', '#include <project_vertex>\nvWP = (modelMatrix * instanceMatrix * vec4(transformed, 1.0)).xyz;');
+      .replace('#include <common>', '#include <common>\nvarying vec3 vWP, vC, vS, vN;\nvarying vec2 vK;\nattribute vec2 aK;')
+      .replace('#include <project_vertex>', `#include <project_vertex>
+      mat4 mI = modelMatrix * instanceMatrix;
+      vWP = (mI * vec4(transformed, 1.0)).xyz;
+      vK = aK; vN = normal;
+      vC = (mI * vec4(0.0, 0.0, 0.0, 1.0)).xyz;
+      vS = vec3(length(mI[0].xyz), length(mI[1].xyz), length(mI[2].xyz));`);
     sh.fragmentShader = sh.fragmentShader
-      .replace('#include <common>', '#include <common>\nvarying vec3 vWP;\nuniform vec3 uPlayer, uFwd;\nuniform float uOn, uR;')
+      .replace('#include <common>', '#include <common>\nvarying vec3 vWP, vC, vS, vN;\nvarying vec2 vK;\nuniform vec3 uPlayer, uFwd;\nuniform float uOn, uR, uNight;\nfloat hsh(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }')
+      .replace('#include <color_fragment>', `#include <color_fragment>
+      float gW = 0.0;
+      if (vK.x > 0.5 && abs(vN.y) < 0.5) {   // fasada Pałacu: okna, arkady, zegar rysowane w shaderze
+        float kd = vK.x, top = vK.y, y = vWP.y;
+        bool xf = abs(vN.x) > 0.5;
+        float W = xf ? vS.z : vS.x;
+        float a = (xf ? vWP.z - vC.z : vWP.x - vC.x) + 0.5 * W;
+        float fid = dot(sign(vN), vec3(1.0, 2.0, 3.0)) + vC.x * 0.37 + vC.z * 0.91;
+        float cw = 0.8, ch = 1.15, ww = 0.42, y0 = 1.3, y1 = top - 1.6;
+        if (kd > 1.5 && kd < 2.5) { cw = 0.9; ch = 0.95; ww = 0.5; y0 = 0.9; y1 = top - 0.7; }
+        if (kd > 2.5 && kd < 3.5) { cw = 0.8; ch = 1.15; ww = 0.4; y0 = 1.3; y1 = top - 5.0; }
+        if (kd > 3.5 && kd < 4.5) { cw = 0.5; ch = 1.0; ww = 0.2; y0 = 23.4; y1 = top - 0.8; }
+        float cols = max(1.0, floor(W / cw)), cell = W / cols;
+        float u = fract(a / cell), id = floor(a / cell);
+        bool win = false;
+        if (kd < 4.5) {
+          float v = fract(y / ch);
+          if (y > y0 && y < y1 && abs(u - 0.5) < 0.5 * ww / cell && v > 0.2 && v < 0.78) { win = true; gW = step(hsh(vec2(id + fid, floor(y / ch))), 0.16); }
+          if (kd > 2.5 && kd < 3.5) {   // pas arkad pod gzymsem
+            float t = (y - (top - 4.4)) / 3.1;
+            float px = (u - 0.5) * cell, py = (t - 0.62) * 3.1;
+            bool ar = t > 0.04 && t < 1.0 && (t < 0.62 ? abs(px) < 0.26 : px * px + py * py < 0.26 * 0.26) && abs(px) < 0.26;
+            if (ar) { win = true; gW = step(hsh(vec2(id + fid, 77.0)), 0.2); }
+          }
+        } else if (kd < 5.5 && kd > 3.5 && y > y0 && y < y1 && abs(u - 0.5) < 0.5 * ww / cell) { win = true; gW = step(hsh(vec2(id + fid, 5.0)), 0.25); }
+        if (kd > 4.5) {   // tarcze zegara
+          float dd = length(vec2(a - 0.5 * W, y - vC.y));
+          if (dd < 0.46) { diffuseColor.rgb = dd > 0.37 ? diffuseColor.rgb * 0.25 : vec3(0.78, 0.74, 0.62); }
+        }
+        if (win) diffuseColor.rgb *= 0.1;
+        else gW = 0.0;
+      }`)
+      .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += vec3(1.0, 0.62, 0.28) * gW * uNight * 1.8;')
       .replace('#include <clipping_planes_fragment>', `#include <clipping_planes_fragment>
       if (uOn > 0.5) {
         vec3 dd = vWP - uPlayer;
@@ -207,7 +247,11 @@ export function createWorld(scene) {
         }
       }`);
   };
-  const bm = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), bmat, 1300);
+  const CAP = 3000;
+  const bgeo = new THREE.BoxGeometry(1, 1, 1);
+  const aK = new THREE.InstancedBufferAttribute(new Float32Array(CAP * 2), 2);
+  bgeo.setAttribute('aK', aK);
+  const bm = new THREE.InstancedMesh(bgeo, bmat, CAP);
   bm.castShadow = bm.receiveShadow = true; bm.frustumCulled = false;
   scene.add(bm);
 
@@ -232,7 +276,8 @@ export function createWorld(scene) {
 
   function rebuildCity() {
     let bn = 0; own.length = 0; cityBlk.length = 0;
-    const add = (i, x, y, z, sx, sy, sz, ry, h, sa, l) => {
+    const add = (i, x, y, z, sx, sy, sz, ry, h, sa, l, kind = 0, top = 0) => {
+      aK.setXY(bn, kind, top);
       dummy.position.set(x, y, z); dummy.rotation.set(0, ry, 0); dummy.scale.set(sx, sy, sz); dummy.updateMatrix();
       bm.setMatrixAt(bn, dummy.matrix); bm.setColorAt(bn, cc.setHSL(h, sa, l)); own[bn] = i; bn++;
     };
@@ -249,9 +294,9 @@ export function createWorld(scene) {
         add(i, o.x, 0.5, o.z, 1.8, 0.9, 3.8, ry, hue, sa, 0.18 + r() * 0.1);
         add(i, o.x, 1.15, o.z, 1.5, 0.5, 2.0, ry, hue, sa, 0.12);
       } else {   // Pałac Kultury i Nauki — model z pliku SketchUp (js/palace.js)
-        for (const [px, pz, w, d, h] of PALACE) {
-          const l = 0.2 + Math.min(h, 34) / 34 * 0.14;
-          add(i, o.x + px, h / 2, o.z + pz, w, h, d, 0, 0.08, 0.1, l);
+        for (const [px, pz, w, d, y1, , kind, y0 = 0] of PALACE) {
+          const l = 0.34 + Math.min(y1, 30) / 30 * 0.1 + (kind === 0 ? 0.06 : 0);   // piaskowiec
+          add(i, o.x + px, (y0 + y1) / 2, o.z + pz, w, y1 - y0, d, 0, 0.09, 0.32, l, kind, y1);
         }
         for (const [px, pz, w, d, , blk] of PALACE) if (blk) cityBlk.push({ x: o.x + px, z: o.z + pz, hw: w / 2, hd: d / 2 });
         return;
@@ -260,7 +305,7 @@ export function createWorld(scene) {
       cityBlk.push({ x: bd.x, z: bd.z, hw: bd.hw, hd: bd.hd });
     });
     bm.count = bn;
-    bm.instanceMatrix.needsUpdate = true;
+    bm.instanceMatrix.needsUpdate = true; aK.needsUpdate = true;
     if (bm.instanceColor) bm.instanceColor.needsUpdate = true;
     bm.boundingSphere = null; bm.boundingBox = null;
   }
