@@ -1,17 +1,18 @@
-# Wskazówki dla asystenta (Claude Code) pracującego w tym repo
+# Guidance for the assistant (Claude Code) working in this repo
 
-Projekt: gra przeglądarkowa „Capital Quarantine” (three.js, filtr pixel-art). Pełny kontekst: `docs/ARCHITEKTURA.md`; plan: `TODO.md`, `docs/MULTIPLAYER.md`.
+Project: browser game "Capital Quarantine" (three.js, pixel-art filter). Full context: `docs/ARCHITECTURE.md`; plan: `TODO.md`, `docs/MULTIPLAYER.md`.
 
-## Zasady stałe (od właściciela)
-- **Każda wysyłka = nowa wersja**: podbij `js/version.js`, dopisz wpis na górze `CHANGELOG.md`, uruchom `node tools/check-version.mjs`, potem push na `main`; w odpowiedzi podaj numer wersji.
-- **Nie wypychaj tagów** (blokowane; tagi zakłada właściciel w Releases). Nie obchodź blokady.
-- **API/AI na samym końcu.** Statystyki wejścia tylko akcji i tylko lokalnie; do modelu wyłącznie zaokrąglone cechy; najpierw modele lokalne.
-- Bez zewnętrznych skryptów/CDN; CSP `script-src 'self'`. three.js tylko lokalnie z `vendor/`.
-- Zmieniaj tylko to, o co poproszono („poza tym nie zmieniaj nic”).
-- Odpowiadaj po polsku, zwięźle; piszesz, co było i czego nie było sprawdzone.
-- Zdjęcia z plików Google (Street View/Earth) nie wchodzą do repo (licencja). Pałac: atrybucja CC BY 4.0 (kon.kp wg metadanych) musi zostać.
+## Standing rules (from the owner)
+- **Every push = a new version**: bump `js/version.js`, add an entry at the top of `CHANGELOG.md`, run `node tools/check-version.mjs`, then push to `main`; state the version number in your reply.
+- **Do not push tags** (blocked; the owner creates tags in Releases). Do not work around the block.
+- **API/AI at the very end.** Input statistics only of actions and only locally; only rounded features go to a model; local models first.
+- No external scripts/CDNs; CSP `script-src 'self'`. three.js only locally from `vendor/`.
+- Change only what was asked ("don't change anything else").
+- Reply to the owner in Polish, concisely; say what was and was not verified. Everything in the repo (UI, code comments, docs) is in English; Polish exists only as the optional interface language in `js/i18n/pl.js`.
+- Photos from Google files (Street View/Earth) do not go into the repo (licence). Palace: CC BY 4.0 attribution (kon.kp per file metadata) must stay.
+- Keep the module/folder structure (see the file map in `docs/ARCHITECTURE.md`); put new UI strings in both `js/i18n/en.js` and `pl.js`.
 
-## Praktyka
-- Zdalne `main` może wyprzedzać (zmiany workflow): `git pull --rebase origin main`.
-- Hook „unpushed commit” bywa fałszywy, gdy lokalny `origin/main` jest nieodświeżony: `git fetch origin +refs/heads/main:refs/remotes/origin/main` i porównaj `git rev-parse HEAD origin/main`.
-- Testy headless: patrz „Testowanie” w `docs/ARCHITEKTURA.md` (Playwright + SwiftShader).
+## Practice
+- The remote `main` may be ahead (workflow changes): `git pull --rebase origin main`.
+- The "unpushed commit" hook can be a false positive when the local `origin/main` is stale: `git fetch origin +refs/heads/main:refs/remotes/origin/main` and compare `git rev-parse HEAD origin/main`.
+- Headless tests: see "Testing" in `docs/ARCHITECTURE.md` (Playwright + SwiftShader).

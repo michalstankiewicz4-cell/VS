@@ -1,0 +1,34 @@
+/* Start / pause / options overlay. The 3D showcase renders behind it. */
+#menu{position:fixed;inset:0;z-index:5;display:flex;align-items:center;background:linear-gradient(90deg,rgba(5,3,8,.88) 0,rgba(5,3,8,.55) 34%,rgba(5,3,8,0) 62%)}
+#menu[data-screen=pause],#menu[data-screen=dead],#menu[data-screen=options]{background:rgba(5,3,8,.6)}
+#menu[data-screen=pause],#menu[data-screen=dead]{justify-content:center}
+#menu[data-screen=options]{justify-content:center}
+.screen{width:min(380px,calc(100vw - 32px));box-sizing:border-box;padding:24px 28px;margin-left:clamp(16px,6vw,90px)}
+#menu[data-screen=pause] .screen,#menu[data-screen=dead] .screen,#menu[data-screen=options] .screen{margin-left:0;background:#120b18;border:1px solid #4a2d52;text-align:center}
+#menu[data-screen=options] .screen{width:min(560px,calc(100vw - 24px));max-height:calc(100vh - 24px);overflow:auto}
+.logo{margin:0 0 6px;font-size:34px;line-height:1.05;letter-spacing:.12em;color:#e8a0b0;text-shadow:3px 3px 0 #5a1626}
+.screen h2{margin:0 0 14px;font-size:20px;color:#e8a0b0;letter-spacing:.06em}
+.screen p{margin:6px 0;color:#c9bcd0;white-space:pre-line}
+.stack{display:flex;flex-direction:column;gap:8px;margin:18px 0 10px}
+.stack button{padding:10px 14px;font-size:15px;text-align:left;letter-spacing:.04em;background:rgba(28,18,34,.9)}
+#menu[data-screen=pause] .stack button,#menu[data-screen=dead] .stack button,#menu[data-screen=options] .stack button{text-align:center}
+.stack button:hover:not(:disabled){background:#2c1630;padding-left:20px}
+.stack button.sub{color:#a89aae}
+.soonbtn{display:flex;justify-content:space-between;align-items:center}
+.badge{font-size:11px;color:#e8d8a0;border:1px solid #6a5a2a;padding:0 6px}
+.info{color:#e8d8a0!important}
+.foot{margin-top:22px!important;font-size:11px;color:#8f8396!important}
+/* options */
+.tabs{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:12px}
+.tab{padding:5px 10px}
+.tabbody{text-align:left}
+.tabbody h3{margin:14px 0 4px;font-size:13px;color:#c9b5d6}
+.orow{display:grid;grid-template-columns:minmax(0,190px) 1fr 52px;gap:8px;align-items:center;margin:6px 0}
+.orow .val{text-align:right;color:#8f8396}
+.orow.chk{grid-template-columns:22px 1fr}
+.orow.col{grid-template-columns:1fr;gap:4px}
+.choices{display:flex;gap:6px;flex-wrap:wrap}
+.keyrow{grid-template-columns:1fr auto}
+.keys{display:flex;gap:6px}
+.key{min-width:92px;text-align:center}
+@media (max-width:640px){.orow{grid-template-columns:1fr 1fr 44px}.logo{font-size:26px}}

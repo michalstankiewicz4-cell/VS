@@ -1,18 +1,17 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'">
 <title>Capital Quarantine — Free Zombie Survival Browser Game</title>
-<meta name="description" content="Capital Quarantine: free post-apocalyptic zombie survival shooter in your browser. Top-down isometric pixel-art 3D, ruined Warsaw and the Palace of Culture and Science, day and night cycle, base building with sentry guns and barricades, built-in map editor. No download, no install. Gra przeglądarkowa o przetrwaniu w zombie apokalipsie w Warszawie.">
-<meta name="keywords" content="Capital Quarantine, Warsaw zombie game, Warsaw game, zombie survival game, post-apocalyptic browser game, free browser game, HTML5 game, top-down shooter, isometric pixel art, Palace of Culture and Science, Warsaw game, base building game, tower defense, map editor, three.js game, no download, play online, gra przeglądarkowa, gra zombie, Warszawa, Pałac Kultury, apokalipsa, przetrwanie">
+<meta name="description" content="Capital Quarantine: free post-apocalyptic zombie survival shooter in your browser. Top-down isometric pixel-art 3D, ruined Warsaw and the Palace of Culture and Science, day and night cycle, drivable cars with chase and cockpit views, base building with sentry guns and barricades, built-in map editor. No download, no install.">
+<meta name="keywords" content="Capital Quarantine, Warsaw zombie game, Warsaw game, zombie survival game, post-apocalyptic browser game, free browser game, HTML5 game, top-down shooter, isometric pixel art, Palace of Culture and Science, Warsaw game, base building game, driving game, tower defense, map editor, three.js game, no download, play online">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="author" content="michalstankiewicz4-cell">
 <meta name="theme-color" content="#120b18">
 <link rel="canonical" href="https://michalstankiewicz4-cell.github.io/VS/">
 <link rel="alternate" hreflang="en" href="https://michalstankiewicz4-cell.github.io/VS/">
-<link rel="alternate" hreflang="pl" href="https://michalstankiewicz4-cell.github.io/VS/">
 <link rel="alternate" hreflang="x-default" href="https://michalstankiewicz4-cell.github.io/VS/">
 <link rel="icon" type="image/png" href="assets/icon.png">
 <meta property="og:type" content="website">
@@ -26,7 +25,6 @@
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Start of Capital Quarantine: the player stands in front of the Palace of Culture and Science as zombies close in">
 <meta property="og:locale" content="en_US">
-<meta property="og:locale:alternate" content="pl_PL">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Capital Quarantine — Free Zombie Survival Browser Game">
 <meta name="twitter:description" content="Post-apocalyptic Warsaw, Palace of Culture and Science, zombies, day and night, base building. Play free in your browser.">
@@ -35,44 +33,14 @@
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"VideoGame","name":"Capital Quarantine","url":"https://michalstankiewicz4-cell.github.io/VS/","image":"https://michalstankiewicz4-cell.github.io/VS/assets/og-image.png","description":"Free post-apocalyptic zombie survival shooter in the browser. Top-down isometric pixel-art 3D, ruined Warsaw with the Palace of Culture and Science, day and night cycle, base building and a map editor.","genre":["Survival","Shooter","Zombie","Base building"],"gamePlatform":"Web browser","applicationCategory":"Game","operatingSystem":"Any (HTML5, WebGL)","playMode":"SinglePlayer","inLanguage":["pl","en"],"isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Person","name":"michalstankiewicz4-cell","url":"https://github.com/michalstankiewicz4-cell"},"keywords":"zombie survival, post-apocalyptic, Warsaw, Palace of Culture and Science, browser game, pixel art, base building"}
 </script>
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/menu.css">
+<link rel="stylesheet" href="css/hud.css">
 </head>
 <body>
-<noscript><h1>Capital Quarantine</h1><p>Free post-apocalyptic zombie survival shooter for your browser: top-down isometric pixel-art 3D, ruined Warsaw and the Palace of Culture and Science, day and night cycle, base building with sentry guns, barricades and bunkers, and a built-in map editor. JavaScript and WebGL are required to play. Gra przeglądarkowa o przetrwaniu w zombie apokalipsie w Warszawie — wymaga JavaScript i WebGL.</p></noscript>
+<noscript><h1>Capital Quarantine</h1><p>Free post-apocalyptic zombie survival shooter for your browser: top-down isometric pixel-art 3D, ruined Warsaw and the Palace of Culture and Science, day and night cycle, base building with sentry guns, barricades and bunkers, and a built-in map editor. JavaScript and WebGL are required to play.</p></noscript>
 <div id="app"></div>
-<div id="top"><div id="hpbar"><i></i></div><div id="run"></div></div>
-<div id="ui"><div class="box"><h1 id="uiT">Capital Quarantine</h1><p id="uiP"></p><div class="btns"><button id="bPlay" type="button">Zagraj</button><button id="bBuild" type="button">Buduj bazę</button><button id="bEdit" type="button">Edytor map</button></div><button id="bWipe" type="button" class="tiny">Wyzeruj zapis</button></div></div>
-<div id="ed" hidden>
- <div class="btns"><button type="button" data-e="b">Budynek</button><button type="button" data-e="c">Auto</button><button type="button" data-e="x">Usuń</button><button type="button" id="eRot">Obróć (R)</button></div>
- <label class="row">Szerokość <input type="range" id="eW" min="4" max="14" step="1" value="8"><span id="eWv">8</span></label>
- <label class="row">Głębokość <input type="range" id="eD" min="4" max="14" step="1" value="8"><span id="eDv">8</span></label>
- <label class="row">Wysokość <input type="range" id="eH" min="2" max="9" step="0.5" value="4"><span id="eHv">4</span></label>
- <div class="btns"><button type="button" id="eDone">Zagraj</button><button type="button" id="eDef">Domyślna mapa</button><button type="button" id="eExp">Eksport</button><button type="button" id="eImp">Import</button></div>
- <textarea id="eJson" hidden rows="5" spellcheck="false" aria-label="JSON mapy"></textarea>
- <p class="note" id="eInfo"></p>
-</div>
-<div id="build" hidden><div id="bank"></div><div class="btns"><button type="button" data-t="tower">Stanowisko (25)</button><button type="button" data-t="wall">Barykada (8)</button><button type="button" data-t="crypt">Schron (40)</button><button type="button" data-t="remove">Usuń</button><button type="button" id="bDone">Zagraj</button></div><p class="note" id="bInfo"></p></div>
-<aside id="hud">
- <div id="fps">–</div>
- <details open>
-  <summary>Statystyki wejścia (tylko lokalnie)</summary>
-  <label class="chk"><input type="checkbox" id="cnt" checked> zliczaj akcje</label>
-  <pre id="stats"></pre>
-  <p class="note">Zliczane są akcje gry (ruch, kliknięcia), nie klawisze ani pozycja myszy. Nic nie jest wysyłane.</p>
-  <p class="note">Tak wyglądałby pakiet dla AI (zaokrąglone cechy):</p>
-  <pre id="feat"></pre>
-  <button id="rst" type="button">Wyzeruj statystyki</button>
- </details>
- <details>
-  <summary>Render (filtr pixel-art)</summary>
-  <label class="row">Wysokość pikseli <input type="range" id="pixelH" min="100" max="400" step="10" value="200"><span id="pixelHv">200</span></label>
-  <label class="row">Poziomy kolorów <input type="range" id="levels" min="3" max="16" step="1" value="7"><span id="levelsv">7</span></label>
-  <label class="row">Dithering <input type="range" id="dither" min="0" max="1" step="0.05" value="0.8"><span id="ditherv">0.8</span></label>
-  <label class="row">Obrys <input type="range" id="edge" min="0" max="1" step="0.05" value="0.8"><span id="edgev">0.8</span></label>
-  <label class="row">Jasność <input type="range" id="bright" min="0.5" max="3" step="0.05" value="1.4"><span id="brightv">1.4</span></label>
- </details>
- <p class="note">Ruch: WASD · strzał: LPM · kamera: Q/E lub PPM+przeciągnięcie · zoom: kółko myszy · F: wsiądź/wysiądź z auta (W/S gaz/hamulec, A/D skręt)</p>
-</aside>
+<div id="ui"></div>
 <script type="module" src="js/main.js"></script>
 </body>
 </html>

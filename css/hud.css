@@ -1,0 +1,13 @@
+/* In-game HUD, base builder and map editor panels. */
+#top{position:fixed;left:50%;top:10px;transform:translateX(-50%);z-index:2;text-align:center;pointer-events:none;min-width:260px}
+#hpbar{height:10px;background:#2a1018;border:1px solid #5a2030}
+#hpbar i{display:block;height:100%;width:100%;background:#c01838}
+#run{margin-top:4px;color:#e8d8e0;text-shadow:0 0 3px #000;white-space:pre}
+#hint{position:fixed;left:10px;bottom:8px;z-index:2;color:#8f8396;text-shadow:0 0 3px #000;pointer-events:none;font-size:11px}
+#fps{position:fixed;left:10px;top:10px;z-index:6;color:#e8a0b0;text-shadow:0 0 3px #000;pointer-events:none}
+#build,#ed{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:2;background:rgba(8,5,12,.82);border:1px solid #3a2740;padding:10px 14px;text-align:center}
+#bank{color:#e8d8a0;margin-bottom:4px}
+#ed{width:min(360px,calc(100vw - 24px));box-sizing:border-box}
+#ed .row{display:grid;grid-template-columns:90px 1fr 34px;gap:6px;align-items:center;margin:4px 0;text-align:left}
+#ed .row span:last-child{text-align:right;color:#8f8396}
+#ed textarea{width:100%;box-sizing:border-box;background:#120b18;color:#d9cfd6;border:1px solid #4a2d52;font:11px ui-monospace,Consolas,monospace;margin-top:6px}

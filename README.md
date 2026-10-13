@@ -1,44 +1,49 @@
 # Capital Quarantine
 
-Postapokaliptyczna Warszawa: człowiek z karabinem kontra zombie, widok z góry, 3D w niskiej rozdzielczości z filtrem pixel-art (three.js). Za punkty po śmierci budujesz bazę. Grasz: <https://michalstankiewicz4-cell.github.io/VS/>
-Sterowanie: WASD ruch, LPM strzał, F auto (wsiądź/wysiądź), Q/E lub PPM+przeciągnięcie obrót kamery, kółko zoom, Esc menu.
+Post-apocalyptic Warsaw: a man with a rifle against zombies, top-down view, low-resolution 3D with a pixel-art filter (three.js). Points earned after you die pay for your base. Play: <https://michalstankiewicz4-cell.github.io/VS/>
 
-**Dokumentacja:** [`docs/ARCHITEKTURA.md`](docs/ARCHITEKTURA.md) (kontekst i pliki) · [`TODO.md`](TODO.md) · [`docs/MULTIPLAYER.md`](docs/MULTIPLAYER.md) · [`CLAUDE.md`](CLAUDE.md) (zasady pracy asystenta) · [`CHANGELOG.md`](CHANGELOG.md)
+Default controls (all rebindable in Options): WASD move, left mouse fire, F enter/exit a car, C change camera view in a car (isometric / chase / cockpit), Q/E or right-mouse drag rotate the camera, wheel zoom, Esc pause.
 
-## Uruchomienie
-Moduły ES wymagają serwera (nie działa z `file://`):
-- VS Code: rozszerzenie *Live Server* → „Open with Live Server”,
-- albo w katalogu projektu: `python -m http.server 8000` i otwórz `http://localhost:8000`.
+**Documentation:** [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) (context and files) · [`TODO.md`](TODO.md) · [`docs/MULTIPLAYER.md`](docs/MULTIPLAYER.md) · [`CLAUDE.md`](CLAUDE.md) (assistant rules) · [`CHANGELOG.md`](CHANGELOG.md)
 
-## Struktura
-- `js/render.js` – render do małego bufora + shader końcowy (kwantyzacja, dither, obrys z głębi),
-- `js/world.js` – teren, miasto i Pałac, gracz, wrogowie (instancje), struktury bazy, światła i cykl dnia/nocy,
-- `js/palace.js` – dane brył Pałacu Kultury,
-- `js/input.js` – wejście i statystyki (patrz niżej),
-- `js/main.js` – pętla, kamera, panel,
-- `vendor/` – three.js 0.186.1 (MIT) wgrany lokalnie; sumy SHA-256 w `vendor/SHA256.txt`.
+## Running locally
+ES modules need a web server (they do not work from `file://`):
+- VS Code: the *Live Server* extension → "Open with Live Server",
+- or in the project folder: `python -m http.server 8000` and open `http://localhost:8000`.
 
-## Bezpieczeństwo i prywatność
-- brak zewnętrznych skryptów, CDN-ów i zapytań sieciowych; CSP w `index.html` dopuszcza tylko zasoby z własnego originu,
-- żadnych `eval`, `innerHTML` ani zapisu kluczy (API będzie dodane na końcu),
-- statystyki wejścia: zliczane są akcje gry, nie klawisze ani pozycja myszy; pola formularzy są pomijane; wszystko zostaje w pamięci strony,
-- pakiet dla AI (`Input.features()`) zawiera tylko zaokrąglone cechy.
+## Menus and options
+Start screen: Single Player (Start run, Build base), Multiplayer (PvE co-op and PvP, coming soon), Map Editor, Options. Esc pauses a run (it never ends it); in menus Esc goes back. Options: Graphics, Controls (key bindings), Mouse, Language (English / Polski), Privacy & data.
 
-## Wersjonowanie
-Wersja jest w `js/version.js` (widać ją w grze), historia w `CHANGELOG.md`, a każda wysyłka to nowa wersja (tagi `vX.Y.Z` zakładasz w Releases na GitHubie).
-Przed każdym pushem: podbij wersję, dopisz wpis w changelogu i uruchom `node tools/check-version.mjs`.
+## Structure
+- `js/main.js` – entry point; `js/core/` – app shell and mode state machine, camera rig, settings, storage,
+- `js/world/` – terrain, sky and day/night, city map and Palace, player, vehicles, enemies, bullets, base structures,
+- `js/render/` – pixel-art pipeline (low-res target + final shader),
+- `js/input/` – key bindings and input with local statistics (see below),
+- `js/i18n/` – English and Polish strings,
+- `js/ui/`, `js/modes/` – menus, options, HUD, base builder and map editor,
+- `vendor/` – three.js 0.186.1 (MIT) vendored locally; SHA-256 sums in `vendor/SHA256.txt`.
 
-## Edytor map i przezroczystość
-Esc wraca do menu (tam też ustawienia). Menu → „Edytor map": stawianie/usuwanie budynków i obiektów, rozmiar, obrót, eksport/import JSON (zapis lokalny w przeglądarce). Budynki zasłaniające postać robią się częściowo przezroczyste.
+## Security and privacy
+- no external scripts, CDNs or network requests; the CSP in `index.html` only allows resources from the same origin,
+- no `eval`, no `innerHTML`, no stored keys (an API will be added at the very end),
+- input statistics: only game actions are counted, never keys or mouse position; form fields are ignored; everything stays local,
+- the bundle meant for an AI (`Input.features()`) contains only rounded features.
 
-## Atrybucje
-- Pałac Kultury i Nauki: uproszczony model oparty na modelu SketchUp (BezNazwy6.skp), autor wg metadanych pliku: **kon.kp**, licencja [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). W grze użyto tylko brył wyznaczonych z obrysów kondygnacji (zmieniono: uproszczenie, skala, obrót).
+## Versioning
+The version lives in `js/version.js` (shown in the game and the FPS counter), history in `CHANGELOG.md`; every push is a new version (the owner creates `vX.Y.Z` tags in GitHub Releases).
+Before every push: bump the version, add a changelog entry and run `node tools/check-version.mjs`.
 
-## Cykl dnia i nocy
-Czas biegu: ~5 min dnia, ~5 min nocy, naprzemiennie (menu, budowa i edytor zawsze za dnia).
+## Map editor and transparency
+Main menu > Map Editor: place/remove buildings and cars, size, rotation, JSON export/import (saved locally in the browser). Buildings that hide the character become partly transparent in the isometric view.
+
+## Attributions
+- Palace of Culture and Science: simplified model based on a SketchUp model (BezNazwy6.skp), author per file metadata: **kon.kp**, licence [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Only boxes derived from the storey outlines are used in the game (changed: simplification, scale, rotation).
+
+## Day and night
+A run has about 5 min of day and 5 min of night, alternating (menu, building and the editor are always daytime).
 
 ## SEO
-Tagi w `index.html` (EN + PL), miniatura `assets/og-image.png`, `sitemap.xml`. Po wdrożeniu dodaj stronę w Google Search Console (typ „Prefiks adresu URL") i wyślij sitemapę.
+Tags in `index.html`, thumbnail `assets/og-image.png`, `sitemap.xml`. After deployment add the site in Google Search Console ("URL prefix" type) and submit the sitemap.
 
-## Auta
-F — wsiądź/wysiądź z auta stojącego w pobliżu; W/S gaz i hamulec, A/D skręt; przejechanie zombie zabija go.
+## Cars
+F enters/exits a nearby car; W/S throttle and brake, A/D steer; running over a zombie kills it. C cycles the camera: isometric, chase, cockpit (drag to look around).

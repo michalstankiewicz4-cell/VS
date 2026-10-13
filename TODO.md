@@ -1,47 +1,51 @@
 # TODO
 
-Legenda: **P1** następne, **P2** później, **P3** pomysły. Stan na v0.8.2. Kontekst: [`docs/ARCHITEKTURA.md`](docs/ARCHITEKTURA.md).
+Legend: **P1** next, **P2** later, **P3** ideas. State as of v0.11.0. Context: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
-## Multiplayer (plan w [`docs/MULTIPLAYER.md`](docs/MULTIPLAYER.md))
-- [ ] P2 Decyzja: co-op/PvP, liczba graczy, wspólny bank, P2P czy serwer
-- [ ] P2 Refaktor: czysty stan + `step()` bez three.js, deterministyczny RNG
-- [ ] P2 Dwóch graczy lokalnie (model danych bez sieci)
-- [ ] P2 Warstwa transportu + WebRTC (opt-in, zmiana CSP, opis w README)
-- [ ] P2 Lobby (kod pokoju), snapshoty, interpolacja, testy dwóch klientów
+## Multiplayer (plan in [`docs/MULTIPLAYER.md`](docs/MULTIPLAYER.md))
+- [ ] P2 Decision: co-op/PvP, player count, shared bank, P2P or server (menu entries "PvE co-op" and "PvP" exist as "Soon")
+- [ ] P2 Refactor: pure state + `step()` without three.js, deterministic RNG
+- [ ] P2 Two local players (data model without a network)
+- [ ] P2 Transport layer + WebRTC (opt-in, CSP change, README note)
+- [ ] P2 Lobby (room code), snapshots, interpolation, two-client tests
 
-## Rozgrywka
-- [ ] P1 Zombie nocą: więcej/szybsze po zmroku (dziś cykl dnia i nocy tylko wizualny)
-- [ ] P1 Balans: koszty struktur, HP zombie, tempo punktów, bonus za czas
-- [ ] P2 Struktury bazy w edytorze map (CKM/barykada/schron jako darmowe narzędzia) — do potwierdzenia, czy potrzebne
-- [ ] P2 Więcej typów wrogów i broni; ulepszenia za punkty
-- [ ] P2 Dźwięk (strzały, kroki, zmierzch) — bez zewnętrznych plików albo lokalne, mała waga
-- [ ] P3 Pogoda, losowe wydarzenia, więcej landmarków Warszawy (Stadion, Złote Tarasy…)
+## Gameplay
+- [ ] P1 Zombies at night: more/faster after dusk (the day/night cycle is visual only today)
+- [ ] P1 Balance: structure costs, zombie HP, points pace, time bonus
+- [ ] P2 Base structures in the map editor (sentry/barricade/bunker as free tools) — to be confirmed
+- [ ] P2 More enemy types and weapons; upgrades for points
+- [ ] P2 Sound (shots, steps, dusk) — no external files, or small local ones
+- [ ] P3 Weather, random events, more Warsaw landmarks (Stadium, Złote Tarasy…)
+- [ ] P2 Cars: damage/fuel, headlights at night, engine sound, car–car collisions, dashboard gauges
 
-- [ ] P2 Auta: obrażenia/paliwo, światła nocą, dźwięk silnika, kolizje auto–auto, wsiadanie przez zombie-kierowców? (pomysł)
+## Look
+- [ ] P2 Palace: close-up details (clock, arcades), proportion fixes against the model
+- [ ] P2 Destruction/ruins of buildings, fire, smoke
+- [ ] P2 Cockpit view: proper car interior (hide the bonnet box, dashboard gauges)
+- [ ] P3 Palette/filter themes in Options > Graphics
 
-## Wygląd
-- [ ] P2 Pałac: podglądy z bliska (zegar, arkady), poprawki proporcji względem modelu
-- [ ] P2 Zniszczenia/ruiny budynków, ogień, dym
-- [ ] P3 Przełącznik motywów palety/filtra pixel-art w menu
+## Menus and settings
+- [ ] P2 Gamepad support and bindings
+- [ ] P2 Separate volume/sound options once sound exists
+- [ ] P3 More languages (add a dictionary in `js/i18n/` and an entry in `LANGS`)
 
-## Edytor map
-- [ ] P2 Wskazywanie i zaznaczanie istniejących obiektów, przesuwanie, kopiowanie
-- [ ] P2 Pałac Kultury: pozwolić przesuwać/ukrywać? (dziś stały w (0,−46); sprawdzić, czy narzędzie „Usuń” może go skasować — niepotwierdzone testem)
-- [ ] P3 Wiele zapisów map, udostępnianie przez link/plik
+## Map editor
+- [ ] P2 Select, move and copy existing objects
+- [ ] P2 Palace of Culture: allow moving/hiding? (fixed at (0,−46) today; whether the Remove tool can delete it is untested)
+- [ ] P3 Several map slots, sharing by link/file
 
-## Techniczne
-- [ ] P1 Skrypt/test E2E w repo (Playwright) zamiast ręcznych skryptów w /tmp
-- [ ] P2 Wydajność: profil na słabszych GPU; opcjonalne obniżanie `pixelH`
-- [ ] P2 Wersja angielska interfejsu (przełącznik języka); dziś UI po polsku, SEO po angielsku
-- [ ] P3 Zapisy: wersjonowanie formatu (`gra:save:v1` → migracje)
+## Technical
+- [ ] P1 E2E test script in the repo (Playwright) instead of ad-hoc scripts in /tmp
+- [ ] P2 Performance: profile on weaker GPUs; optional automatic lowering of `pixelH`
+- [ ] P3 Save format versioning (`gra:save:v1` → migrations)
 
-## Na samym końcu (decyzja właściciela)
-- [ ] AI/API: tylko po wszystkim innym; najpierw modele lokalne; do modelu wyłącznie zaokrąglone, zagregowane cechy z `Input.features()`; statystyki tylko akcji i tylko lokalnie
+## At the very end (owner's decision)
+- [ ] AI/API: only after everything else; local models first; only rounded, aggregated features from `Input.features()` go to a model; statistics of actions only and only locally
 
-## Operacyjne
-- [ ] Zakładać tagi `vX.Y.Z` w GitHub Releases (właściciel)
-- [ ] Dodać stronę w Google Search Console i wysłać `sitemap.xml`
-- [ ] Zweryfikować autora modelu Pałacu (kon.kp wg metadanych pliku) i ewentualnie poprawić atrybucję
+## Operational
+- [ ] Create `vX.Y.Z` tags in GitHub Releases (owner)
+- [ ] Add the site to Google Search Console and submit `sitemap.xml`
+- [ ] Verify the Palace model author (kon.kp per file metadata) and fix the attribution if needed
 
-## Zrobione (skrót)
-Render pixel-art, miasto Warszawy i Pałac Kultury z modelu SketchUp, strzelanie i punkty, baza (CKM/barykada/schron), kamera (obrót, zoom), przezroczystość budynków, edytor map, Esc → menu, cykl dnia i nocy, start pod Pałacem, SEO i miniatura. Szczegóły: `CHANGELOG.md`.
+## Done (summary)
+Pixel-art render, Warsaw city and Palace of Culture from a SketchUp model, shooting and points, base (sentry/barricade/bunker), camera (rotate, zoom), building transparency, map editor, day/night cycle, start under the Palace, SEO and thumbnail, drivable cars, start screen with menus, pause on Esc, options (graphics, key bindings, mouse, language, privacy), driver views, English UI with Polish option, code split into modules. Details: `CHANGELOG.md`.
