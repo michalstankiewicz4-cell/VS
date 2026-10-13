@@ -1,3 +1,3 @@
 // Wersja gry (semver). Każda wysyłka do repozytorium = nowa wersja.
 // Przed pushem: podbij tutaj, dopisz wpis w CHANGELOG.md, uruchom `node tools/check-version.mjs`.
-export const VERSION = '0.5.2';
+export const VERSION = '0.6.0';

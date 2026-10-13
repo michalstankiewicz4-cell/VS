@@ -107,7 +107,7 @@ function showUi(title, info) {
   $('uiT').textContent = title; $('uiP').textContent = info; $('ui').hidden = false; $('build').hidden = true; $('ed').hidden = true;
 }
 function menuText() {
-  return `Bank: ${bank} pkt · rekord: ${best}\nCeluj myszą, trzymaj LPM, aby strzelać. Ruch: WASD.\nObrót kamery: Q / E albo PPM + przeciągnięcie. Zoom: kółko myszy.\nwersja ${VERSION}`;
+  return `Bank: ${bank} pkt · rekord: ${best}\nCeluj myszą, trzymaj LPM, aby strzelać. Ruch: WASD.\nObrót kamery: Q / E albo PPM + przeciągnięcie. Zoom: kółko myszy.\nModel Pałacu Kultury: kon.kp, CC BY 4.0 (uproszczony)\nwersja ${VERSION}`;
 }
 function startRun() {
   setHud(false);

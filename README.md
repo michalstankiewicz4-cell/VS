@@ -27,3 +27,6 @@ Przed każdym pushem: podbij wersję, dopisz wpis w changelogu i uruchom `node t
 
 ## Edytor map i przezroczystość
 Esc wraca do menu (tam też ustawienia). Menu → „Edytor map": stawianie/usuwanie budynków i obiektów, rozmiar, obrót, eksport/import JSON (zapis lokalny w przeglądarce). Budynki zasłaniające postać robią się częściowo przezroczyste.
+
+## Atrybucje
+- Pałac Kultury i Nauki: uproszczony model oparty na modelu SketchUp (BezNazwy6.skp), autor wg metadanych pliku: **kon.kp**, licencja [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). W grze użyto tylko brył wyznaczonych z obrysów kondygnacji (zmieniono: uproszczenie, skala, obrót).

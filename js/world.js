@@ -1,4 +1,5 @@
 import * as THREE from '../vendor/three.module.js';
+import { PALACE, PALACE_HW, PALACE_HD, PALACE_H } from './palace.js';
 
 export function mulberry32(a) {
   return () => {
@@ -201,7 +202,7 @@ export function createWorld(scene) {
   }
   const bounds = (o) => o.t === 'b' ? { x: o.x, z: o.z, hw: o.w / 2, hd: o.d / 2, h: o.h }
     : o.t === 'c' ? (o.r ? { x: o.x, z: o.z, hw: 1.95, hd: 0.95, h: 1.4 } : { x: o.x, z: o.z, hw: 0.95, hd: 1.95, h: 1.4 })
-    : { x: o.x, z: o.z, hw: 12, hd: 12, h: 46 };
+    : { x: o.x, z: o.z, hw: PALACE_HW, hd: PALACE_HD, h: PALACE_H };
   const inBase = (b) => Math.abs(b.x) - b.hw < BASE_ZONE && Math.abs(b.z) - b.hd < BASE_ZONE;
   const inWorld = (b) => Math.abs(b.x) + b.hw <= EDGE && Math.abs(b.z) + b.hd <= EDGE;
 
@@ -223,12 +224,13 @@ export function createWorld(scene) {
         const hue = r() < 0.5 ? 0.04 : 0.6, sa = 0.25 + r() * 0.25, ry = o.r ? Math.PI / 2 : 0;
         add(i, o.x, 0.5, o.z, 1.8, 0.9, 3.8, ry, hue, sa, 0.18 + r() * 0.1);
         add(i, o.x, 1.15, o.z, 1.5, 0.5, 2.0, ry, hue, sa, 0.12);
-      } else {   // Pałac Kultury i Nauki: schodkowa wieża ze szpilą
-        add(i, o.x, 5, o.z, 24, 10, 24, 0, 0.08, 0.1, 0.24);
-        add(i, o.x, 16, o.z, 15, 12, 15, 0, 0.08, 0.1, 0.27);
-        add(i, o.x, 27, o.z, 9, 10, 9, 0, 0.08, 0.1, 0.3);
-        add(i, o.x, 35, o.z, 5, 6, 5, 0, 0.08, 0.1, 0.32);
-        add(i, o.x, 43, o.z, 0.8, 10, 0.8, 0, 0.1, 0.05, 0.4);
+      } else {   // Pałac Kultury i Nauki — model z pliku SketchUp (js/palace.js)
+        for (const [px, pz, w, d, h] of PALACE) {
+          const l = 0.2 + Math.min(h, 34) / 34 * 0.14;
+          add(i, o.x + px, h / 2, o.z + pz, w, h, d, 0, 0.08, 0.1, l);
+        }
+        for (const [px, pz, w, d, , blk] of PALACE) if (blk) cityBlk.push({ x: o.x + px, z: o.z + pz, hw: w / 2, hd: d / 2 });
+        return;
       }
       const bd = bounds(o);
       cityBlk.push({ x: bd.x, z: bd.z, hw: bd.hw, hd: bd.hd });
@@ -244,7 +246,7 @@ export function createWorld(scene) {
     for (let i = -5; i <= 5; i++) for (let j = -5; j <= 5; j++) {
       const cx = i * 14, cz = j * 14;
       if (Math.abs(cx) <= 28 && Math.abs(cz) <= 28) continue;      // strefa bazy
-      if (Math.abs(cx) <= 14 && cz <= -42 && cz >= -56) continue;   // miejsce na Pałac
+      if (Math.abs(cx) <= 28 && cz <= -42 && cz >= -56) continue;   // miejsce na Pałac
       if (cr() < 0.2) continue;
       const w = 5.5 + cr() * 3.5, d = 5.5 + cr() * 3.5, h = 2.5 + cr() * 4;
       out.push({ t: 'b', x: cx + (cr() - 0.5) * 1.5, z: cz + (cr() - 0.5) * 1.5, w, d, h, s: cr() });

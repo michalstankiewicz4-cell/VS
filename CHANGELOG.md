@@ -4,6 +4,13 @@ Wersjonowanie: `MAJOR.MINOR.PATCH`. Każda wysyłka do repozytorium to nowa wers
 Tagi `vX.Y.Z` zakłada właściciel na GitHubie (Releases) na commitach z tej historii; push tagów z sesji Claude jest blokowany.
 Poprawka błędu = PATCH, nowa funkcja = MINOR, duża zmiana rozgrywki lub zapisu = MAJOR.
 
+## [0.6.0] - 2026-10-13
+### Zmieniono
+- Pałac Kultury odtworzony z modelu SketchUp użytkownika: wieża ze schodkowymi kondygnacjami, narożne baszty i skrzydła (ok. 40 j. wysokości, kolizje przy skrzydłach).
+- Domyślna mapa zostawia wolne miejsce na większy kompleks Pałacu.
+### Atrybucja
+- Model: kon.kp (wg metadanych pliku), CC BY 4.0; informacja w README, menu i kodzie.
+
 ## [0.5.2] - 2026-10-13
 ### Naprawiono
 - Edytor map: nie dało się budować, bo widok startował w strefie bazy, a budynki nie mogły się nakładać. Widok startuje teraz poza bazą, nakładanie jest dozwolone, a przy czerwonym podglądzie edytor podaje przyczynę.
