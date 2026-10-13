@@ -23,7 +23,8 @@ const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, -30, 90);
 const camOffset = new THREE.Vector3(0, 14, 10);
 const camLook = new THREE.Vector3();
 const camRot = new THREE.Vector3(), UP = new THREE.Vector3(0, 1, 0);
-let yaw = 0, userZoom = 1;
+const YAW0 = 10 * Math.PI / 180;   // domyślny obrót kamery: 10° (jak po przesunięciu myszy w lewo)
+let yaw = YAW0, userZoom = 1;
 renderer.domElement.addEventListener('wheel', (e) => {
   e.preventDefault();
   userZoom = Math.min(2.2, Math.max(0.5, userZoom * Math.exp(-e.deltaY * 0.0012)));
