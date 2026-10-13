@@ -4,6 +4,10 @@ Wersjonowanie: `MAJOR.MINOR.PATCH`. Każda wysyłka do repozytorium to nowa wers
 Tagi `vX.Y.Z` zakłada właściciel na GitHubie (Releases) na commitach z tej historii; push tagów z sesji Claude jest blokowany.
 Poprawka błędu = PATCH, nowa funkcja = MINOR, duża zmiana rozgrywki lub zapisu = MAJOR.
 
+## [0.8.1] - 2026-10-13
+### Zmieniono
+- Punkt startu gracza: dziedziniec przed Pałacem Kultury (0, -36,5). Nic więcej.
+
 ## [0.8.0] - 2026-10-13
 ### Dodano
 - Pałac Kultury z proceduralnymi detalami (shader, bez zdjęć): siatka okien, arkady pod gzymsem głównej kondygnacji, smukłe szczeliny, tarcze zegara, piramidowy dach i szpic, gzymsy, pinakle i krenelaż baszt, kolor piaskowca.

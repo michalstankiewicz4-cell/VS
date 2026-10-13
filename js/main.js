@@ -109,9 +109,10 @@ function showUi(title, info) {
 function menuText() {
   return `Bank: ${bank} pkt · rekord: ${best}\nCeluj myszą, trzymaj LPM, aby strzelać. Ruch: WASD.\nObrót kamery: Q / E albo PPM + przeciągnięcie. Zoom: kółko myszy.\nModel Pałacu Kultury: kon.kp, CC BY 4.0 (uproszczony)\nwersja ${VERSION}`;
 }
+const START_Z = -36.5;   // punkt startu: dziedziniec przed Pałacem Kultury (Pałac stoi w (0, -46))
 function startRun() {
   setHud(false);
-  world.reset(); world.setMode('play'); mode = 'play'; zoomT = 1;
+  world.reset(); world.player.pos.set(0, 0, START_Z); world.setMode('play'); mode = 'play'; zoomT = 1;
   $('ui').hidden = true; $('build').hidden = true; $('ed').hidden = true;
 }
 function openBuild() {
