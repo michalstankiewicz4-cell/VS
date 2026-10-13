@@ -4,6 +4,9 @@ Wersjonowanie: `MAJOR.MINOR.PATCH`. Każda wysyłka do repozytorium to nowa wers
 Tagi `vX.Y.Z` zakłada właściciel na GitHubie (Releases) na commitach z tej historii; push tagów z sesji Claude jest blokowany.
 Poprawka błędu = PATCH, nowa funkcja = MINOR, duża zmiana rozgrywki lub zapisu = MAJOR.
 
+## [0.4.3] - 2026-10-13
+- Skrypt kontrolny wykrywa niepodbitą wersję także przy niezatwierdzonych zmianach.
+
 ## [0.4.2] - 2026-10-13
 - Skrypt kontrolny sam pobiera `origin/main` przed porównaniem (wcześniej w płytkim klonie nie miał punktu odniesienia).
 

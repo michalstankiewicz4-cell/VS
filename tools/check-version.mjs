@@ -17,8 +17,9 @@ if (log !== ver) fail(`js/version.js = ${ver}, a pierwszy wpis w CHANGELOG.md = 
 
 sh('git fetch -q origin +refs/heads/main:refs/remotes/origin/main');   // odśwież punkt odniesienia (best-effort)
 const head = sh('git rev-parse HEAD'), remote = sh('git rev-parse origin/main');
-if (head && head === remote) { console.log(`OK: wersja ${ver}, HEAD == origin/main (nic nowego do wysłania)`); process.exit(0); }
-if (sh('git status --porcelain')) console.log('Uwaga: są niezatwierdzone zmiany.');
+const dirty = !!sh('git status --porcelain');
+if (head && head === remote && !dirty) { console.log(`OK: wersja ${ver}, HEAD == origin/main (nic nowego do wysłania)`); process.exit(0); }
+if (dirty) console.log('Uwaga: są niezatwierdzone zmiany — wersja musi być wyższa od wysłanej.');
 
 const baseline = [];
 const sent = RE.exec(sh('git show origin/main:js/version.js'))?.[1];
