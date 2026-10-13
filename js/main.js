@@ -101,17 +101,21 @@ function ground(y) {
 }
 const cell = (p) => ({ gx: Math.round(p.x / 2), gz: Math.round(p.z / 2) });
 
+function setHud(on) { $('hud').hidden = !on; }
 function showUi(title, info) {
+  setHud(true);
   $('uiT').textContent = title; $('uiP').textContent = info; $('ui').hidden = false; $('build').hidden = true; $('ed').hidden = true;
 }
 function menuText() {
   return `Bank: ${bank} pkt · rekord: ${best}\nCeluj myszą, trzymaj LPM, aby strzelać. Ruch: WASD.\nObrót kamery: Q / E albo PPM + przeciągnięcie. Zoom: kółko myszy.\nwersja ${VERSION}`;
 }
 function startRun() {
+  setHud(false);
   world.reset(); world.setMode('play'); mode = 'play'; zoomT = 1;
   $('ui').hidden = true; $('build').hidden = true; $('ed').hidden = true;
 }
 function openBuild() {
+  setHud(false);
   world.reset(); world.setMode('idle'); mode = 'build'; zoomT = 0.7;
   $('ui').hidden = true; $('build').hidden = false; $('ed').hidden = true; refreshBuild();
 }
@@ -130,6 +134,7 @@ function refreshBuild() {
     : 'Usuń: zwraca połowę kosztu.';
 }
 function openEdit() {
+  setHud(false);
   world.reset(); world.setMode('idle'); mode = 'edit'; zoomT = 0.55; editCam.set(0, 0, 0);
   $('ui').hidden = true; $('build').hidden = true; $('ed').hidden = false; refreshEd();
 }
@@ -175,6 +180,13 @@ $('eImp').addEventListener('click', () => {
     const n = world.map.set(JSON.parse(txt));
     saveMap(); refreshEd(); $('eInfo').textContent = `Wczytano ${n} obiektów.`;
   } catch (e) { $('eInfo').textContent = 'Niepoprawny JSON mapy.'; }
+});
+function openMenu() {
+  world.reset(); world.setMode('idle'); mode = 'menu'; zoomT = 1;
+  showUi('Warszawa — Strefa Zero', menuText());
+}
+addEventListener('keydown', (e) => {
+  if (e.code === 'Escape' && mode !== 'menu' && mode !== 'dead') openMenu();
 });
 $('bEdit').addEventListener('click', openEdit);
 $('bPlay').addEventListener('click', startRun);

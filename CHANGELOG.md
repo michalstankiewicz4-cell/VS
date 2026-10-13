@@ -4,6 +4,11 @@ Wersjonowanie: `MAJOR.MINOR.PATCH`. Każda wysyłka do repozytorium to nowa wers
 Tagi `vX.Y.Z` zakłada właściciel na GitHubie (Releases) na commitach z tej historii; push tagów z sesji Claude jest blokowany.
 Poprawka błędu = PATCH, nowa funkcja = MINOR, duża zmiana rozgrywki lub zapisu = MAJOR.
 
+## [0.5.1] - 2026-10-13
+### Zmieniono
+- Esc w grze, budowaniu i edytorze wraca do menu startowego razem z panelem ustawień (statystyki, render).
+- Panel ustawień jest ukryty poza menu, więc nie zasłania gry ani edytora.
+
 ## [0.5.0] - 2026-10-13
 ### Dodano
 - Budynki stają się częściowo przezroczyste (rozrzucony wzór), gdy zasłaniają postać.

@@ -26,4 +26,4 @@ Wersja jest w `js/version.js` (widać ją w grze), historia w `CHANGELOG.md`, a 
 Przed każdym pushem: podbij wersję, dopisz wpis w changelogu i uruchom `node tools/check-version.mjs`.
 
 ## Edytor map i przezroczystość
-Menu → „Edytor map": stawianie/usuwanie budynków i obiektów, rozmiar, obrót, eksport/import JSON (zapis lokalny w przeglądarce). Budynki zasłaniające postać robią się częściowo przezroczyste.
+Esc wraca do menu (tam też ustawienia). Menu → „Edytor map": stawianie/usuwanie budynków i obiektów, rozmiar, obrót, eksport/import JSON (zapis lokalny w przeglądarce). Budynki zasłaniające postać robią się częściowo przezroczyste.
