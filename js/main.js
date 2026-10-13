@@ -23,7 +23,11 @@ const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, -30, 90);
 const camOffset = new THREE.Vector3(0, 14, 10);
 const camLook = new THREE.Vector3();
 const camRot = new THREE.Vector3(), UP = new THREE.Vector3(0, 1, 0);
-let yaw = 0;
+let yaw = 0, userZoom = 1;
+renderer.domElement.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  userZoom = Math.min(2.2, Math.max(0.5, userZoom * Math.exp(-e.deltaY * 0.0012)));
+}, { passive: false });
 
 /* ---- obrót kamery: Q/E albo PPM + przeciągnięcie ---- */
 const camKeys = { KeyQ: false, KeyE: false };
@@ -92,7 +96,7 @@ function showUi(title, info) {
   $('uiT').textContent = title; $('uiP').textContent = info; $('ui').hidden = false; $('build').hidden = true;
 }
 function menuText() {
-  return `Bank: ${bank} pkt · rekord: ${best}\nCeluj myszą, trzymaj LPM, aby strzelać. Ruch: WASD.\nObrót kamery: Q / E albo PPM + przeciągnięcie.`;
+  return `Bank: ${bank} pkt · rekord: ${best}\nCeluj myszą, trzymaj LPM, aby strzelać. Ruch: WASD.\nObrót kamery: Q / E albo PPM + przeciągnięcie. Zoom: kółko myszy.`;
 }
 function startRun() {
   world.reset(); world.setMode('play'); mode = 'play'; zoomT = 1;
@@ -168,7 +172,8 @@ function loop(now) {
   camLook.lerp(target, 1 - Math.exp(-6 * dt));
   camera.position.copy(camLook).add(camRot.copy(camOffset).applyAxisAngle(UP, yaw));
   camera.lookAt(camLook);
-  if (Math.abs(camera.zoom - zoomT) > 0.002) { camera.zoom += (zoomT - camera.zoom) * Math.min(1, dt * 6); camera.updateProjectionMatrix(); }
+  const zt = zoomT * userZoom;
+  if (Math.abs(camera.zoom - zt) > 0.002) { camera.zoom += (zt - camera.zoom) * Math.min(1, dt * 8); camera.updateProjectionMatrix(); }
 
   pipe.render(scene, camera);
 
