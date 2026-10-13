@@ -59,7 +59,6 @@ export default {
   'act.interact': 'Enter / exit car',
   'act.cameraView': 'Camera view (in a car)',
   'act.editRotate': 'Rotate object (map editor)',
-  'act.bend': 'Fold the city (Inception effect)',
 
   'mouse.rot': 'Camera rotation speed',
   'mouse.zoom': 'Zoom speed',
@@ -93,7 +92,7 @@ export default {
   'hud.carIn': ' · car {kmh} km/h · {exit}: exit · {view}: camera',
   'hud.carNear': ' · {key}: enter car',
   'hud.fps': 'v{version} · {fps} fps · render {w}×{h}',
-  'hud.hint': 'Move: {move} · fire: {fire} · camera: {cam} or {drag}-drag · zoom: wheel · {interact}: car · {bend}: fold city · Esc: pause',
+  'hud.hint': 'Move: {move} · fire: {fire} · camera: {cam} or {drag}-drag · zoom: wheel · {interact}: car · Esc: pause',
 
   'build.bank': 'Bank: {bank} pts · bunkers: {n}/3',
   'build.tower': 'Sentry gun (25)',

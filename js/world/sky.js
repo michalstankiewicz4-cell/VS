@@ -49,6 +49,5 @@ export function createSky({ scene }) {
     moon.position.set(px - 10 + 8 * n, 18, pz + 8 - 4 * n);
     moon.target.position.set(px, 0, pz);
   }
-  const setShadows = (on) => { moon.castShadow = on; };    // off while the city is folded (shadows would not bend)
-  return { nightU, nightAt, apply, follow, setShadows };
+  return { nightU, nightAt, apply, follow };
 }

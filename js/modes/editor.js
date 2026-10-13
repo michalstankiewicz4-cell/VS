@@ -13,7 +13,7 @@ export function createEditor({ root, canvas, world, settings, groundAt, pickInde
     inp.addEventListener('input', () => { out.textContent = inp.value; });
     return { el: h('label', { class: 'row' }, tx(labelKey), inp, out), inp };
   };
-  const W = slider('ed.width', 4, 14, 1, 8), D = slider('ed.depth', 4, 14, 1, 8), H = slider('ed.height', 2, 30, 0.5, 4);
+  const W = slider('ed.width', 4, 14, 1, 8), D = slider('ed.depth', 4, 14, 1, 8), H = slider('ed.height', 2, 9, 0.5, 4);
   const info = h('p', { class: 'note' }), json = h('textarea', { rows: 5, spellcheck: 'false', hidden: true, 'aria-label': 'Map JSON' });
   const tools = {};
   const mkTool = (id, key) => { const b = btn(key, () => { tool = id; note = ''; refresh(); }); tools[id] = b; return b; };
@@ -78,8 +78,8 @@ export function createEditor({ root, canvas, world, settings, groundAt, pickInde
     // mv: camera-relative pan vector; zoom: current user zoom (pans slower when zoomed in)
     update(dt, mv, zoom) {
       if (!active) return;
-      pan.x = Math.max(-100, Math.min(100, pan.x + mv.x * 28 * dt / zoom));
-      pan.z = Math.max(-100, Math.min(100, pan.z + mv.z * 28 * dt / zoom));
+      pan.x = Math.max(-70, Math.min(70, pan.x + mv.x * 28 * dt / zoom));
+      pan.z = Math.max(-70, Math.min(70, pan.z + mv.z * 28 * dt / zoom));
       if (tool === 'x') {
         why = '';
         const i = pickIndex();

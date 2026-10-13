@@ -16,7 +16,7 @@ export function createTerrain({ scene, rnd, dummy }) {
   tex.magFilter = tex.minFilter = THREE.NearestFilter;
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.repeat.set(GROUND / TILE, GROUND / TILE);
-  const ground = new THREE.Mesh(new THREE.PlaneGeometry(GROUND, GROUND, 130, 130), new THREE.MeshLambertMaterial({ map: tex }));
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(GROUND, GROUND), new THREE.MeshLambertMaterial({ map: tex }));
   ground.rotation.x = -Math.PI / 2;
   ground.receiveShadow = true;
   scene.add(ground);

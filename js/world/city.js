@@ -15,7 +15,7 @@ const r1 = (v) => Math.round(v * 10) / 10;
 function clean(o) {
   if (!o || typeof o !== 'object') return null;
   const x = r1(num(o.x, -EDGE, EDGE, 0)), z = r1(num(o.z, -EDGE, EDGE, 0)), s = num(o.s, 0, 1, 0.5);
-  if (o.t === 'b') return { t: 'b', x, z, w: r1(num(o.w, 3, 16, 8)), d: r1(num(o.d, 3, 16, 8)), h: r1(num(o.h, 1.5, 30, 4)), s };
+  if (o.t === 'b') return { t: 'b', x, z, w: r1(num(o.w, 3, 16, 8)), d: r1(num(o.d, 3, 16, 8)), h: r1(num(o.h, 1.5, 9, 4)), s };
   if (o.t === 'c') return { t: 'c', x, z, r: o.r ? 1 : 0, s };
   if (o.t === 'p') return { t: 'p', x: PALACE_POS.x, z: PALACE_POS.z, s };
   return null;
@@ -28,7 +28,7 @@ const inWorld = (b) => Math.abs(b.x) + b.hw <= EDGE && Math.abs(b.z) + b.hd <= E
 
 export function createCity({ scene, dummy, col, vehicles, nightU }) {
   const { material, fade } = createCityMaterial({ nightU });
-  const geo = new THREE.BoxGeometry(1, 1, 1, 4, 6, 4);   // tessellated so buildings can bend smoothly
+  const geo = new THREE.BoxGeometry(1, 1, 1);
   // per-instance attribute: (facade kind, top y) for the Palace shader
   const aK = new THREE.InstancedBufferAttribute(new Float32Array(CAP * 2), 2);
   geo.setAttribute('aK', aK);
@@ -52,12 +52,6 @@ export function createCity({ scene, dummy, col, vehicles, nightU }) {
       const r = mulberry32(Math.floor(o.s * 1e9) + 1);
       if (o.t === 'b') {
         const hue = 0.05 + r() * 0.06, li = 0.2 + r() * 0.14, { w, d, h } = o;
-        if (h > 9) {   // skyscraper: glass-and-concrete tower with a shader window grid (lit windows at night)
-          add(i, o.x, h / 2, o.z, w, h, d, 0, 0.58 + r() * 0.06, 0.12, 0.3 + r() * 0.12, 2, h);
-          add(i, o.x, h + 0.4, o.z, w * 0.4, 0.8, d * 0.4, 0, hue, 0.08, 0.2);   // roof machinery
-          const b = bounds(o); col.cityBlk.push({ x: b.x, z: b.z, hw: b.hw, hd: b.hd });
-          return;
-        }
         add(i, o.x, h / 2, o.z, w, h, d, 0, hue, 0.1, li);
         add(i, o.x, h * 0.55, o.z + d * 0.51, w * 0.7, h * 0.5, 0.15, 0, 0, 0, 0.05);   // dark broken windows
         const roof = r() < 0.6, ax = (r() - 0.5) * w * 0.4, az = (r() - 0.5) * d * 0.4, ry = r() * 3;

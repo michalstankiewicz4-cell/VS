@@ -4,14 +4,9 @@ Versioning: `MAJOR.MINOR.PATCH`. Every push to the repository is a new version (
 The owner creates `vX.Y.Z` tags in GitHub Releases on commits from this history; pushing tags from a Claude session is blocked.
 Bug fix = PATCH, new feature = MINOR, big change to gameplay or the save format = MAJOR.
 
-## [0.12.0] - 2026-10-14
-### Added
-- **Space folds the city** (Inception effect): everything ahead of the player bends along an arc that rises and curls over the sky; press again to unfold. Visual only (movement, aiming and shooting still use the flat map). Rebindable (Options > Controls: "Fold the city"); the camera zooms out slightly while folded and shadows are switched off during the fold.
-- Skyscrapers (14–30 units tall) with a window grid that glows at night, in the outer ring of the default map; the map editor height slider now goes up to 30.
-- Two asphalt avenues with lane markings (x = 7 and z = 7).
-### Changed
-- Bigger map: movement/placement limit 76 → 110, object limit 380 → 560, larger default city and more parked cars. A map you saved earlier in the editor is kept as is; use "Default map" in the editor to get the new layout.
-- Buildings and roads are tessellated so they can bend smoothly.
+## [0.12.1] - 2026-10-14
+### Reverted
+- Version 0.12.0 (bigger map, skyscrapers, avenues, Space fold effect) was rolled back; the game is exactly as in 0.11.0.
 
 ## [0.11.0] - 2026-10-13
 ### Added
