@@ -4,6 +4,10 @@ Wersjonowanie: `MAJOR.MINOR.PATCH`. Każda wysyłka do repozytorium to nowa wers
 Tagi `vX.Y.Z` zakłada właściciel na GitHubie (Releases) na commitach z tej historii; push tagów z sesji Claude jest blokowany.
 Poprawka błędu = PATCH, nowa funkcja = MINOR, duża zmiana rozgrywki lub zapisu = MAJOR.
 
+## [0.10.0] - 2026-10-13
+### Dodano
+- Samochody: w trakcie gry auta z mapy są pojazdami. **F** — wsiądź (w pobliżu auta) / wysiądź. Jazda: W/S gaz i hamulec (wsteczny), A/D skręt; maks. ok. 54 km/h. Auto zderza się ze ścianami i innymi autami, przejechanie zombie (powyżej ok. 11 km/h) zabija go (+1 pkt). Zombie atakują auto tylko przy małej prędkości (obrażenia o połowę mniejsze). Za kierownicą nie strzelasz; wieże działają. Zaparkowane auta nadal blokują ruch i pociski. W edytorze i menu auta są jak dotąd statyczne.
+
 ## [0.9.1] - 2026-10-13
 ### Zmieniono
 - Nazwa gry: **Capital Quarantine** (zamiast „Warsaw Quarantine”) — menu, tytuł karty, SEO, README, dokumentacja. W słowach kluczowych zostaje „Warsaw”.

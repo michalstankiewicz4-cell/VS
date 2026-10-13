@@ -274,8 +274,98 @@ export function createWorld(scene) {
   const inBase = (b) => Math.abs(b.x) - b.hw < BASE_ZONE && Math.abs(b.z) - b.hd < BASE_ZONE;
   const inWorld = (b) => Math.abs(b.x) + b.hw <= EDGE && Math.abs(b.z) + b.hd <= EDGE;
 
+  /* ---- pojazdy: auta z mapy są jeżdżące w trakcie gry (F: wsiądź/wysiądź) ---- */
+  const VMAX = 64;
+  const VPARTS = [   // [dx (bok), dy, dz (przód), sx, sy, sz, barwa]  barwa: 0 karoseria, 1 szyby, 2 koła, 3 światła
+    [0, 0.65, 0, 1.8, 0.7, 3.8, 0], [0, 1.25, -0.2, 1.5, 0.5, 2.0, 1],
+    [-0.95, 0.35, 1.25, 0.3, 0.7, 0.7, 2], [0.95, 0.35, 1.25, 0.3, 0.7, 0.7, 2],
+    [-0.95, 0.35, -1.25, 0.3, 0.7, 0.7, 2], [0.95, 0.35, -1.25, 0.3, 0.7, 0.7, 2],
+    [-0.6, 0.7, 1.92, 0.4, 0.22, 0.1, 3], [0.6, 0.7, 1.92, 0.4, 0.22, 0.1, 3],
+  ];
+  const vm = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshLambertMaterial({ color: 0xffffff }), VMAX * VPARTS.length);
+  vm.castShadow = vm.receiveShadow = true; vm.frustumCulled = false; vm.count = 0;
+  scene.add(vm);
+  const veh = [];
+  let liveCars = false, driving = null;
+  const CAR = { max: 15, rev: 6, acc: 14, racc: 9, brake: 28, coast: 4, turn: 1.9 };
+  function placeVeh(v) {
+    const c = Math.cos(v.th), sn = Math.sin(v.th);
+    VPARTS.forEach(([dx, dy, dz, sx, sy, sz], k) => {
+      dummy.position.set(v.x + dx * c + dz * sn, dy, v.z - dx * sn + dz * c);
+      dummy.rotation.set(0, v.th, 0); dummy.scale.set(sx, sy, sz); dummy.updateMatrix();
+      vm.setMatrixAt(v.i * VPARTS.length + k, dummy.matrix);
+    });
+    vm.instanceMatrix.needsUpdate = true;
+  }
+  function paintVeh(v) {
+    VPARTS.forEach((p, k) => {
+      const col = p[6] === 0 ? cc.setHSL(v.hue, v.sa, v.l) : p[6] === 1 ? cc.setHSL(0.6, 0.2, 0.1) : p[6] === 2 ? cc.setHSL(0, 0, 0.04) : cc.setHSL(0.13, 0.9, 0.6);
+      vm.setColorAt(v.i * VPARTS.length + k, col);
+    });
+    if (vm.instanceColor) vm.instanceColor.needsUpdate = true;
+  }
+  const parkBlk = (v) => {   // zaparkowane auto: wyrównane do osi, blokuje ruch i pociski
+    const alongZ = Math.abs(Math.sin(v.th)) < 0.5;
+    v.blk.x = v.x; v.blk.z = v.z; v.blk.hw = alongZ ? 0.95 : 1.95; v.blk.hd = alongZ ? 1.95 : 0.95;
+  };
+  function endDrive() {
+    if (!driving) return;
+    const v = driving; driving = null;
+    v.th = Math.round(v.th / (Math.PI / 2)) * Math.PI / 2; v.vel = 0;
+    parkBlk(v); cityBlk.push(v.blk); placeVeh(v);
+    const c = Math.cos(v.th), sn = Math.sin(v.th);
+    const ox = { v: v.x - 2.0 * c }, oz = { v: v.z + 2.0 * sn };   // wysiadasz z lewej strony
+    push(ox, oz, 0.45);
+    state.pos.set(ox.v, 0, oz.v); player.visible = true; S.driving = false;
+  }
+  function nearestCar(maxD) {
+    let best = null, bd = maxD * maxD;
+    for (const v of veh) { const dx = v.x - state.pos.x, dz = v.z - state.pos.z, d = dx * dx + dz * dz; if (d < bd) { bd = d; best = v; } }
+    return best;
+  }
+  function toggleCar() {
+    if (S.mode !== 'play') return;
+    if (driving) { endDrive(); return; }
+    const v = nearestCar(3.4);
+    if (!v) return;
+    const i = cityBlk.indexOf(v.blk); if (i >= 0) cityBlk.splice(i, 1);
+    driving = v; player.visible = false; S.driving = true; state.pos.set(v.x, 0, v.z);
+  }
+  function driveStep(dt, thr, steer, t) {
+    const v = driving;
+    // przyspieszanie, hamowanie, toczenie się
+    if (thr > 0) v.vel += (v.vel < 0 ? CAR.brake : CAR.acc) * thr * dt;
+    else if (thr < 0) v.vel += (v.vel > 0 ? -CAR.brake : -CAR.racc) * -thr * dt;
+    else v.vel -= Math.sign(v.vel) * Math.min(Math.abs(v.vel), CAR.coast * dt);
+    v.vel = Math.max(-CAR.rev, Math.min(CAR.max, v.vel));
+    // skręt zależny od prędkości (prawo = obrót zgodnie z ruchem wskazówek zegara na ekranie)
+    v.th -= steer * CAR.turn * Math.max(-1, Math.min(1, v.vel / 5)) * dt;
+    let nx = v.x + Math.sin(v.th) * v.vel * dt, nz = v.z + Math.cos(v.th) * v.vel * dt;
+    // kolizje: dwa koła (przód, tył)
+    const f = Math.sin(v.th), g = Math.cos(v.th);
+    let mx = 0, mz = 0;
+    for (const o of [1.0, -1.0]) {
+      const a = { v: nx + f * o }, b = { v: nz + g * o };
+      const ax = a.v, bz = b.v; push(a, b, 0.95);
+      mx += a.v - ax; mz += b.v - bz;
+    }
+    if (Math.abs(mx) + Math.abs(mz) > 0.02) { v.vel *= Math.max(0, 1 - 4 * dt) * 0.9; }
+    nx += mx; nz += mz;
+    v.x = Math.max(-76, Math.min(76, nx)); v.z = Math.max(-76, Math.min(76, nz));
+    state.pos.set(v.x, 0, v.z); state.face = v.th;
+    placeVeh(v);
+    S.speed = Math.abs(v.vel);
+  }
+  // przejechanie zombie
+  function runOver(i) {
+    const v = driving; if (!v || Math.abs(v.vel) < 3) return false;
+    const dx = ex[i] - v.x, dz = ez[i] - v.z, c = Math.cos(v.th), sn = Math.sin(v.th);
+    const fw = dx * sn + dz * c, sd = dx * c - dz * sn;
+    return Math.abs(fw) < 2.2 && Math.abs(sd) < 1.2;
+  }
+
   function rebuildCity() {
-    let bn = 0; own.length = 0; cityBlk.length = 0;
+    let bn = 0; own.length = 0; cityBlk.length = 0; veh.length = 0; driving = null;
     const add = (i, x, y, z, sx, sy, sz, ry, h, sa, l, kind = 0, top = 0) => {
       aK.setXY(bn, kind, top);
       dummy.position.set(x, y, z); dummy.rotation.set(0, ry, 0); dummy.scale.set(sx, sy, sz); dummy.updateMatrix();
@@ -290,8 +380,13 @@ export function createWorld(scene) {
         const roof = r() < 0.6, ax = (r() - 0.5) * w * 0.4, az = (r() - 0.5) * d * 0.4, ry = r() * 3;
         if (roof) add(i, o.x + ax, h + 0.3, o.z + az, w * 0.5, 0.6, d * 0.5, ry, hue, 0.08, li * 0.8);  // zawalony strop
       } else if (o.t === 'c') {
-        const hue = r() < 0.5 ? 0.04 : 0.6, sa = 0.25 + r() * 0.25, ry = o.r ? Math.PI / 2 : 0;
-        add(i, o.x, 0.5, o.z, 1.8, 0.9, 3.8, ry, hue, sa, 0.18 + r() * 0.1);
+        const hue = r() < 0.5 ? 0.04 : 0.6, sa = 0.25 + r() * 0.25, ry = o.r ? Math.PI / 2 : 0, li = 0.18 + r() * 0.1;
+        if (liveCars && veh.length < VMAX) {   // w trakcie gry auto jest pojazdem
+          const v = { i: veh.length, x: o.x, z: o.z, th: o.r ? (r() < 0.5 ? 1 : -1) * Math.PI / 2 : (r() < 0.5 ? 0 : Math.PI), vel: 0, hue, sa, l: li, blk: {} };
+          parkBlk(v); veh.push(v); cityBlk.push(v.blk);
+          return;
+        }
+        add(i, o.x, 0.5, o.z, 1.8, 0.9, 3.8, ry, hue, sa, li);
         add(i, o.x, 1.15, o.z, 1.5, 0.5, 2.0, ry, hue, sa, 0.12);
       } else {   // Pałac Kultury i Nauki — model z pliku SketchUp (js/palace.js)
         for (const [px, pz, w, d, y1, , kind, y0 = 0] of PALACE) {
@@ -304,6 +399,8 @@ export function createWorld(scene) {
       const bd = bounds(o);
       cityBlk.push({ x: bd.x, z: bd.z, hw: bd.hw, hd: bd.hd });
     });
+    vm.count = veh.length * VPARTS.length;
+    for (const v of veh) { placeVeh(v); paintVeh(v); }
     bm.count = bn;
     bm.instanceMatrix.needsUpdate = true; aK.needsUpdate = true;
     if (bm.instanceColor) bm.instanceColor.needsUpdate = true;
@@ -479,40 +576,51 @@ export function createWorld(scene) {
   }
 
   function reset() {
-    state.pos.set(0, 0, 0); state.face = 0;
+    if (driving) endDrive();
+    state.pos.set(0, 0, 0); state.face = 0; player.visible = true; S.driving = false; S.speed = 0;
     S.maxHp = 100 + 25 * countType('crypt'); S.hp = S.maxHp;
     S.kills = 0; S.pts = 0; S.time = 0; S.night = 0; S.fireCd = 0; S.active = 0;
     for (let i = 0; i < ENEMIES; i++) park(i);
     for (let i = 0; i < PN; i++) { pl[i] = 0; hideP(i); }
     em.instanceMatrix.needsUpdate = true; pm.instanceMatrix.needsUpdate = true;
   }
-  const setMode = (m) => { S.mode = m; };
+  const setMode = (m) => {
+    S.mode = m;
+    const live = m === 'play';
+    if (live !== liveCars) { if (!live && driving) endDrive(); liveCars = live; rebuildCity(); }
+  };
 
-  function update(dt, t, mv, aim, firing) {
+  function update(dt, t, mv, aim, firing, drv = { thr: 0, steer: 0 }) {
     const nightN = S.mode === 'play' ? nightAt(S.time) : 0;
     applySky(nightN);
     if (S.mode !== 'play') return;
     S.time += dt;
 
-    // gracz
-    const px0 = { v: state.pos.x + mv.x * state.speed * dt }, pz0 = { v: state.pos.z + mv.z * state.speed * dt };
-    push(px0, pz0, 0.45);
-    state.pos.x = px0.v; state.pos.z = pz0.v;
-    const moving = mv.x !== 0 || mv.z !== 0;
+    // gracz (pieszo albo za kierownicą)
+    if (driving) {
+      driveStep(dt, drv.thr, drv.steer, t);
+      S.carNear = false;
+    } else {
+      const px0 = { v: state.pos.x + mv.x * state.speed * dt }, pz0 = { v: state.pos.z + mv.z * state.speed * dt };
+      push(px0, pz0, 0.45);
+      state.pos.x = px0.v; state.pos.z = pz0.v;
+      const moving = mv.x !== 0 || mv.z !== 0;
+      let want = moving ? Math.atan2(mv.x, mv.z) : state.face;
+      if (firing && aim) want = Math.atan2(aim.x - state.pos.x, aim.z - state.pos.z);
+      let d = want - state.face; d = Math.atan2(Math.sin(d), Math.cos(d));
+      state.face += d * Math.min(1, dt * 14);
+      player.rotation.y = state.face;
+      rig.position.y = moving ? Math.abs(Math.sin(t * 11)) * 0.07 : 0;
+      legL.rotation.x = moving ? Math.sin(t * 11) * 0.7 : 0;
+      legR.rotation.x = moving ? -Math.sin(t * 11) * 0.7 : 0;
+      state.pos.x = Math.max(-76, Math.min(76, state.pos.x)); state.pos.z = Math.max(-76, Math.min(76, state.pos.z));
+      S.carNear = !!nearestCar(3.4);
+    }
     const px = state.pos.x, pz = state.pos.z;
-    let want = moving ? Math.atan2(mv.x, mv.z) : state.face;
-    if (firing && aim) want = Math.atan2(aim.x - px, aim.z - pz);
-    let d = want - state.face; d = Math.atan2(Math.sin(d), Math.cos(d));
-    state.face += d * Math.min(1, dt * 14);
-    player.rotation.y = state.face;
-    rig.position.y = moving ? Math.abs(Math.sin(t * 11)) * 0.07 : 0;
-    legL.rotation.x = moving ? Math.sin(t * 11) * 0.7 : 0;
-    legR.rotation.x = moving ? -Math.sin(t * 11) * 0.7 : 0;
-    state.pos.x = Math.max(-76, Math.min(76, state.pos.x)); state.pos.z = Math.max(-76, Math.min(76, state.pos.z));
 
-    // strzelanie
+    // strzelanie (tylko pieszo)
     S.fireCd -= dt;
-    if (firing && aim && S.fireCd <= 0) {
+    if (!driving && firing && aim && S.fireCd <= 0) {
       let dx = aim.x - px, dz = aim.z - pz; const l = Math.hypot(dx, dz) || 1;
       const a = Math.atan2(dx, dz) + (rnd() - 0.5) * 0.08;
       dx = Math.sin(a); dz = Math.cos(a);
@@ -548,8 +656,9 @@ export function createWorld(scene) {
       const dx = px - ex[i], dz = pz - ez[i];
       const dist = Math.hypot(dx, dz) || 1;
       if (dist > 34) { spawn(i, state.pos); continue; }
+      if (driving && runOver(i)) { S.kills++; S.pts++; spawn(i, state.pos); continue; }
       let vx = dx / dist, vz = dz / dist;
-      if (dist < 1.1) touching++;
+      if (driving ? (dist < 2.6 && Math.abs(driving.vel) < 3) : dist < 1.1) touching++;
       if (dist < 1.0) { vx = 0; vz = 0; }
       for (let j = 0; j < S.active; j++) {
         if (j === i) continue;
@@ -566,7 +675,7 @@ export function createWorld(scene) {
       em.setMatrixAt(i, dummy.matrix);
     }
     em.instanceMatrix.needsUpdate = true;
-    S.hp -= touching * 8 * dt;
+    S.hp -= touching * 8 * dt * (driving ? 0.5 : 1);
     if (S.hp <= 0) { S.hp = 0; S.mode = 'dead'; }
 
     // wieże
@@ -610,5 +719,5 @@ export function createWorld(scene) {
     pm.instanceMatrix.needsUpdate = true;
   }
 
-  return { player: state, S, nightAt, DAY_LEN, update, reset, setMode, place, remove, canPlace, list, load, count: countType, setGhost, setGhostBox, map, fade, enemyCount: ENEMIES };
+  return { player: state, S, toggleCar, nightAt, DAY_LEN, update, reset, setMode, place, remove, canPlace, list, load, count: countType, setGhost, setGhostBox, map, fade, enemyCount: ENEMIES };
 }

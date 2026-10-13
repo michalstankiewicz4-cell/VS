@@ -40,6 +40,7 @@ Publikacja: repo <https://github.com/michalstankiewicz4-cell/VS>, strona <https:
 - **Fasada Pałacu**: ten sam materiał, rodzaje 1–5 w shaderze (okna, arkady, szczeliny, tarcze zegara); okna świecą nocą (`uNight`).
 - **Struktury bazy** (`COST`): `tower` Stanowisko CKM 25, `wall` barykada 8, `crypt` schron 40 (+25 maks. HP, max 3). Siatka budowy co 2 j., zasięg ±14 komórek; usunięcie zwraca połowę kosztu.
 - **Wrogowie**: liczba aktywnych rośnie z czasem (`18 + S.time`, do 110), HP z czasem (`hpFor`: 2/3/4), prędkość rośnie do +80% (`S.time/240`). Zabójstwo = 1 pkt.
+- **Pojazdy** (`world.js`): w trybie `play` obiekty `{t:'c'}` stają się pojazdami (`veh`, osobna `InstancedMesh` `vm`, 8 brył na auto, maks. 64). `rebuildCity()` przy zmianie trybu włącza/wyłącza `liveCars`. `toggleCar()` (klawisz F) wsiada/wysiada; `driveStep()` — prosta fizyka (przyspieszenie 14, hamowanie 28, maks. 15 j./s, skręt zależny od prędkości), kolizje dwoma kołami przez `push()`, `runOver()` — przejechanie zombie. Zaparkowane auto = blokada AABB wyrównana do osi (po wysiadaniu kąt zaokrąglany do 90°). Wejście: `Input.axes()`.
 - **Cykl dnia i nocy**: okres 600 s (≈5 min dnia + 5 min nocy), przejścia ≈40 s, `nightAt(czas)`, bieg startuje za dnia; menu/budowa/edytor zawsze dzień. `applySky(n)` interpoluje niebo, mgłę, światła i latarkę.
 - Punkt startu gracza: `START_Z = -36.5` w `main.js` (dziedziniec przed Pałacem).
 

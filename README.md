@@ -1,7 +1,7 @@
 # Capital Quarantine
 
 Postapokaliptyczna Warszawa: człowiek z karabinem kontra zombie, widok z góry, 3D w niskiej rozdzielczości z filtrem pixel-art (three.js). Za punkty po śmierci budujesz bazę. Grasz: <https://michalstankiewicz4-cell.github.io/VS/>
-Sterowanie: WASD ruch, LPM strzał, Q/E lub PPM+przeciągnięcie obrót kamery, kółko zoom, Esc menu.
+Sterowanie: WASD ruch, LPM strzał, F auto (wsiądź/wysiądź), Q/E lub PPM+przeciągnięcie obrót kamery, kółko zoom, Esc menu.
 
 **Dokumentacja:** [`docs/ARCHITEKTURA.md`](docs/ARCHITEKTURA.md) (kontekst i pliki) · [`TODO.md`](TODO.md) · [`docs/MULTIPLAYER.md`](docs/MULTIPLAYER.md) · [`CLAUDE.md`](CLAUDE.md) (zasady pracy asystenta) · [`CHANGELOG.md`](CHANGELOG.md)
 
@@ -39,3 +39,6 @@ Czas biegu: ~5 min dnia, ~5 min nocy, naprzemiennie (menu, budowa i edytor zawsz
 
 ## SEO
 Tagi w `index.html` (EN + PL), miniatura `assets/og-image.png`, `sitemap.xml`. Po wdrożeniu dodaj stronę w Google Search Console (typ „Prefiks adresu URL") i wyślij sitemapę.
+
+## Auta
+F — wsiądź/wysiądź z auta stojącego w pobliżu; W/S gaz i hamulec, A/D skręt; przejechanie zombie zabija go.

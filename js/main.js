@@ -188,6 +188,7 @@ function openMenu() {
   showUi('Capital Quarantine', menuText());
 }
 addEventListener('keydown', (e) => {
+  if (e.code === 'KeyF' && mode === 'play' && !e.repeat && !inForm(e.target)) world.toggleCar();
   if (e.code === 'Escape' && mode !== 'menu' && mode !== 'dead') openMenu();
 });
 $('bEdit').addEventListener('click', openEdit);
@@ -228,7 +229,7 @@ function loop(now) {
   const mv = { x: raw.x * cy + raw.z * sy, z: -raw.x * sy + raw.z * cy };
   let aim = null;
   if (mode === 'play') aim = ground(0.9);
-  world.update(dt, now / 1000, mv, aim, input.firing);
+  world.update(dt, now / 1000, mv, aim, input.firing, input.axes());
   if (mode === 'play') {
     input.tick(dt, raw.x !== 0 || raw.z !== 0);
     if (S.mode === 'dead') die();
@@ -278,7 +279,7 @@ function loop(now) {
     $('hpbar').firstElementChild.style.width = (S.maxHp ? S.hp / S.maxHp * 100 : 0) + '%';
     const m = Math.floor(S.time / 60), s = String(Math.floor(S.time % 60)).padStart(2, '0');
     $('run').textContent = mode === 'play'
-      ? `HP ${Math.ceil(S.hp)}/${S.maxHp} · pkt ${S.pts} · zabójstwa ${S.kills} · ${m}:${s} · ${S.night > 0.5 ? 'noc' : 'dzień'} · bank ${bank}`
+      ? `HP ${Math.ceil(S.hp)}/${S.maxHp} · pkt ${S.pts} · zabójstwa ${S.kills} · ${m}:${s} · ${S.night > 0.5 ? 'noc' : 'dzień'} · bank ${bank}${S.driving ? ` · auto ${Math.round(S.speed * 3.6)} km/h · F: wysiądź` : S.carNear ? ' · F: wsiądź do auta' : ''}`
       : `bank ${bank} pkt`;
     const c = input.counts;
     $('stats').textContent = `ruch ${c.move} · kliknięcia ${c.click}\nuniki ${c.dash} · interakcje ${c.interact} · budowa ${c.build}`;

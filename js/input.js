@@ -14,7 +14,7 @@ const MOVE = {
 const ACTIONS = {
   KeyW: 'move', KeyA: 'move', KeyS: 'move', KeyD: 'move',
   ArrowUp: 'move', ArrowDown: 'move', ArrowLeft: 'move', ArrowRight: 'move',
-  Space: 'dash', KeyE: 'interact', KeyB: 'build'
+  Space: 'dash', KeyE: 'interact', KeyF: 'interact', KeyB: 'build'
 };
 const WINDOW_S = 60;
 
@@ -54,6 +54,12 @@ export class Input {
     if (!act) return;
     if (MOVE[e.code]) { down ? this.held.add(e.code) : this.held.delete(e.code); }
     if (down && !e.repeat && this.enabled) { this.counts[act]++; this.cur.a++; }
+  }
+
+  axes() {   // sterowanie pojazdem: gaz/hamulec i skręt (bez normalizacji)
+    let t = 0, st = 0;
+    for (const k of this.held) { st += MOVE[k][0]; t -= MOVE[k][1]; }
+    return { thr: Math.max(-1, Math.min(1, t)), steer: Math.max(-1, Math.min(1, st)) };
   }
 
   moveVector() {

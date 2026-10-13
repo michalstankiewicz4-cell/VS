@@ -17,6 +17,8 @@ Legenda: **P1** następne, **P2** później, **P3** pomysły. Stan na v0.8.2. Ko
 - [ ] P2 Dźwięk (strzały, kroki, zmierzch) — bez zewnętrznych plików albo lokalne, mała waga
 - [ ] P3 Pogoda, losowe wydarzenia, więcej landmarków Warszawy (Stadion, Złote Tarasy…)
 
+- [ ] P2 Auta: obrażenia/paliwo, światła nocą, dźwięk silnika, kolizje auto–auto, wsiadanie przez zombie-kierowców? (pomysł)
+
 ## Wygląd
 - [ ] P2 Pałac: podglądy z bliska (zegar, arkady), poprawki proporcji względem modelu
 - [ ] P2 Zniszczenia/ruiny budynków, ogień, dym
