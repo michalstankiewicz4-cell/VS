@@ -3,6 +3,7 @@ import * as THREE from '../../vendor/three.module.js';
 import { h, btn, tx } from '../ui/dom.js';
 import { t, onLang } from '../i18n/index.js';
 import { createUnderlay } from './underlay.js';
+import { read, write, KEYS } from '../core/storage.js';
 import { moveLabel, camLabel, firstKey } from '../input/bindings.js';
 
 export function createEditor({ scene, root, canvas, world, settings, groundAt, pickIndex, isPaused, onPlay, saveMap }) {
@@ -75,9 +76,29 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
         } catch (e) { note = t('ed.badJson'); refresh(); }
       })),
     json, info);
+  // Remember editor settings (tool, rotation, top view, sliders) between sessions; the underlay image itself is not saved.
+  const sliders = { w: W, d: D, h: H, rw: RW, rl: RL, city: uCity, uo: uO };
+  const sv = read(KEYS.editor), clampN = (v, s) => Math.min(+s.inp.max, Math.max(+s.inp.min, +v));
+  if (sv && typeof sv === 'object') {
+    if (['b', 'c', 'r', 'x'].includes(sv.tool)) tool = sv.tool;
+    rot = sv.rot ? 1 : 0; top = !!sv.top;
+    for (const [k, s] of Object.entries(sliders)) {
+      if (!Number.isFinite(+sv[k]) || sv[k] === null) continue;
+      s.inp.value = clampN(sv[k], s);
+      if (s === uCity) s.out.textContent = (+s.inp.value).toFixed(2);   // applied on open(), not now
+      else s.inp.dispatchEvent(new Event('input'));
+    }
+  }
+  let saved = '';
+  const persist = () => {
+    const o = { tool, rot, top }; for (const [k, s] of Object.entries(sliders)) o[k] = +s.inp.value;
+    const j = JSON.stringify(o); if (j !== saved) { saved = j; write(KEYS.editor, o); }
+  };
+  panel.addEventListener('input', persist);
   root.append(panel);
 
   function refresh() {
+    persist();
     for (const [id, b] of Object.entries(tools)) b.classList.toggle('on', id === tool);
     rotBtn.textContent = t('ed.rotate', { key: firstKey(settings.data.keys, 'editRotate') });
     rotBtn.classList.toggle('on', rot === 1);
