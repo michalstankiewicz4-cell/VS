@@ -4,6 +4,12 @@ Versioning: `MAJOR.MINOR.PATCH`. Every push to the repository is a new version (
 The owner creates `vX.Y.Z` tags in GitHub Releases on commits from this history; pushing tags from a Claude session is blocked.
 Bug fix = PATCH, new feature = MINOR, big change to gameplay or the save format = MAJOR.
 
+## [0.15.0] - 2026-10-14
+### Added
+- Map editor: "Size of things" sliders (0.5–2.0) for people, vehicles and enemies, with a live preview (a person and a zombie follow the cursor). Vehicle scale also scales parked-car blockers, driving collision and run-over hit area; people/enemy collision radii are unchanged. Saved with the other editor settings; applies in play too.
+### Changed
+- Map editor panel moved to the right side with the tools as a vertical column.
+
 ## [0.14.2] - 2026-10-14
 ### Added
 - Map editor: "Reset settings" button restores tool, rotation, top view and all sliders to defaults (the map itself is untouched; "Default map" resets the map).

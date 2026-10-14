@@ -21,13 +21,13 @@ export function createVehicles({ scene, dummy, col, S, player }) {
   scene.add(mesh);
   const list = [];
   const cc = new THREE.Color();
-  let driving = null;
+  let driving = null, sc = 1;   // sc: editor-chosen size multiplier
 
   function place(v) {
     const c = Math.cos(v.th), sn = Math.sin(v.th);
     PARTS.forEach(([dx, dy, dz, sx, sy, sz], k) => {
-      dummy.position.set(v.x + dx * c + dz * sn, dy, v.z - dx * sn + dz * c);
-      dummy.rotation.set(0, v.th, 0); dummy.scale.set(sx, sy, sz); dummy.updateMatrix();
+      dummy.position.set(v.x + (dx * c + dz * sn) * sc, dy * sc, v.z + (dz * c - dx * sn) * sc);
+      dummy.rotation.set(0, v.th, 0); dummy.scale.set(sx * sc, sy * sc, sz * sc); dummy.updateMatrix();
       mesh.setMatrixAt(v.i * PARTS.length + k, dummy.matrix);
     });
     mesh.instanceMatrix.needsUpdate = true;
@@ -42,7 +42,7 @@ export function createVehicles({ scene, dummy, col, S, player }) {
   // A parked car is snapped to the axes and blocks movement and bullets.
   const park = (v) => {
     const alongZ = Math.abs(Math.sin(v.th)) < 0.5;
-    v.blk.x = v.x; v.blk.z = v.z; v.blk.hw = alongZ ? 0.95 : 1.95; v.blk.hd = alongZ ? 1.95 : 0.95;
+    v.blk.x = v.x; v.blk.z = v.z; v.blk.hw = (alongZ ? 0.95 : 1.95) * sc; v.blk.hd = (alongZ ? 1.95 : 0.95) * sc;
   };
 
   // Called by the city before it re-creates its objects (its obstacle list is cleared separately).
@@ -54,6 +54,7 @@ export function createVehicles({ scene, dummy, col, S, player }) {
     return v;
   }
   function finish() {
+    for (const v of list) park(v);
     mesh.count = list.length * PARTS.length;
     for (const v of list) { place(v); paint(v); }
   }
@@ -98,9 +99,9 @@ export function createVehicles({ scene, dummy, col, S, player }) {
     // collisions: two circles (front and rear)
     const f = Math.sin(v.th), g = Math.cos(v.th);
     let mx = 0, mz = 0;
-    for (const o of [1.0, -1.0]) {
+    for (const o of [sc, -sc]) {
       const a = { v: nx + f * o }, b = { v: nz + g * o };
-      const ax = a.v, bz = b.v; col.push(a, b, 0.95);
+      const ax = a.v, bz = b.v; col.push(a, b, 0.95 * sc);
       mx += a.v - ax; mz += b.v - bz;
     }
     if (Math.abs(mx) + Math.abs(mz) > 0.02) v.vel *= Math.max(0, 1 - 4 * dt) * 0.9;
@@ -114,9 +115,10 @@ export function createVehicles({ scene, dummy, col, S, player }) {
   function runsOver(x, z) {
     const v = driving; if (!v || Math.abs(v.vel) < 3) return false;
     const dx = x - v.x, dz = z - v.z, c = Math.cos(v.th), sn = Math.sin(v.th);
-    return Math.abs(dx * sn + dz * c) < 2.2 && Math.abs(dx * c - dz * sn) < 1.2;
+    return Math.abs(dx * sn + dz * c) < 2.2 * sc && Math.abs(dx * c - dz * sn) < 1.2 * sc;
   }
   return {
+    setScale(k) { sc = k; for (const v of list) { if (v !== driving) park(v); place(v); } },
     list, clear, spawn, finish, nearest, toggle, exit, step, runsOver,
     get driving() { return driving; },
   };

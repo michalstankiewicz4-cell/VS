@@ -96,6 +96,13 @@ export function createWorld(scene) {
     player: player.state, S, fade: city.fade, map: city.map, setCityOpacity: city.setOpacity, enemyCount: ENEMIES,
     nightAt: sky.nightAt, DAY_LEN,
     reset, update, driveState,
+    // Editor size multipliers for people (player), vehicles and enemies.
+    setScales: ({ p, v, e }) => { player.setScale(p); vehicles.setScale(v); enemies.setScale(e); },
+    // Editor preview: shows the player and a zombie at (x, z) so sizes can be compared with buildings.
+    setPreview: (on, x, z) => {
+      player.state.pos.set(x, 0, z); player.setVisible(on); if (on) player.animate(false, 0);
+      enemies.preview(on, x + 1.6, z);
+    },
     setMode: (m) => { S.mode = m; },
     toggleCar: vehicles.toggle,
     place: base.place, remove: base.remove, canPlace: base.canPlace, list: base.list, load: base.load, count: base.count,

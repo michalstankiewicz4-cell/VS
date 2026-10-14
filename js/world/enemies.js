@@ -27,6 +27,7 @@ export function createEnemies({ scene, rnd, dummy, col, S, around, vehicles }) {
   const ex = new Float32Array(ENEMIES), ez = new Float32Array(ENEMIES), es = new Float32Array(ENEMIES);
   const ep = new Float32Array(ENEMIES), eh = new Float32Array(ENEMIES);
   const colr = new THREE.Color();
+  let sc = 1;   // editor-chosen size multiplier (visual)
   const hpFor = () => S.time > 180 ? 4 : S.time > 90 ? 3 : 2;
   const spawn = (i) => {
     const a = rnd() * Math.PI * 2, r = 20 + rnd() * 6;
@@ -75,12 +76,18 @@ export function createEnemies({ scene, rnd, dummy, col, S, around, vehicles }) {
       ex[i] = nx.v; ez[i] = nz.v;
       dummy.position.set(ex[i], Math.abs(Math.sin(t * 6 + ep[i])) * 0.06, ez[i]);
       dummy.rotation.set(0, Math.atan2(dx, dz), 0);
-      dummy.scale.set(1, 1, 1);
+      dummy.scale.set(sc, sc, sc);
       dummy.updateMatrix();
       mesh.setMatrixAt(i, dummy.matrix);
     }
     mesh.instanceMatrix.needsUpdate = true;
     return { touching, car: !!car };
   }
-  return { ex, ez, reset, hit, update };
+  // Editor size preview: shows one zombie (instance 0) at (x, z) or hides it.
+  function preview(on, x, z) {
+    if (on) { dummy.position.set(x, 0, z); dummy.rotation.set(0, 2.4, 0); dummy.scale.set(sc, sc, sc); dummy.updateMatrix(); mesh.setMatrixAt(0, dummy.matrix); }
+    else hide(0);
+    mesh.instanceMatrix.needsUpdate = true;
+  }
+  return { ex, ez, reset, hit, update, preview, setScale: (k) => { sc = k; } };
 }

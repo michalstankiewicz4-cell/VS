@@ -41,5 +41,5 @@ export function createPlayer({ scene }) {
       legL.rotation.x = legR.rotation.x = 0;
     }
   }
-  return { state, group, animate, setVisible: (v) => { group.visible = v; } };
+  return { state, group, animate, setScale: (k) => group.scale.setScalar(k), setVisible: (v) => { group.visible = v; } };
 }

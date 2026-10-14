@@ -17,6 +17,10 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
   };
   const W = slider('ed.width', 4, 14, 1, 8), D = slider('ed.depth', 4, 14, 1, 8), H = slider('ed.height', 2, 9, 0.5, 4);
   const RW = slider('ed.roadWidth', 2, 12, 1, 4), RL = slider('ed.roadLength', 4, 60, 2, 20);
+  const applyScales = () => world.setScales({ p: +SP.inp.value, v: +SV.inp.value, e: +SE.inp.value });
+  const sc = (key) => { const s = slider(key, 0.5, 2, 0.05, 1); s.inp.addEventListener('input', () => { s.el.lastChild.textContent = (+s.inp.value).toFixed(2); applyScales(); }); return s; };
+  const SP = sc('ed.scale.player'), SV = sc('ed.scale.car'), SE = sc('ed.scale.enemy');
+  const scaleBox = h('details', { class: 'under', open: true }, h('summary', {}, tx('ed.scale.title')), SP.el, SV.el, SE.el, h('p', { class: 'note' }, tx('ed.scale.hint')));
   const under = createUnderlay({ scene });
   const file = h('input', { type: 'file', accept: 'image/*', hidden: true });
   const uSlider = (key, min, max, step, val, fmt, fn) => {
@@ -57,8 +61,8 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
   const rotBtn = h('button', { type: 'button', on: { click: () => { rot ^= 1; refresh(); } } });
 
   const panel = h('div', { id: 'ed', hidden: true },
-    h('div', { class: 'btns' }, mkTool('b', 'ed.building'), mkTool('c', 'ed.car'), mkTool('r', 'ed.road'), mkTool('x', 'ed.remove'), rotBtn, topBtn),
-    W.el, D.el, H.el, RW.el, RL.el, underBox,
+    h('div', { class: 'btns tools' }, mkTool('b', 'ed.building'), mkTool('c', 'ed.car'), mkTool('r', 'ed.road'), mkTool('x', 'ed.remove'), rotBtn, topBtn),
+    W.el, D.el, H.el, RW.el, RL.el, scaleBox, underBox,
     h('div', { class: 'btns' }, btn('ed.play', onPlay),
       btn('ed.resetSettings', () => {
         tool = 'b'; rot = 0; top = false;
@@ -82,8 +86,8 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
       })),
     json, info);
   // Remember editor settings (tool, rotation, top view, sliders) between sessions; the underlay image itself is not saved.
-  const DEF = { w: 8, d: 8, h: 4, rw: 4, rl: 20, city: 1, uo: 0.6 };
-  const sliders = { w: W, d: D, h: H, rw: RW, rl: RL, city: uCity, uo: uO };
+  const DEF = { sp: 1, sv: 1, se: 1, w: 8, d: 8, h: 4, rw: 4, rl: 20, city: 1, uo: 0.6 };
+  const sliders = { sp: SP, sv: SV, se: SE, w: W, d: D, h: H, rw: RW, rl: RL, city: uCity, uo: uO };
   const sv = read(KEYS.editor), clampN = (v, s) => Math.min(+s.inp.max, Math.max(+s.inp.min, +v));
   if (sv && typeof sv === 'object') {
     if (['b', 'c', 'r', 'x'].includes(sv.tool)) tool = sv.tool;
@@ -91,6 +95,7 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
     for (const [k, s] of Object.entries(sliders)) {
       if (!Number.isFinite(+sv[k]) || sv[k] === null) continue;
       s.inp.value = clampN(sv[k], s);
+      if (s === SP || s === SV || s === SE) { s.inp.dispatchEvent(new Event('input')); continue; }
       if (s === uCity) s.out.textContent = (+s.inp.value).toFixed(2);   // applied on open(), not now
       else s.inp.dispatchEvent(new Event('input'));
     }
@@ -144,13 +149,14 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
     get top() { return active && top; },
     toggleTop() { if (active) { top = !top; refresh(); } },
     rotate() { if (active) { rot ^= 1; refresh(); } },
-    open() { active = true; under.setVisible(true); world.setCityOpacity(+uCity.inp.value); panel.hidden = false; pan.set(0, 0, 44); note = ''; refresh(); },
-    close() { active = false; under.setVisible(false); world.setCityOpacity(1); panel.hidden = true; world.setGhostBox(false, 0, 0, 0, 1, 1, 1, false); },
+    open() { active = true; applyScales(); under.setVisible(true); world.setCityOpacity(+uCity.inp.value); panel.hidden = false; pan.set(0, 0, 44); note = ''; refresh(); },
+    close() { active = false; world.setPreview(false, 0, 0); under.setVisible(false); world.setCityOpacity(1); panel.hidden = true; world.setGhostBox(false, 0, 0, 0, 1, 1, 1, false); },
     // mv: camera-relative pan vector; zoom: current user zoom (pans slower when zoomed in)
     update(dt, mv, zoom) {
       if (!active) return;
       pan.x = Math.max(-70, Math.min(70, pan.x + mv.x * 28 * dt / zoom));
       pan.z = Math.max(-70, Math.min(70, pan.z + mv.z * 28 * dt / zoom));
+      const pp = groundAt(0); world.setPreview(!!pp, pp ? pp.x : 0, pp ? pp.z : 0);
       if (tool === 'x') {
         why = '';
         const i = pickIndex();
