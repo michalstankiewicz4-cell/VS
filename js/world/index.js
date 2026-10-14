@@ -31,7 +31,9 @@ export function createWorld(scene) {
   const bullets = createProjectiles({ scene, dummy, col, S, enemies });
   const base = createStructures({ scene, col });
 
+  let saved = null;   // player position stashed while the editor size preview borrows the player model
   function reset(mode) {
+    saved = null;
     vehicles.exit();
     S.mode = mode;
     const live = mode === 'play' || mode === 'menu';
@@ -100,8 +102,12 @@ export function createWorld(scene) {
     setScales: ({ p, v, e }) => { player.setScale(p); vehicles.setScale(v); enemies.setScale(e); },
     // Editor preview: shows the player and a zombie at (x, z) so sizes can be compared with buildings.
     setPreview: (on, x, z) => {
-      player.state.pos.set(x, 0, z); player.setVisible(on); if (on) player.animate(false, 0);
       enemies.preview(on, x + 1.6, z);
+      if (on) { if (!saved) saved = player.state.pos.clone(); player.state.pos.set(x, 0, z); player.setVisible(true); player.animate(false, 0); }
+      else if (saved) {   // restore exactly what the current mode expects (the player is only visible in live modes)
+        player.state.pos.copy(saved); saved = null;
+        player.setVisible(S.mode === 'play' || S.mode === 'menu');
+      }
     },
     setMode: (m) => { S.mode = m; },
     toggleCar: vehicles.toggle,

@@ -4,6 +4,10 @@ Versioning: `MAJOR.MINOR.PATCH`. Every push to the repository is a new version (
 The owner creates `vX.Y.Z` tags in GitHub Releases on commits from this history; pushing tags from a Claude session is blocked.
 Bug fix = PATCH, new feature = MINOR, big change to gameplay or the save format = MAJOR.
 
+## [0.15.1] - 2026-10-14
+### Fixed
+- The player was invisible after starting a run: leaving the map editor hid the player model (the 0.15.0 size preview). The preview now restores the player's position and visibility.
+
 ## [0.15.0] - 2026-10-14
 ### Added
 - Map editor: "Size of things" sliders (0.5–2.0) for people, vehicles and enemies, with a live preview (a person and a zombie follow the cursor). Vehicle scale also scales parked-car blockers, driving collision and run-over hit area; people/enemy collision radii are unchanged. Saved with the other editor settings; applies in play too.
