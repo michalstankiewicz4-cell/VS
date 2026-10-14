@@ -158,7 +158,7 @@ export default {
   'ed.scale.player': 'Ludzie',
   'ed.scale.car': 'Pojazdy',
   'ed.scale.enemy': 'Przeciwnicy',
-  'ed.scale.hint': 'Podgląd przy kursorze: człowiek i zombie. Samochody na mapie też zmieniają rozmiar.',
+  'ed.scale.hint': 'Podgląd na środku widoku: człowiek i zombie. Samochody na mapie też zmieniają rozmiar.',
   'ed.select': 'Wybierz',
   'ed.palace': 'Pałac',
   'ed.act.select': 'kliknij obiekt, by zobaczyć opcje',

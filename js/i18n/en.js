@@ -158,7 +158,7 @@ export default {
   'ed.scale.player': 'People',
   'ed.scale.car': 'Vehicles',
   'ed.scale.enemy': 'Enemies',
-  'ed.scale.hint': 'Preview next to the cursor: a person and a zombie. Cars on the map change size too.',
+  'ed.scale.hint': 'Preview at the centre of the view: a person and a zombie. Cars on the map change size too.',
   'ed.select': 'Select',
   'ed.palace': 'Palace',
   'ed.act.select': 'click an object for options',

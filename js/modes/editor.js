@@ -20,7 +20,7 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
   const applyScales = () => world.setScales({ p: +SP.inp.value, v: +SV.inp.value, e: +SE.inp.value });
   const sc = (key) => { const s = slider(key, 0.5, 2, 0.05, 1); s.inp.addEventListener('input', () => { s.el.lastChild.textContent = (+s.inp.value).toFixed(2); applyScales(); }); return s; };
   const SP = sc('ed.scale.player'), SV = sc('ed.scale.car'), SE = sc('ed.scale.enemy');
-  const scaleBox = h('details', { class: 'under', open: true }, h('summary', {}, tx('ed.scale.title')), SP.el, SV.el, SE.el, h('p', { class: 'note' }, tx('ed.scale.hint')));
+  const scaleBox = h('details', { class: 'under' }, h('summary', {}, tx('ed.scale.title')), SP.el, SV.el, SE.el, h('p', { class: 'note' }, tx('ed.scale.hint')));
   const under = createUnderlay({ scene });
   const file = h('input', { type: 'file', accept: 'image/*', hidden: true });
   const uSlider = (key, min, max, step, val, fmt, fn) => {
@@ -194,7 +194,7 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
       pan.x = Math.max(-70, Math.min(70, pan.x + mv.x * 28 * dt / zoom));
       pan.z = Math.max(-70, Math.min(70, pan.z + mv.z * 28 * dt / zoom));
       if (tool !== 's' || moving) { bar.hidden = true; hot = -1; barFor = ''; }
-      const pp = groundAt(0); world.setPreview(!!pp, pp ? pp.x : 0, pp ? pp.z : 0);
+      world.setPreview(scaleBox.open, pan.x + 3, pan.z);   // size preview only while the "Size of things" section is open, at the view centre
       if (tool === 's' && !moving) {
         why = '';
         if (hot >= world.map.count()) hot = -1;
