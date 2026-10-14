@@ -17,10 +17,12 @@ function clean(o) {
   const x = r1(num(o.x, -EDGE, EDGE, 0)), z = r1(num(o.z, -EDGE, EDGE, 0)), s = num(o.s, 0, 1, 0.5);
   if (o.t === 'b') return { t: 'b', x, z, w: r1(num(o.w, 3, 16, 8)), d: r1(num(o.d, 3, 16, 8)), h: r1(num(o.h, 1.5, 9, 4)), s };
   if (o.t === 'c') return { t: 'c', x, z, r: o.r ? 1 : 0, s };
+  if (o.t === 'r') return { t: 'r', x, z, w: r1(num(o.w, 2, 12, 4)), d: r1(num(o.d, 4, 60, 20)), r: o.r ? 1 : 0, s };
   if (o.t === 'p') return { t: 'p', x: PALACE_POS.x, z: PALACE_POS.z, s };
   return null;
 }
 const bounds = (o) => o.t === 'b' ? { x: o.x, z: o.z, hw: o.w / 2, hd: o.d / 2, h: o.h }
+  : o.t === 'r' ? (o.r ? { x: o.x, z: o.z, hw: o.d / 2, hd: o.w / 2, h: 0.1 } : { x: o.x, z: o.z, hw: o.w / 2, hd: o.d / 2, h: 0.1 })
   : o.t === 'c' ? (o.r ? { x: o.x, z: o.z, hw: 1.95, hd: 0.95, h: 1.4 } : { x: o.x, z: o.z, hw: 0.95, hd: 1.95, h: 1.4 })
   : { x: o.x, z: o.z, hw: PALACE_HW, hd: PALACE_HD, h: PALACE_H };
 const inBase = (b) => Math.abs(b.x) - b.hw < BASE_ZONE && Math.abs(b.z) - b.hd < BASE_ZONE;
@@ -56,6 +58,11 @@ export function createCity({ scene, dummy, col, vehicles, nightU }) {
         add(i, o.x, h * 0.55, o.z + d * 0.51, w * 0.7, h * 0.5, 0.15, 0, 0, 0, 0.05);   // dark broken windows
         const roof = r() < 0.6, ax = (r() - 0.5) * w * 0.4, az = (r() - 0.5) * d * 0.4, ry = r() * 3;
         if (roof) add(i, o.x + ax, h + 0.3, o.z + az, w * 0.5, 0.6, d * 0.5, ry, hue, 0.08, li * 0.8);   // collapsed roof
+      } else if (o.t === 'r') {   // road: flat asphalt slab with a centre line; no collision
+        const b = bounds(o), L = o.d * 0.96;
+        add(i, o.x, 0.04, o.z, b.hw * 2, 0.08, b.hd * 2, 0, 0.66, 0.06, 0.09);
+        add(i, o.x, 0.085, o.z, o.r ? L : 0.14, 0.02, o.r ? 0.14 : L, 0, 0.13, 0.5, 0.42);
+        return;
       } else if (o.t === 'c') {
         const hue = r() < 0.5 ? 0.04 : 0.6, sa = 0.25 + r() * 0.25, ry = o.r ? Math.PI / 2 : 0, li = 0.18 + r() * 0.1;
         if (live) {
@@ -133,6 +140,8 @@ export function createCity({ scene, dummy, col, vehicles, nightU }) {
   return {
     map, fade, rebuild,
     setLive(v) { live = v; },
+    // Editor only: see-through city so an underlay image shows through (restored to 1 afterwards).
+    setOpacity(o) { material.opacity = o; material.transparent = o < 1; material.needsUpdate = true; },
     get live() { return live; },
   };
 }

@@ -115,6 +115,7 @@ export function createApp({ appEl, uiEl }) {
     if (act === 'interact' && mode === 'play') world.toggleCar();
     else if (act === 'cameraView' && mode === 'play' && S.driving) rig.cycleView();
     else if (act === 'editRotate' && mode === 'edit') editor.rotate();
+    else if (act === 'editTopView' && mode === 'edit') editor.toggleTop();
   };
 
   /* ---- settings -> systems ---- */
@@ -164,6 +165,7 @@ export function createApp({ appEl, uiEl }) {
       else if (mode === 'build') builder.update();
     }
 
+    rig.topDown = mode === 'edit' && editor.top;
     const target = mode === 'play' || mode === 'dead' ? world.player.pos : mode === 'edit' ? editor.pan : origin;
     const view = rig.update(sdt, t0, { mode, target, zoomT: ZOOM[mode], car: mode === 'play' ? world.driveState() : null });
     rig.camera.getWorldDirection(fwd);

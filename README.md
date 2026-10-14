@@ -24,7 +24,7 @@ Start screen: Single Player (Start run, Build base), Multiplayer (PvE co-op and 
 - `vendor/` – three.js 0.186.1 (MIT) vendored locally; SHA-256 sums in `vendor/SHA256.txt`.
 
 ## Security and privacy
-- no external scripts, CDNs or network requests; the CSP in `index.html` only allows resources from the same origin,
+- no external scripts or CDNs; the CSP in `index.html` allows only same-origin resources, plus map tile images from `tile.openstreetmap.org` (© OpenStreetMap contributors, ODbL) and `server.arcgisonline.com` (Imagery © Esri) — requested only when you click a tile button in the map editor; Google imagery is not used,
 - no `eval`, no `innerHTML`, no stored keys (an API will be added at the very end),
 - input statistics: only game actions are counted, never keys or mouse position; form fields are ignored; everything stays local,
 - the bundle meant for an AI (`Input.features()`) contains only rounded features.

@@ -93,7 +93,7 @@ export function createWorld(scene) {
   };
 
   return {
-    player: player.state, S, fade: city.fade, map: city.map, enemyCount: ENEMIES,
+    player: player.state, S, fade: city.fade, map: city.map, setCityOpacity: city.setOpacity, enemyCount: ENEMIES,
     nightAt: sky.nightAt, DAY_LEN,
     reset, update, driveState,
     setMode: (m) => { S.mode = m; },

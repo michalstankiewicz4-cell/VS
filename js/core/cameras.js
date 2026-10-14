@@ -18,7 +18,7 @@ export function createCameraRig({ scene, settings, input }) {
   scene.add(persp);                             // so the cockpit dash (child of the camera) renders
   let camera = ortho;
 
-  let yaw = YAW0, userZoom = 1;
+  let yaw = YAW0, userZoom = 1, topDown = false;
   let lookYaw = 0, lookPitch = 0, chaseTh = 0, viewIdx = 0;
   const look = new THREE.Vector3(), tmp = new THREE.Vector3(), tmp2 = new THREE.Vector3();
   let initialised = false, hadCar = false;
@@ -73,7 +73,8 @@ export function createCameraRig({ scene, settings, input }) {
       yaw += (input.isDown('camRight') - input.isDown('camLeft')) * 1.8 * dt;
       if (!initialised) { look.copy(ctx.target); initialised = true; }
       look.lerp(ctx.target, 1 - Math.exp(-6 * dt));
-      ortho.position.copy(look).add(tmp.copy(ISO_OFFSET).applyAxisAngle(UP, yaw));
+      if (topDown) { ortho.position.copy(look).set(look.x, 24, look.z); ortho.up.set(0, 0, -1).applyAxisAngle(UP, yaw); }   // straight down, 90°
+      else { ortho.position.copy(look).add(tmp.copy(ISO_OFFSET).applyAxisAngle(UP, yaw)); ortho.up.set(0, 1, 0); }
       ortho.lookAt(look);
       const zt = ctx.zoomT * userZoom;
       if (Math.abs(ortho.zoom - zt) > 0.002) { ortho.zoom += (zt - ortho.zoom) * Math.min(1, dt * 8); ortho.updateProjectionMatrix(); }
@@ -112,6 +113,7 @@ export function createCameraRig({ scene, settings, input }) {
     update, resize, cycleView,
     get camera() { return camera; },
     get yaw() { return yaw; },
+    set topDown(v) { topDown = !!v; },
     get zoom() { return userZoom; },
     get view() { return camera === ortho ? 'iso' : 'persp'; },
   };

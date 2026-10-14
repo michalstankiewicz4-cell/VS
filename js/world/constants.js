@@ -17,6 +17,8 @@ export const EDGE = 76;            // movement / placement limit
 
 export const PALACE_POS = { x: 0, z: -46 };
 // The Palace spire (tip of the tower) in world coordinates: palace origin + the tower's offset in the model.
+// Real-world position of the spire (for online map tiles) and the model scale (about 0.17 game units per metre).
+export const GEO = { lat: 52.23167, lon: 21.00611, unitsPerMeter: 0.17 };
 export const SPIRE = { x: PALACE_POS.x - 0.23, z: PALACE_POS.z + 0.37 };
 // Player spawn: the courtyard in front of the Palace of Culture and Science, with a car parked next to it.
 export const START = { x: 0, z: -36.5 };

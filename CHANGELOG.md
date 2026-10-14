@@ -4,6 +4,15 @@ Versioning: `MAJOR.MINOR.PATCH`. Every push to the repository is a new version (
 The owner creates `vX.Y.Z` tags in GitHub Releases on commits from this history; pushing tags from a Claude session is blocked.
 Bug fix = PATCH, new feature = MINOR, big change to gameplay or the save format = MAJOR.
 
+## [0.14.0] - 2026-10-14
+### Added
+- Map editor: optional online underlay (opt-in, editor only) — OpenStreetMap or Esri World Imagery tiles (7x7 at zoom 17) centred on the Palace spire, with attribution. Google imagery is not used. Not saved; "Remove" drops it.
+- Map editor: "Our map opacity" slider (restored to 1 on leaving the editor).
+- Map editor: Road tool (flat asphalt with a centre line, width/length sliders, no collision; new object type `r`).
+- Map editor: 90° top view (key T, rebindable; button in the panel).
+### Changed
+- CSP `img-src` now also allows `https://tile.openstreetmap.org` and `https://server.arcgisonline.com` (tiles are requested only after clicking a tile button). To remove the feature: drop the two hosts and `loadTiles` in `js/modes/underlay.js`; built map data stays.
+
 ## [0.13.0] - 2026-10-14
 ### Added
 - Map editor underlay: load a map screenshot (any image up to 8 MB, north up) from a file; it lies flat on the ground, centred on the Palace spire, with width (scale), opacity and rotation sliders, "Center on spire" and "Remove". The image is read locally (no network requests, CSP unchanged), downscaled to 2048 px, shown only in the editor and not saved.

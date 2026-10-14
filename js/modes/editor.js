@@ -6,7 +6,7 @@ import { createUnderlay } from './underlay.js';
 import { moveLabel, camLabel, firstKey } from '../input/bindings.js';
 
 export function createEditor({ scene, root, canvas, world, settings, groundAt, pickIndex, isPaused, onPlay, saveMap }) {
-  let active = false, tool = 'b', rot = 0, why = '', whyShown = '', note = '';
+  let active = false, top = false, tool = 'b', rot = 0, why = '', whyShown = '', note = '';
   const pan = new THREE.Vector3(0, 0, 44);
 
   const slider = (labelKey, min, max, step, val) => {
@@ -15,6 +15,7 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
     return { el: h('label', { class: 'row' }, tx(labelKey), inp, out), inp };
   };
   const W = slider('ed.width', 4, 14, 1, 8), D = slider('ed.depth', 4, 14, 1, 8), H = slider('ed.height', 2, 9, 0.5, 4);
+  const RW = slider('ed.roadWidth', 2, 12, 1, 4), RL = slider('ed.roadLength', 4, 60, 2, 20);
   const under = createUnderlay({ scene });
   const file = h('input', { type: 'file', accept: 'image/*', hidden: true });
   const uSlider = (key, min, max, step, val, fmt, fn) => {
@@ -25,8 +26,20 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
   const uW = uSlider('ed.u.width', 20, 400, 5, under.width, (v) => String(v), (v) => under.setWidth(v));
   const uO = uSlider('ed.u.opacity', 0.1, 1, 0.05, 0.6, (v) => v.toFixed(2), (v) => under.setOpacity(v));
   const uR = uSlider('ed.u.rotate', -180, 180, 1, 0, (v) => v + '°', (v) => under.setRotation(v));
+  const credit = h('p', { class: 'note' });
+  const uCity = uSlider('ed.u.city', 0.1, 1, 0.05, 1, (v) => v.toFixed(2), (v) => world.setCityOpacity(v));
+  const tiles = (prov) => async () => {
+    note = t('ed.u.loading'); refresh();
+    try {
+      const w = await under.loadTiles(prov, (d, n) => { note = t('ed.u.progress', { d, n }); refresh(); });
+      uW.inp.step = 1; uW.inp.value = Math.round(w); uW.out.textContent = String(Math.round(w)); under.setWidth(w);
+      note = t('ed.u.ok');
+    } catch (e) { note = t('ed.u.net'); }
+    refresh();
+  };
+  const uOsm = btn('ed.u.osm', tiles('osm')), uEsri = btn('ed.u.esri', tiles('esri'));
   const uCenter = btn('ed.u.center', () => under.center());
-  const uClear = btn('ed.u.clear', () => { under.clear(); });
+  const uClear = btn('ed.u.clear', () => { under.clear(); refresh(); });
   const uLoad = btn('ed.u.load', () => file.click());
   file.addEventListener('change', async () => {
     const f = file.files && file.files[0]; file.value = '';
@@ -35,15 +48,16 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
     refresh();
   });
   const underBox = h('details', { class: 'under' }, h('summary', {}, tx('ed.u.title')),
-    h('div', { class: 'btns' }, uLoad, uCenter, uClear), file, uW.el, uO.el, uR.el, h('p', { class: 'note' }, tx('ed.u.hint')));
+    h('div', { class: 'btns' }, uLoad, uCenter, uClear), h('p', { class: 'note' }, tx('ed.u.online')), h('div', { class: 'btns' }, uOsm, uEsri), credit, file, uCity.el, uW.el, uO.el, uR.el, h('p', { class: 'note' }, tx('ed.u.hint')));
   const info = h('p', { class: 'note' }), json = h('textarea', { rows: 5, spellcheck: 'false', hidden: true, 'aria-label': 'Map JSON' });
   const tools = {};
   const mkTool = (id, key) => { const b = btn(key, () => { tool = id; note = ''; refresh(); }); tools[id] = b; return b; };
+  const topBtn = h('button', { type: 'button', on: { click: () => { top = !top; refresh(); } } });
   const rotBtn = h('button', { type: 'button', on: { click: () => { rot ^= 1; refresh(); } } });
 
   const panel = h('div', { id: 'ed', hidden: true },
-    h('div', { class: 'btns' }, mkTool('b', 'ed.building'), mkTool('c', 'ed.car'), mkTool('x', 'ed.remove'), rotBtn),
-    W.el, D.el, H.el, underBox,
+    h('div', { class: 'btns' }, mkTool('b', 'ed.building'), mkTool('c', 'ed.car'), mkTool('r', 'ed.road'), mkTool('x', 'ed.remove'), rotBtn, topBtn),
+    W.el, D.el, H.el, RW.el, RL.el, underBox,
     h('div', { class: 'btns' }, btn('ed.play', onPlay),
       btn('ed.default', () => { world.map.reset(); saveMap(); note = t('ed.restored'); refresh(); }),
       btn('ed.export', async () => {
@@ -67,6 +81,11 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
     for (const [id, b] of Object.entries(tools)) b.classList.toggle('on', id === tool);
     rotBtn.textContent = t('ed.rotate', { key: firstKey(settings.data.keys, 'editRotate') });
     rotBtn.classList.toggle('on', rot === 1);
+    topBtn.textContent = t('ed.top', { key: firstKey(settings.data.keys, 'editTopView') });
+    topBtn.classList.toggle('on', top);
+    for (const s of [W, D, H]) s.el.hidden = tool !== 'b';
+    for (const s of [RW, RL]) s.el.hidden = tool !== 'r';
+    credit.textContent = under.source === 'osm' || under.source === 'esri' ? t('ed.u.credit.' + under.source) : '';
     const k = settings.data.keys;
     let s = t('ed.info', { n: world.map.count(), max: world.map.max, action: t(tool === 'x' ? 'ed.act.remove' : 'ed.act.place'), move: moveLabel(k), cam: camLabel(k) });
     if (note) s += '\n' + note;
@@ -81,6 +100,7 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
     if (!p) return null;
     const x = Math.round(p.x), z = Math.round(p.z);
     return tool === 'b' ? { t: 'b', x, z, w: +W.inp.value, d: +D.inp.value, h: +H.inp.value, s: Math.random() }
+      : tool === 'r' ? { t: 'r', x, z, w: +RW.inp.value, d: +RL.inp.value, r: rot, s: Math.random() }
       : { t: 'c', x, z, r: rot, s: Math.random() };
   }
 
@@ -94,9 +114,11 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
 
   return {
     pan,
+    get top() { return active && top; },
+    toggleTop() { if (active) { top = !top; refresh(); } },
     rotate() { if (active) { rot ^= 1; refresh(); } },
-    open() { active = true; under.setVisible(true); panel.hidden = false; pan.set(0, 0, 44); note = ''; refresh(); },
-    close() { active = false; under.setVisible(false); panel.hidden = true; world.setGhostBox(false, 0, 0, 0, 1, 1, 1, false); },
+    open() { active = true; under.setVisible(true); world.setCityOpacity(+uCity.inp.value); panel.hidden = false; pan.set(0, 0, 44); note = ''; refresh(); },
+    close() { active = false; under.setVisible(false); world.setCityOpacity(1); panel.hidden = true; world.setGhostBox(false, 0, 0, 0, 1, 1, 1, false); },
     // mv: camera-relative pan vector; zoom: current user zoom (pans slower when zoomed in)
     update(dt, mv, zoom) {
       if (!active) return;

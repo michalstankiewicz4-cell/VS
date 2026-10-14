@@ -26,7 +26,7 @@ Published at: repo <https://github.com/michalstankiewicz4-cell/VS>, site <https:
 | `js/input/bindings.js`, `input.js` | Rebindable actions and key labels; input + local action statistics |
 | `js/i18n/{index,en,pl}.js` | `t()`, `bind()`, `setLang()`; English (default/fallback) and Polish dictionaries |
 | `js/ui/{dom,hud,menu}.js`, `js/ui/options/*` | DOM builder `h()`, HUD, menu screens, options tabs |
-| `js/modes/{builder,editor,underlay}.js` | Base builder, city map editor, and the editor's reference-image underlay (local file → canvas texture on a ground plane at the spire `SPIRE`; data: URLs only, CSP-safe) |
+| `js/modes/{builder,editor,underlay}.js` | Base builder, city map editor, and the editor's reference-image underlay (local file → canvas texture on a ground plane at the spire `SPIRE`; data: URLs only, CSP-safe; optional OSM/Esri tiles via `loadTiles`, z=17 7x7, Web-Mercator, `GEO` in constants, CSP `img-src` hosts) |
 | `tools/check-version.mjs` | Version check before pushing |
 | `vendor/` | three.js r0.186.1 + `SHA256.txt` + licence |
 | `assets/` | `og-image.png` (1200×630 thumbnail), `icon.png` |
@@ -78,6 +78,8 @@ Storage errors are swallowed (private mode etc.).
 Tools Building/Car/Remove, rotate (editRotate key), size sliders, JSON export/import, "Default map". Editor camera: move keys pan (±70), start outside the base at (0, 44). Buildings may overlap; the base zone is blocked and the reason is shown. No point cost.
 
 ## Privacy and security
+- Only network use: opt-in map tiles in the editor underlay (OSM/Esri hosts in CSP `img-src`); nothing else.
+- Map objects: `b` building, `c` car, `r` road (flat, no collision; w 2–12, d 4–60). Editor top view: `rig.topDown` (camera straight above, key T).
 - CSP in `index.html`: `script-src 'self'`, no external scripts/CDNs, no `eval`/`innerHTML`, no API keys in the repo.
 - Input statistics (`js/input/input.js`): only **game actions** are counted (move / interact / camera / clicks) — not key codes, not mouse position (position stays in memory for aiming); form fields are ignored; everything is local. `Input.features()` returns rounded aggregates only. **Nothing is sent to any model** (AI/API comes at the very end, local models first). Shown in Options > Privacy & data.
 
