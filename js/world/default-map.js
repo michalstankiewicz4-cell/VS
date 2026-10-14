@@ -1,6 +1,7 @@
 // The default city layout (deterministic): a loose grid of ruined blocks, parked cars and the Palace of Culture.
 import { mulberry32 } from '../core/util.js';
 import { PALACE_POS } from './constants.js';
+import { PALACE_HW, PALACE_HD } from './data/palace.js';
 
 export function defaultMap() {
   const cr = mulberry32(2026), out = [];
@@ -16,6 +17,8 @@ export function defaultMap() {
     const along = cr() < 0.5, line = (Math.floor(cr() * 10) - 5) * 14 + 7, t = (cr() * 2 - 1) * 68;
     const x = along ? line + (cr() - 0.5) * 2 : t, z = along ? t : line + (cr() - 0.5) * 2;
     if (Math.abs(x) < 32 && Math.abs(z) < 32) continue;
+    const cw = along ? 0.95 : 1.95, cd = along ? 1.95 : 0.95;   // no car parked inside the Palace footprint
+    if (Math.abs(x - PALACE_POS.x) < cw + PALACE_HW && Math.abs(z - PALACE_POS.z) < cd + PALACE_HD) continue;
     out.push({ t: 'c', x, z, r: along ? 0 : 1, s: cr() });
   }
   out.push({ t: 'p', x: PALACE_POS.x, z: PALACE_POS.z, s: 0.5 });

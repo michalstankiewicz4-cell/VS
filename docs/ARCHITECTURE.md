@@ -79,6 +79,7 @@ Tools Building/Car/Remove, rotate (editRotate key), size sliders, JSON export/im
 
 ## Privacy and security
 - Only network use: opt-in map tiles in the editor underlay (OSM/Esri hosts in CSP `img-src`); nothing else.
+- Editor Select tool: hover → `#edbar` options (project() in app.js maps world→screen); `map.replace/restore/item`, `why(o, skip)` does bounds + overlap checks (roads exempt with roads/cars). The Palace (`p`) is a normal single-instance object at any free position.
 - Map objects: `b` building, `c` car, `r` road (flat, no collision; w 2–12, d 4–60). Editor top view: `rig.topDown` (camera straight above, key T).
 - CSP in `index.html`: `script-src 'self'`, no external scripts/CDNs, no `eval`/`innerHTML`, no API keys in the repo.
 - Input statistics (`js/input/input.js`): only **game actions** are counted (move / interact / camera / clicks) — not key codes, not mouse position (position stays in memory for aiming); form fields are ignored; everything is local. `Input.features()` returns rounded aggregates only. **Nothing is sent to any model** (AI/API comes at the very end, local models first). Shown in Options > Privacy & data.

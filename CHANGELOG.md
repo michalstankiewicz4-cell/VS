@@ -4,6 +4,16 @@ Versioning: `MAJOR.MINOR.PATCH`. Every push to the repository is a new version (
 The owner creates `vX.Y.Z` tags in GitHub Releases on commits from this history; pushing tags from a Claude session is blocked.
 Bug fix = PATCH, new feature = MINOR, big change to gameplay or the save format = MAJOR.
 
+## [0.16.0] - 2026-10-14
+### Added
+- Map editor: **Select** tool — hover an object to get a floating options bar next to it: Move, Rotate, Taller/Lower/Bigger/Smaller (buildings), Longer/Shorter (roads), Delete. Move picks the object up and puts it down at the cursor (R rotates it, "Cancel move" restores it).
+- Map editor: **Palace** tool — the Palace of Culture is now a normal object: it can be moved, deleted and placed again (one at a time, anywhere that is free).
+### Fixed
+- Objects can no longer be placed over other objects (overlap check for buildings, cars, roads and the Palace; roads may cross roads and lie under cars). Maps that already contain overlaps still load.
+### Changed
+- The default map no longer parks cars inside the Palace footprint (saved maps are untouched).
+- Reason code `palace` now means "only one Palace allowed"; new `overlap`.
+
 ## [0.15.2] - 2026-10-14
 ### Fixed
 - Map editor: buildings, cars and roads can no longer be placed on top of the Palace of Culture (footprint check; the ghost turns red with the reason). Maps already containing such objects still load unchanged.

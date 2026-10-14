@@ -6,8 +6,8 @@ import { createUnderlay } from './underlay.js';
 import { read, write, KEYS } from '../core/storage.js';
 import { moveLabel, camLabel, firstKey } from '../input/bindings.js';
 
-export function createEditor({ scene, root, canvas, world, settings, groundAt, pickIndex, isPaused, onPlay, saveMap }) {
-  let active = false, top = false, tool = 'b', rot = 0, why = '', whyShown = '', note = '';
+export function createEditor({ scene, root, canvas, world, settings, groundAt, pickIndex, project, isPaused, onPlay, saveMap }) {
+  let active = false, top = false, tool = 'b', hot = -1, grace = 0, barFor = '', barOver = false, moving = null, rot = 0, why = '', whyShown = '', note = '';
   const pan = new THREE.Vector3(0, 0, 44);
 
   const slider = (labelKey, min, max, step, val) => {
@@ -56,12 +56,43 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
     h('div', { class: 'btns' }, uLoad, uCenter, uClear), h('p', { class: 'note' }, tx('ed.u.online')), h('div', { class: 'btns' }, uOsm, uEsri), credit, file, uCity.el, uW.el, uO.el, uR.el, h('p', { class: 'note' }, tx('ed.u.hint')));
   const info = h('p', { class: 'note' }), json = h('textarea', { rows: 5, spellcheck: 'false', hidden: true, 'aria-label': 'Map JSON' });
   const tools = {};
-  const mkTool = (id, key) => { const b = btn(key, () => { tool = id; note = ''; refresh(); }); tools[id] = b; return b; };
+  const mkTool = (id, key) => { const b = btn(key, () => { cancelMove(); tool = id; note = ''; refresh(); }); tools[id] = b; return b; };
+  const cancelMove = () => { if (moving) { world.map.restore(moving.orig); moving = null; } };
+  const cancelBtn = btn('ed.cancelMove', () => { cancelMove(); refresh(); });
+  cancelBtn.hidden = true;
+  // Floating options next to the hovered object (Select tool): move, rotate, resize, delete.
+  const bar = h('div', { id: 'edbar', hidden: true });
+  bar.addEventListener('mouseenter', () => { barOver = true; });
+  bar.addEventListener('mouseleave', () => { barOver = false; });
+  const modify = (patch) => {
+    const o = world.map.item(hot); if (!o) return;
+    const n = { ...o, ...patch(o) };
+    if (world.map.replace(hot, n)) { saveMap(); note = ''; } else note = t('ed.o.cant', { why: t('ed.why.' + world.map.why(n, hot)) });
+    barFor = ''; refresh();
+  };
+  const turn = (o) => (o.t === 'b' ? { w: o.d, d: o.w } : { r: o.r ? 0 : 1 });
+  const buildBar = (o) => {
+    bar.replaceChildren();
+    const add = (key, fn) => bar.append(btn(key, fn));
+    add('ed.o.move', () => { moving = { orig: world.map.item(hot) }; world.map.removeAt(hot); hot = -1; barFor = ''; refresh(); });
+    if (o.t !== 'p') add('ed.o.rotate', () => modify(turn));
+    if (o.t === 'b') {
+      add('ed.o.taller', () => modify((q) => ({ h: q.h + 0.5 })));
+      add('ed.o.lower', () => modify((q) => ({ h: q.h - 0.5 })));
+      add('ed.o.bigger', () => modify((q) => ({ w: q.w + 1, d: q.d + 1 })));
+      add('ed.o.smaller', () => modify((q) => ({ w: q.w - 1, d: q.d - 1 })));
+    }
+    if (o.t === 'r') {
+      add('ed.o.longer', () => modify((q) => ({ d: q.d + 2 })));
+      add('ed.o.shorter', () => modify((q) => ({ d: q.d - 2 })));
+    }
+    add('ed.o.delete', () => { if (world.map.removeAt(hot)) saveMap(); hot = -1; barFor = ''; barOver = false; note = ''; refresh(); });
+  };
   const topBtn = h('button', { type: 'button', on: { click: () => { top = !top; refresh(); } } });
   const rotBtn = h('button', { type: 'button', on: { click: () => { rot ^= 1; refresh(); } } });
 
   const panel = h('div', { id: 'ed', hidden: true },
-    h('div', { class: 'btns tools' }, mkTool('b', 'ed.building'), mkTool('c', 'ed.car'), mkTool('r', 'ed.road'), mkTool('x', 'ed.remove'), rotBtn, topBtn),
+    h('div', { class: 'btns tools' }, mkTool('s', 'ed.select'), mkTool('b', 'ed.building'), mkTool('c', 'ed.car'), mkTool('r', 'ed.road'), mkTool('p', 'ed.palace'), mkTool('x', 'ed.remove'), rotBtn, topBtn, cancelBtn),
     W.el, D.el, H.el, RW.el, RL.el, scaleBox, underBox,
     h('div', { class: 'btns' }, btn('ed.play', onPlay),
       btn('ed.resetSettings', () => {
@@ -69,7 +100,7 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
         for (const [k, s] of Object.entries(sliders)) { s.inp.value = DEF[k]; s.inp.dispatchEvent(new Event('input')); }
         world.setCityOpacity(1); note = t('ed.settingsReset'); refresh();
       }),
-      btn('ed.default', () => { world.map.reset(); saveMap(); note = t('ed.restored'); refresh(); }),
+      btn('ed.default', () => { moving = null; world.map.reset(); saveMap(); note = t('ed.restored'); refresh(); }),
       btn('ed.export', async () => {
         const txt = JSON.stringify(world.map.list());
         json.hidden = false; json.value = txt;
@@ -77,6 +108,7 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
         note = t(ok ? 'ed.copied' : 'ed.selected'); refresh();
       }),
       btn('ed.import', () => {
+        cancelMove();
         if (json.hidden) { json.hidden = false; json.value = ''; note = t('ed.pasteHint'); refresh(); return; }
         try {
           if (json.value.length > 300000) throw new Error('too large');
@@ -90,7 +122,7 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
   const sliders = { sp: SP, sv: SV, se: SE, w: W, d: D, h: H, rw: RW, rl: RL, city: uCity, uo: uO };
   const sv = read(KEYS.editor), clampN = (v, s) => Math.min(+s.inp.max, Math.max(+s.inp.min, +v));
   if (sv && typeof sv === 'object') {
-    if (['b', 'c', 'r', 'x'].includes(sv.tool)) tool = sv.tool;
+    if (['s', 'b', 'c', 'r', 'p', 'x'].includes(sv.tool)) tool = sv.tool;
     rot = sv.rot ? 1 : 0; top = !!sv.top;
     for (const [k, s] of Object.entries(sliders)) {
       if (!Number.isFinite(+sv[k]) || sv[k] === null) continue;
@@ -106,7 +138,7 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
     const j = JSON.stringify(o); if (j !== saved) { saved = j; write(KEYS.editor, o); }
   };
   panel.addEventListener('input', persist);
-  root.append(panel);
+  root.append(panel, bar);
 
   function refresh() {
     persist();
@@ -119,7 +151,9 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
     for (const s of [RW, RL]) s.el.hidden = tool !== 'r';
     credit.textContent = under.source === 'osm' || under.source === 'esri' ? t('ed.u.credit.' + under.source) : '';
     const k = settings.data.keys;
-    let s = t('ed.info', { n: world.map.count(), max: world.map.max, action: t(tool === 'x' ? 'ed.act.remove' : 'ed.act.place'), move: moveLabel(k), cam: camLabel(k) });
+    cancelBtn.hidden = !moving;
+    let s = t('ed.info', { n: world.map.count() + (moving ? 1 : 0), max: world.map.max, action: t(tool === 'x' ? 'ed.act.remove' : tool === 's' && !moving ? 'ed.act.select' : 'ed.act.place'), move: moveLabel(k), cam: camLabel(k) });
+    if (moving) s += '\n' + t('ed.moving');
     if (note) s += '\n' + note;
     else if (why) s += '\n' + t('ed.cant', { why: t('ed.why.' + why) });
     info.textContent = s;
@@ -131,7 +165,9 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
     const p = groundAt(0);
     if (!p) return null;
     const x = Math.round(p.x), z = Math.round(p.z);
+    if (moving) return { ...moving.orig, x, z };
     return tool === 'b' ? { t: 'b', x, z, w: +W.inp.value, d: +D.inp.value, h: +H.inp.value, s: Math.random() }
+      : tool === 'p' ? { t: 'p', x, z, s: 0.5 }
       : tool === 'r' ? { t: 'r', x, z, w: +RW.inp.value, d: +RL.inp.value, r: rot, s: Math.random() }
       : { t: 'c', x, z, r: rot, s: Math.random() };
   }
@@ -140,7 +176,8 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
     if (!active || isPaused() || e.button !== settings.data.mouse.fireButton) return;
     note = '';
     if (tool === 'x') { const i = pickIndex(); if (i >= 0 && world.map.removeAt(i)) saveMap(); }
-    else { const o = currentObject(); if (o && world.map.add(o)) saveMap(); }
+    else if (tool === 's' && !moving) return;
+    else { const o = currentObject(); if (o && world.map.add(o)) { saveMap(); moving = null; } else if (o && moving) note = t('ed.o.cant', { why: t('ed.why.' + world.map.why(o)) }); }
     refresh();
   });
 
@@ -148,21 +185,38 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
     pan,
     get top() { return active && top; },
     toggleTop() { if (active) { top = !top; refresh(); } },
-    rotate() { if (active) { rot ^= 1; refresh(); } },
+    rotate() { if (!active) return; if (moving) moving.orig = { ...moving.orig, ...turn(moving.orig) }; else rot ^= 1; refresh(); },
     open() { active = true; applyScales(); under.setVisible(true); world.setCityOpacity(+uCity.inp.value); panel.hidden = false; pan.set(0, 0, 44); note = ''; refresh(); },
-    close() { active = false; world.setPreview(false, 0, 0); under.setVisible(false); world.setCityOpacity(1); panel.hidden = true; world.setGhostBox(false, 0, 0, 0, 1, 1, 1, false); },
+    close() { cancelMove(); active = false; bar.hidden = true; hot = -1; barFor = ''; world.setPreview(false, 0, 0); under.setVisible(false); world.setCityOpacity(1); panel.hidden = true; world.setGhostBox(false, 0, 0, 0, 1, 1, 1, false); },
     // mv: camera-relative pan vector; zoom: current user zoom (pans slower when zoomed in)
     update(dt, mv, zoom) {
       if (!active) return;
       pan.x = Math.max(-70, Math.min(70, pan.x + mv.x * 28 * dt / zoom));
       pan.z = Math.max(-70, Math.min(70, pan.z + mv.z * 28 * dt / zoom));
+      if (tool !== 's' || moving) { bar.hidden = true; hot = -1; barFor = ''; }
       const pp = groundAt(0); world.setPreview(!!pp, pp ? pp.x : 0, pp ? pp.z : 0);
-      if (tool === 'x') {
+      if (tool === 's' && !moving) {
+        why = '';
+        const i = barOver ? hot : pickIndex();
+        if (i >= 0) { hot = i; grace = 0.5; } else if (hot >= 0 && !barOver && (grace -= dt) <= 0) hot = -1;
+        const o = hot >= 0 ? world.map.item(hot) : null;
+        if (!o) { bar.hidden = true; barFor = ''; world.setGhostBox(false, 0, 0, 0, 1, 1, 1, false); }
+        else {
+          const b = world.map.bounds(hot);
+          world.setGhostBox(true, b.x, b.h / 2, b.z, b.hw * 2 + 0.2, b.h + 0.2, b.hd * 2 + 0.2, true);
+          if (barFor !== hot + o.t) { barFor = hot + o.t; buildBar(o); }
+          bar.hidden = false;
+          const a = project(b.x, b.h, b.z), bw = bar.offsetWidth || 90, bh = bar.offsetHeight || 150;
+          const left = a.x + 36 + bw > innerWidth - 336 ? a.x - 36 - bw : a.x + 36;
+          bar.style.left = Math.max(4, left) + 'px'; bar.style.top = Math.max(4, Math.min(innerHeight - bh - 4, a.y - 20)) + 'px';
+        }
+      } else if (tool === 'x') {
         why = '';
         const i = pickIndex();
         if (i >= 0) { const b = world.map.bounds(i); world.setGhostBox(true, b.x, b.h / 2, b.z, b.hw * 2 + 0.2, b.h + 0.2, b.hd * 2 + 0.2, false); }
         else world.setGhostBox(false, 0, 0, 0, 1, 1, 1, false);
       } else {
+        bar.hidden = true;
         const o = currentObject();
         if (o) { const b = world.map.boundsOf(o); world.setGhostBox(true, b.x, b.h / 2, b.z, b.hw * 2, b.h, b.hd * 2, world.map.canPlace(o)); why = world.map.why(o); }
         else { why = ''; world.setGhostBox(false, 0, 0, 0, 1, 1, 1, false); }

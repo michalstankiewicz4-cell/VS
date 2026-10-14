@@ -63,6 +63,12 @@ export function createApp({ appEl, uiEl }) {
     ray.setFromCamera(ndc.set(input.mouse.x, input.mouse.y), rig.camera);
     return ray.ray.intersectPlane(plane, hit) ? hit : null;
   }
+  const pv = new THREE.Vector3();
+  function project(x, y, z) {   // world point -> screen pixels (for editor floating options)
+    pv.set(x, y, z).project(rig.camera);
+    const r = canvas.getBoundingClientRect();
+    return { x: r.left + (pv.x + 1) / 2 * r.width, y: r.top + (1 - pv.y) / 2 * r.height };
+  }
   function pickIndex() {
     if (!rig.camera.isOrthographicCamera) return -1;
     ray.setFromCamera(ndc.set(input.mouse.x, input.mouse.y), rig.camera);
@@ -74,7 +80,7 @@ export function createApp({ appEl, uiEl }) {
   const isPaused = () => paused;
   const hud = createHud(uiEl);
   const builder = createBuilder({ root: uiEl, canvas, world, progress, settings, groundAt, isPaused, onPlay: () => startRun() });
-  const editor = createEditor({ scene, root: uiEl, canvas, world, settings, groundAt, pickIndex, isPaused, onPlay: () => startRun(), saveMap });
+  const editor = createEditor({ scene, root: uiEl, canvas, world, settings, groundAt, pickIndex, project, isPaused, onPlay: () => startRun(), saveMap });
   const menu = createMenu(uiEl, {
     actions: { start: () => startRun(), build: () => openBuild(), editor: () => openEdit(), resume: () => resume(), quit: () => goMenu() },
     ctx: { settings, input, progress },

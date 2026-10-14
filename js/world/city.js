@@ -3,7 +3,7 @@
 import * as THREE from '../../vendor/three.module.js';
 import { mulberry32 } from '../core/util.js';
 import { PALACE, PALACE_HW, PALACE_HD, PALACE_H } from './data/palace.js';
-import { MAP_MAX, BASE_ZONE, EDGE, PALACE_POS, START_CAR } from './constants.js';
+import { MAP_MAX, BASE_ZONE, EDGE, START_CAR } from './constants.js';
 import { createCityMaterial } from './city-material.js';
 import { defaultMap } from './default-map.js';
 
@@ -18,7 +18,7 @@ function clean(o) {
   if (o.t === 'b') return { t: 'b', x, z, w: r1(num(o.w, 3, 16, 8)), d: r1(num(o.d, 3, 16, 8)), h: r1(num(o.h, 1.5, 9, 4)), s };
   if (o.t === 'c') return { t: 'c', x, z, r: o.r ? 1 : 0, s };
   if (o.t === 'r') return { t: 'r', x, z, w: r1(num(o.w, 2, 12, 4)), d: r1(num(o.d, 4, 60, 20)), r: o.r ? 1 : 0, s };
-  if (o.t === 'p') return { t: 'p', x: PALACE_POS.x, z: PALACE_POS.z, s };
+  if (o.t === 'p') return { t: 'p', x, z, s };
   return null;
 }
 const bounds = (o) => o.t === 'b' ? { x: o.x, z: o.z, hw: o.w / 2, hd: o.d / 2, h: o.h }
@@ -26,8 +26,9 @@ const bounds = (o) => o.t === 'b' ? { x: o.x, z: o.z, hw: o.w / 2, hd: o.d / 2, 
   : o.t === 'c' ? (o.r ? { x: o.x, z: o.z, hw: 1.95, hd: 0.95, h: 1.4 } : { x: o.x, z: o.z, hw: 0.95, hd: 1.95, h: 1.4 })
   : { x: o.x, z: o.z, hw: PALACE_HW, hd: PALACE_HD, h: PALACE_H };
 const inBase = (b) => Math.abs(b.x) - b.hw < BASE_ZONE && Math.abs(b.z) - b.hd < BASE_ZONE;
-// Footprint overlap with the Palace of Culture (no building, car or road on top of it).
-const onPalace = (b) => Math.abs(b.x - PALACE_POS.x) < b.hw + PALACE_HW && Math.abs(b.z - PALACE_POS.z) < b.hd + PALACE_HD;
+// Two footprints overlap (roads may cross roads and lie under cars; everything else is solid).
+const flat = (o) => o.t === 'r';
+const overlap = (a, b) => Math.abs(a.x - b.x) < a.hw + b.hw - 0.05 && Math.abs(a.z - b.z) < a.hd + b.hd - 0.05;
 const inWorld = (b) => Math.abs(b.x) + b.hw <= EDGE && Math.abs(b.z) + b.hd <= EDGE;
 
 export function createCity({ scene, dummy, col, vehicles, nightU }) {
@@ -98,25 +99,32 @@ export function createCity({ scene, dummy, col, vehicles, nightU }) {
     count: () => items.length,
     bounds: (i) => bounds(items[i]),
     boundsOf: (o) => bounds(o),
-    canPlace(o) {
-      const c = clean(o);
-      if (!c || c.t === 'p' || items.length >= MAP_MAX) return false;
-      const b = bounds(c);
-      return inWorld(b) && !inBase(b) && !onPalace(b);
-    },
+    // skip: index of an item being modified (ignored in the overlap / limit checks)
+    canPlace(o, skip = -1) { return map.why(o, skip) === ''; },
     // Reason code for a refused placement ('' = fine); the UI translates it.
-    why(o) {
+    why(o, skip = -1) {
       const c = clean(o);
       if (!c) return 'invalid';
-      if (c.t === 'p') return 'palace';
-      if (items.length >= MAP_MAX) return 'limit';
+      if (skip < 0 && items.length >= MAP_MAX) return 'limit';
+      if (c.t === 'p' && items.some((q, i) => i !== skip && q.t === 'p')) return 'palace';
       const b = bounds(c);
       if (!inWorld(b)) return 'edge';
       if (inBase(b)) return 'base';
-      if (onPalace(b)) return 'onPalace';
+      for (let i = 0; i < items.length; i++) {
+        if (i === skip) continue;
+        const q = items[i];
+        if (flat(c) && (flat(q) || q.t === 'c')) continue;
+        if (flat(q) && c.t === 'c') continue;
+        if (overlap(b, bounds(q))) return 'overlap';
+      }
       return '';
     },
     add(o) { if (!map.canPlace(o)) return false; items.push(clean(o)); rebuild(); return true; },
+    // Replaces item i with a modified copy (validated against everything else).
+    replace(i, o) { if (!items[i] || !map.canPlace(o, i)) return false; items[i] = clean(o); rebuild(); return true; },
+    item: (i) => (items[i] ? { ...items[i] } : null),
+    // Puts a previously removed object back without validation (cancelling a move).
+    restore(o) { const c = clean(o); if (c) { items.push(c); rebuild(); } },
     removeAt(i) { if (!items[i]) return false; items.splice(i, 1); rebuild(); return true; },
     pick(raycaster) {
       const hit = raycaster.intersectObject(mesh)[0];
