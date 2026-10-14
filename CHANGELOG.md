@@ -4,6 +4,10 @@ Versioning: `MAJOR.MINOR.PATCH`. Every push to the repository is a new version (
 The owner creates `vX.Y.Z` tags in GitHub Releases on commits from this history; pushing tags from a Claude session is blocked.
 Bug fix = PATCH, new feature = MINOR, big change to gameplay or the save format = MAJOR.
 
+## [0.16.2] - 2026-10-14
+### Changed
+- Map editor Select tool: an object is selected (highlighted, options bar shown) by clicking it, not by hovering; clicking empty ground deselects.
+
 ## [0.16.1] - 2026-10-14
 ### Added
 - Small "dev reset" button at the top centre (tooltip explains it): two clicks wipe all data stored in the browser (settings, map, editor settings, save) and reload. The in-game HUD moved 12 px down to make room.

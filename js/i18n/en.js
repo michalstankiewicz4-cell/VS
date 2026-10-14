@@ -161,7 +161,7 @@ export default {
   'ed.scale.hint': 'Preview next to the cursor: a person and a zombie. Cars on the map change size too.',
   'ed.select': 'Select',
   'ed.palace': 'Palace',
-  'ed.act.select': 'hover an object for options',
+  'ed.act.select': 'click an object for options',
   'ed.moving': 'Moving: click to put it down.',
   'ed.cancelMove': 'Cancel move',
   'ed.o.move': 'Move',

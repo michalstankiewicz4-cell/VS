@@ -60,7 +60,7 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
   const cancelMove = () => { if (moving) { world.map.restore(moving.orig); moving = null; } };
   const cancelBtn = btn('ed.cancelMove', () => { cancelMove(); refresh(); });
   cancelBtn.hidden = true;
-  // Floating options next to the hovered object (Select tool): move, rotate, resize, delete.
+  // Floating options next to the clicked (selected) object (Select tool): move, rotate, resize, delete.
   const bar = h('div', { id: 'edbar', hidden: true });
   bar.addEventListener('mouseenter', () => { barOver = true; });
   bar.addEventListener('mouseleave', () => { barOver = false; });
@@ -176,7 +176,7 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
     if (!active || isPaused() || e.button !== settings.data.mouse.fireButton) return;
     note = '';
     if (tool === 'x') { const i = pickIndex(); if (i >= 0 && world.map.removeAt(i)) saveMap(); }
-    else if (tool === 's' && !moving) return;
+    else if (tool === 's' && !moving) { const i = pickIndex(); hot = i; barFor = ''; if (i < 0) { bar.hidden = true; return; } }
     else { const o = currentObject(); if (o && world.map.add(o)) { saveMap(); moving = null; } else if (o && moving) note = t('ed.o.cant', { why: t('ed.why.' + world.map.why(o)) }); }
     refresh();
   });
@@ -197,8 +197,7 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
       const pp = groundAt(0); world.setPreview(!!pp, pp ? pp.x : 0, pp ? pp.z : 0);
       if (tool === 's' && !moving) {
         why = '';
-        const i = barOver ? hot : pickIndex();
-        if (i >= 0) { hot = i; grace = 0.5; } else if (hot >= 0 && !barOver && (grace -= dt) <= 0) hot = -1;
+        if (hot >= world.map.count()) hot = -1;
         const o = hot >= 0 ? world.map.item(hot) : null;
         if (!o) { bar.hidden = true; barFor = ''; world.setGhostBox(false, 0, 0, 0, 1, 1, 1, false); }
         else {

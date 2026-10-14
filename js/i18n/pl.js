@@ -161,7 +161,7 @@ export default {
   'ed.scale.hint': 'Podgląd przy kursorze: człowiek i zombie. Samochody na mapie też zmieniają rozmiar.',
   'ed.select': 'Wybierz',
   'ed.palace': 'Pałac',
-  'ed.act.select': 'najedź na obiekt, by zobaczyć opcje',
+  'ed.act.select': 'kliknij obiekt, by zobaczyć opcje',
   'ed.moving': 'Przenoszenie: kliknij, aby odłożyć.',
   'ed.cancelMove': 'Anuluj przenoszenie',
   'ed.o.move': 'Przenieś',
