@@ -16,6 +16,8 @@ export const BASE_ZONE = 30;       // half-size of the central zone kept free of
 export const EDGE = 76;            // movement / placement limit
 
 export const PALACE_POS = { x: 0, z: -46 };
+// The Palace spire (tip of the tower) in world coordinates: palace origin + the tower's offset in the model.
+export const SPIRE = { x: PALACE_POS.x - 0.23, z: PALACE_POS.z + 0.37 };
 // Player spawn: the courtyard in front of the Palace of Culture and Science, with a car parked next to it.
 export const START = { x: 0, z: -36.5 };
 export const START_CAR = { x: 3.0, z: -36.5, th: 0 };

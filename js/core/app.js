@@ -74,7 +74,7 @@ export function createApp({ appEl, uiEl }) {
   const isPaused = () => paused;
   const hud = createHud(uiEl);
   const builder = createBuilder({ root: uiEl, canvas, world, progress, settings, groundAt, isPaused, onPlay: () => startRun() });
-  const editor = createEditor({ root: uiEl, canvas, world, settings, groundAt, pickIndex, isPaused, onPlay: () => startRun(), saveMap });
+  const editor = createEditor({ scene, root: uiEl, canvas, world, settings, groundAt, pickIndex, isPaused, onPlay: () => startRun(), saveMap });
   const menu = createMenu(uiEl, {
     actions: { start: () => startRun(), build: () => openBuild(), editor: () => openEdit(), resume: () => resume(), quit: () => goMenu() },
     ctx: { settings, input, progress },

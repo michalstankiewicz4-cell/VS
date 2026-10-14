@@ -30,6 +30,7 @@ Legend: **P1** next, **P2** later, **P3** ideas. State as of v0.11.0. Context: [
 - [ ] P3 More languages (add a dictionary in `js/i18n/` and an entry in `LANGS`)
 
 ## Map editor
+- [ ] P2 Underlay: save it between sessions (IndexedDB), optional OpenStreetMap tiles (opt-in, needs CSP `img-src` change; Google Maps tiles are not allowed)
 - [ ] P2 Select, move and copy existing objects
 - [ ] P2 Palace of Culture: allow moving/hiding? (fixed at (0,−46) today; whether the Remove tool can delete it is untested)
 - [ ] P3 Several map slots, sharing by link/file

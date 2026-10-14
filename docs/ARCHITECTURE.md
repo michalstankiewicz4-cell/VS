@@ -26,7 +26,7 @@ Published at: repo <https://github.com/michalstankiewicz4-cell/VS>, site <https:
 | `js/input/bindings.js`, `input.js` | Rebindable actions and key labels; input + local action statistics |
 | `js/i18n/{index,en,pl}.js` | `t()`, `bind()`, `setLang()`; English (default/fallback) and Polish dictionaries |
 | `js/ui/{dom,hud,menu}.js`, `js/ui/options/*` | DOM builder `h()`, HUD, menu screens, options tabs |
-| `js/modes/{builder,editor}.js` | Base builder and city map editor |
+| `js/modes/{builder,editor,underlay}.js` | Base builder, city map editor, and the editor's reference-image underlay (local file → canvas texture on a ground plane at the spire `SPIRE`; data: URLs only, CSP-safe) |
 | `tools/check-version.mjs` | Version check before pushing |
 | `vendor/` | three.js r0.186.1 + `SHA256.txt` + licence |
 | `assets/` | `og-image.png` (1200×630 thumbnail), `icon.png` |

@@ -11,3 +11,6 @@
 #ed .row{display:grid;grid-template-columns:90px 1fr 34px;gap:6px;align-items:center;margin:4px 0;text-align:left}
 #ed .row span:last-child{text-align:right;color:#8f8396}
 #ed textarea{width:100%;box-sizing:border-box;background:#120b18;color:#d9cfd6;border:1px solid #4a2d52;font:11px ui-monospace,Consolas,monospace;margin-top:6px}
+#ed details.under{margin:6px 0;text-align:left}
+#ed details.under summary{cursor:pointer;color:#c9b5d6}
+#ed{max-height:calc(100vh - 32px);overflow:auto}

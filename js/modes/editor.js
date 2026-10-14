@@ -2,9 +2,10 @@
 import * as THREE from '../../vendor/three.module.js';
 import { h, btn, tx } from '../ui/dom.js';
 import { t, onLang } from '../i18n/index.js';
+import { createUnderlay } from './underlay.js';
 import { moveLabel, camLabel, firstKey } from '../input/bindings.js';
 
-export function createEditor({ root, canvas, world, settings, groundAt, pickIndex, isPaused, onPlay, saveMap }) {
+export function createEditor({ scene, root, canvas, world, settings, groundAt, pickIndex, isPaused, onPlay, saveMap }) {
   let active = false, tool = 'b', rot = 0, why = '', whyShown = '', note = '';
   const pan = new THREE.Vector3(0, 0, 44);
 
@@ -14,6 +15,27 @@ export function createEditor({ root, canvas, world, settings, groundAt, pickInde
     return { el: h('label', { class: 'row' }, tx(labelKey), inp, out), inp };
   };
   const W = slider('ed.width', 4, 14, 1, 8), D = slider('ed.depth', 4, 14, 1, 8), H = slider('ed.height', 2, 9, 0.5, 4);
+  const under = createUnderlay({ scene });
+  const file = h('input', { type: 'file', accept: 'image/*', hidden: true });
+  const uSlider = (key, min, max, step, val, fmt, fn) => {
+    const out = h('span', {}, fmt(val)), inp = h('input', { type: 'range', min, max, step, value: val });
+    inp.addEventListener('input', () => { out.textContent = fmt(+inp.value); fn(+inp.value); });
+    return { el: h('label', { class: 'row' }, tx(key), inp, out), inp, out };
+  };
+  const uW = uSlider('ed.u.width', 20, 400, 5, under.width, (v) => String(v), (v) => under.setWidth(v));
+  const uO = uSlider('ed.u.opacity', 0.1, 1, 0.05, 0.6, (v) => v.toFixed(2), (v) => under.setOpacity(v));
+  const uR = uSlider('ed.u.rotate', -180, 180, 1, 0, (v) => v + '°', (v) => under.setRotation(v));
+  const uCenter = btn('ed.u.center', () => under.center());
+  const uClear = btn('ed.u.clear', () => { under.clear(); });
+  const uLoad = btn('ed.u.load', () => file.click());
+  file.addEventListener('change', async () => {
+    const f = file.files && file.files[0]; file.value = '';
+    if (!f) return;
+    try { await under.load(f); note = t('ed.u.ok'); } catch (e) { note = t(e.message === 'big' ? 'ed.u.big' : 'ed.u.bad'); }
+    refresh();
+  });
+  const underBox = h('details', { class: 'under' }, h('summary', {}, tx('ed.u.title')),
+    h('div', { class: 'btns' }, uLoad, uCenter, uClear), file, uW.el, uO.el, uR.el, h('p', { class: 'note' }, tx('ed.u.hint')));
   const info = h('p', { class: 'note' }), json = h('textarea', { rows: 5, spellcheck: 'false', hidden: true, 'aria-label': 'Map JSON' });
   const tools = {};
   const mkTool = (id, key) => { const b = btn(key, () => { tool = id; note = ''; refresh(); }); tools[id] = b; return b; };
@@ -21,7 +43,7 @@ export function createEditor({ root, canvas, world, settings, groundAt, pickInde
 
   const panel = h('div', { id: 'ed', hidden: true },
     h('div', { class: 'btns' }, mkTool('b', 'ed.building'), mkTool('c', 'ed.car'), mkTool('x', 'ed.remove'), rotBtn),
-    W.el, D.el, H.el,
+    W.el, D.el, H.el, underBox,
     h('div', { class: 'btns' }, btn('ed.play', onPlay),
       btn('ed.default', () => { world.map.reset(); saveMap(); note = t('ed.restored'); refresh(); }),
       btn('ed.export', async () => {
@@ -73,8 +95,8 @@ export function createEditor({ root, canvas, world, settings, groundAt, pickInde
   return {
     pan,
     rotate() { if (active) { rot ^= 1; refresh(); } },
-    open() { active = true; panel.hidden = false; pan.set(0, 0, 44); note = ''; refresh(); },
-    close() { active = false; panel.hidden = true; world.setGhostBox(false, 0, 0, 0, 1, 1, 1, false); },
+    open() { active = true; under.setVisible(true); panel.hidden = false; pan.set(0, 0, 44); note = ''; refresh(); },
+    close() { active = false; under.setVisible(false); panel.hidden = true; world.setGhostBox(false, 0, 0, 0, 1, 1, 1, false); },
     // mv: camera-relative pan vector; zoom: current user zoom (pans slower when zoomed in)
     update(dt, mv, zoom) {
       if (!active) return;
