@@ -4,6 +4,10 @@ Versioning: `MAJOR.MINOR.PATCH`. Every push to the repository is a new version (
 The owner creates `vX.Y.Z` tags in GitHub Releases on commits from this history; pushing tags from a Claude session is blocked.
 Bug fix = PATCH, new feature = MINOR, big change to gameplay or the save format = MAJOR.
 
+## [0.16.4] - 2026-10-14
+### Changed
+- Documentation brought up to date (README, ARCHITECTURE, TODO): map editor tools, object types, overlap rules, size multipliers, underlay, persistence, dev reset, privacy/CSP note. No code changes.
+
 ## [0.16.3] - 2026-10-14
 ### Fixed
 - Map editor: the person/zombie size preview no longer follows the cursor while placing buildings. It appears only while the "Size of things" section is open, at the centre of the view (the section is now closed by default).

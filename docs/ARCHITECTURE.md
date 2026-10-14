@@ -1,6 +1,6 @@
 # Architecture and project context
 
-Browser game **Capital Quarantine**: post-apocalyptic Warsaw, a man with a rifle against zombies, top-down view (isometric projection), 3D rendered at low resolution with a pixel-art filter. No dependencies except three.js (vendored locally), no network requests.
+Browser game **Capital Quarantine**: post-apocalyptic Warsaw, a man with a rifle against zombies, top-down view (isometric projection), 3D rendered at low resolution with a pixel-art filter. No dependencies except three.js (vendored locally). The only network use is optional and opt-in: map tiles for the editor underlay.
 
 Published at: repo <https://github.com/michalstankiewicz4-cell/VS>, site <https://michalstankiewicz4-cell.github.io/VS/> (GitHub Pages, workflow `.github/workflows/static.yml`).
 
@@ -45,14 +45,14 @@ Screens (`js/ui/menu.js`): `main`, `single`, `multi`, `pause`, `dead`, `options`
 
 ## Settings (`js/core/settings.js`)
 Stored in `localStorage` key `cq:settings:v1`: `lang`, `gfx` (pixelH, levels, dither, edge, bright, fov, showFps), `mouse` (rotSens, zoomSens, invertRotate, invertZoom, fireButton, dragButton — the two buttons must differ), `privacy.stats`, `keys` (action → two `KeyboardEvent.code` slots). Everything passes through `sanitize()` (clamps, whitelists, a key code can be used by one slot only; `Escape` is reserved). Change settings only via `settings.update(draft => …)`; listeners via `settings.onChange`.
-Key actions (`js/input/bindings.js`): moveUp/Down/Left/Right, camLeft/camRight, interact, cameraView, editRotate. Each has a statistics category (move / interact / camera) or none.
+Key actions (`js/input/bindings.js`): moveUp/Down/Left/Right, camLeft/camRight, interact, cameraView, editRotate, editTopView (T). Each has a statistics category (move / interact / camera) or none.
 
 ## Rendering (`js/render/pixel-pipeline.js`)
 - three.js scene → `WebGLRenderTarget` of height `pixelH` (default 200 px) with a `DepthTexture` → full-screen shader: brightness `bright`, quantisation to `levels` with 4×4 Bayer dithering (`dither`), outline from depth differences (`edge`), vignette. Parameters via `pipe.setParams()` (driven by settings).
 - Works with orthographic and perspective cameras: for perspective the shader linearises depth (`persp`, `near`, `far` uniforms) and thresholds the edge as a relative difference.
 
 ## Cameras (`js/core/cameras.js`)
-- **Iso** (on foot, building, editing): orthographic, offset `(0,14,10)` from the target, near/far −30/90, yaw (default 10°), user zoom 0.5–2.2× (wheel). Movement is rotated by `yaw`: `x = mx·cos + mz·sin`, `z = −mx·sin + mz·cos`. Rotate: camLeft/camRight keys or drag with the drag button.
+- **Iso** (on foot, building, editing): orthographic, offset `(0,14,10)` from the target, near/far −30/90, yaw (default 10°), user zoom 0.5–2.2× (wheel). Movement is rotated by `yaw`: `x = mx·cos + mz·sin`, `z = −mx·sin + mz·cos`. Rotate: camLeft/camRight keys or drag with the drag button. In the editor `rig.topDown` (set by the app from `editor.top`) puts the camera straight above the target (y = 24, `up` = −z rotated by yaw to avoid a lookAt degeneracy).
 - **Chase / cockpit** (driving; **C** cycles iso → chase → cockpit): perspective, FOV from settings. Chase: 7.5 behind, 3.6 up, smoothed heading, drag orbits. Cockpit: eye at the driver seat (`SEAT` in `vehicles.js`: 0.42 left, 1.4 up, 0.15 forward), a dashboard box and steering wheel attached to the camera (wheel follows `car.steer`), drag looks around, re-centres on release.
 - **Showcase** (menu mode): low perspective camera in front of the character with a slow sway.
 - The building see-through fade (`world.fade`) is only enabled in the iso view during a run.
@@ -61,10 +61,11 @@ Key actions (`js/input/bindings.js`): moveUp/Down/Left/Right, camLeft/camRight, 
 - Ground `GROUND = 200`, movement limit ±76 (`EDGE`). Base zone: centre, `BASE_ZONE = 30` (kept free of city objects). Constants in `constants.js`. Start: `START = (0, −36.5)` (courtyard in front of the Palace) and `START_CAR = (3, −36.5)`.
 - **Instances**: enemies (`ENEMIES = 110`, shared geometry via `mergeBoxes`), bullets (`PN = 96`), rubble (`GRAVES = 260`), city (one `InstancedMesh`, capacity 3000, per-instance attribute `aK` = (facade kind, top height)).
 - **Collisions** (`collision.js`): AABBs and circles in `blockers` (base structures) and `cityBlk` (city + parked cars); `push()` moves actors out, `hitsAny()` stops bullets.
-- **City = editable map** (`world.map`, `city.js`): objects `{t:'b',x,z,w,d,h,s}` (building), `{t:'c',x,z,r,s}` (car), `{t:'p',x:0,z:-46,s}` (Palace, fixed). Limits: 380 objects, w/d 3–16, h 1.5–9, nothing inside the base zone. Validation in `clean()`/`set()` — nothing outside the schema passes (JSON import is safe). `map.why()` returns reason codes (`invalid`, `palace`, `limit`, `edge`, `base`) that the editor translates (`ed.why.*`).
+- **City = editable map** (`world.map`, `city.js`): objects `{t:'b',x,z,w,d,h,s}` (building), `{t:'c',x,z,r,s}` (car), `{t:'r',x,z,w,d,r,s}` (road: flat slab, w 2–12, d 4–60, no collision), `{t:'p',x,z,s}` (Palace — a normal object, one at a time, default (0,−46)). Limits: 380 objects, w/d 3–16, h 1.5–9, nothing inside the base zone. Validation in `clean()`/`set()` — nothing outside the schema passes (JSON import is safe; `set()` does not check overlaps so older maps still load). `map.why(o, skip)` returns reason codes (`invalid`, `palace` = only one, `limit`, `edge`, `base`, `overlap`) that the editor translates (`ed.why.*`); `skip` ignores the item being modified. Overlap = AABB footprints (roads are exempt with roads and cars). Other map API: `canPlace`, `add`, `replace(i,o)`, `removeAt`, `item(i)`, `restore(o)` (re-adds without validation, used to cancel a move), `pick(ray)`, `bounds(i)`, `boundsOf(o)`.
 - **Building transparency**: shader in `city-material.js` — dither-discard of fragments between camera and player within `uR = 2.8`.
 - **Palace facade**: same material, kinds 1–5 in the shader (windows, arcades, slits, clock faces); windows glow at night (`uNight`).
 - **Base structures** (`structures.js`, `COST`): `tower` sentry gun 25, `wall` barricade 8, `crypt` bunker 40 (+25 max HP, max 3). Build grid 2 units, range ±14 cells; removing refunds half.
+- **Size multipliers**: `world.setScales({p,v,e})` (people/vehicles/enemies, visual; vehicles also scale parked blockers, driving circles and the run-over area) and `world.setPreview(on,x,z)` (borrows the player model + one zombie instance for the editor preview; restores position/visibility).
 - **Enemies** (`enemies.js`): the active count grows with time (`18 + S.time`, up to 110), HP grows (`hpFor`: 2/3/4), speed up to +80%. A kill = 1 point.
 - **Vehicles** (`vehicles.js`): in live modes (`play`, `menu`) map cars become vehicles (separate `InstancedMesh`, 8 boxes per car, max 64) plus the start car. `toggle()` (interact key) enters/exits; `step()` simple physics (accel 14, brake 28, max 15 u/s, speed-dependent steering), two-circle collision via `push()`, `runsOver()` for zombies. A parked car is an axis-aligned AABB (angle snapped to 90° on exit); you get out on the driver's (left) side. Input: `Input.axes()`.
 - **Day/night** (`sky.js`): period 600 s (about 5 min day + 5 min night), transitions about 40 s, `nightAt(time)`; a run starts in daylight; menu/build/editor are always day.
@@ -73,15 +74,16 @@ Key actions (`js/input/bindings.js`): moveUp/Down/Left/Right, camLeft/camRight, 
 - `gra:save:v1` — `{ bank, best, s: base structures }`
 - `gra:map:v1` — list of map objects (editor)
 - `cq:settings:v1` — settings
+- `cq:editor:v1` — map editor settings (tool, rotation, top view, sliders, opacities); the underlay image is never stored
 Storage errors are swallowed (private mode etc.).
 
 ## Map editor (`js/modes/editor.js`)
-Tools Building/Car/Remove, rotate (editRotate key), size sliders, JSON export/import, "Default map". Editor camera: move keys pan (±70), start outside the base at (0, 44). Buildings may overlap; the base zone is blocked and the reason is shown. No point cost.
+Right-hand panel. Tools: Select (click → floating `#edbar` with Move / Rotate / Taller / Lower / Bigger / Smaller / Longer / Shorter / Delete, positioned with `project()` from `app.js`), Building, Car, Road, Palace, Remove; rotate (editRotate key), top view (editTopView), size sliders, "Size of things" (preview only while that section is open), "Our map opacity" (`world.setCityOpacity`, restored to 1 on close), underlay, JSON export/import, "Reset settings", "Default map". Moving = `removeAt` + ghost at the cursor + `add` on click (`restore` on cancel/close). Editor camera: move keys pan (±70), start outside the base at (0, 44). Settings persist under `cq:editor:v1`. No point cost.
+Underlay (`modes/underlay.js`): plane at the spire (`SPIRE` in `constants.js`, a fixed real-world anchor — it does not follow a moved Palace); local file (max 8 MB, scaled to ≤2048 px, data: URL, CSP-safe) or tiles (`loadTiles('osm'|'esri')`: 7×7 tiles at z=17, Web-Mercator, `GEO` lat/lon, 0.17 u/m; needs the two hosts in CSP `img-src`; images are drawn to a canvas with `crossOrigin='anonymous'`). To remove online tiles: delete the hosts from the CSP and `loadTiles`/`PROVIDERS`.
+Dev reset (`ui/devreset.js`): two-click button that clears localStorage/sessionStorage and reloads.
 
 ## Privacy and security
-- Only network use: opt-in map tiles in the editor underlay (OSM/Esri hosts in CSP `img-src`); nothing else.
-- Editor Select tool: hover → `#edbar` options (project() in app.js maps world→screen); `map.replace/restore/item`, `why(o, skip)` does bounds + overlap checks (roads exempt with roads/cars). The Palace (`p`) is a normal single-instance object at any free position.
-- Map objects: `b` building, `c` car, `r` road (flat, no collision; w 2–12, d 4–60). Editor top view: `rig.topDown` (camera straight above, key T).
+- Only network use: opt-in map tiles in the editor underlay (OSM/Esri hosts in CSP `img-src`, attribution shown in the editor); nothing else. Google imagery is not used.
 - CSP in `index.html`: `script-src 'self'`, no external scripts/CDNs, no `eval`/`innerHTML`, no API keys in the repo.
 - Input statistics (`js/input/input.js`): only **game actions** are counted (move / interact / camera / clicks) — not key codes, not mouse position (position stays in memory for aiming); form fields are ignored; everything is local. `Input.features()` returns rounded aggregates only. **Nothing is sent to any model** (AI/API comes at the very end, local models first). Shown in Options > Privacy & data.
 

@@ -1,6 +1,6 @@
 # TODO
 
-Legend: **P1** next, **P2** later, **P3** ideas. State as of v0.11.0. Context: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+Legend: **P1** next, **P2** later, **P3** ideas. State as of v0.16.3. Context: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ## Multiplayer (plan in [`docs/MULTIPLAYER.md`](docs/MULTIPLAYER.md))
 - [ ] P2 Decision: co-op/PvP, player count, shared bank, P2P or server (menu entries "PvE co-op" and "PvP" exist as "Soon")
@@ -30,13 +30,14 @@ Legend: **P1** next, **P2** later, **P3** ideas. State as of v0.11.0. Context: [
 - [ ] P3 More languages (add a dictionary in `js/i18n/` and an entry in `LANGS`)
 
 ## Map editor
-- [ ] P2 Underlay: save it between sessions (IndexedDB), optional OpenStreetMap tiles (opt-in, needs CSP `img-src` change; Google Maps tiles are not allowed)
-- [ ] P2 Select, move and copy existing objects
-- [ ] P2 Palace of Culture: allow moving/hiding? (fixed at (0,−46) today; whether the Remove tool can delete it is untested)
+- [ ] P2 Underlay: save it between sessions (IndexedDB); verify real OSM/Esri tile loading and Esri CORS (only tested with mocked tiles)
+- [ ] P2 Copy/duplicate objects, multi-select, undo/redo
+- [ ] P2 Per-object scale (cars, people) instead of global size sliders; scale collision radii of people/enemies
+- [ ] P2 Editor: place base structures and enemy spawn points; roads that connect/auto-join
 - [ ] P3 Several map slots, sharing by link/file
 
 ## Technical
-- [ ] P1 E2E test script in the repo (Playwright) instead of ad-hoc scripts in /tmp
+- [ ] P1 E2E test script in the repo (Playwright) instead of ad-hoc scripts in /tmp (editor flows: select/move/rotate/delete, Palace re-place, overlap, export/import, play after editor)
 - [ ] P2 Performance: profile on weaker GPUs; optional automatic lowering of `pixelH`
 - [ ] P3 Save format versioning (`gra:save:v1` → migrations)
 
@@ -49,4 +50,4 @@ Legend: **P1** next, **P2** later, **P3** ideas. State as of v0.11.0. Context: [
 - [ ] Verify the Palace model author (kon.kp per file metadata) and fix the attribution if needed
 
 ## Done (summary)
-Pixel-art render, Warsaw city and Palace of Culture from a SketchUp model, shooting and points, base (sentry/barricade/bunker), camera (rotate, zoom), building transparency, map editor, day/night cycle, start under the Palace, SEO and thumbnail, drivable cars, start screen with menus, pause on Esc, options (graphics, key bindings, mouse, language, privacy), driver views, English UI with Polish option, code split into modules. Details: `CHANGELOG.md`.
+Pixel-art render, Warsaw city and Palace of Culture from a SketchUp model, shooting and points, base (sentry/barricade/bunker), camera (rotate, zoom), building transparency, map editor, day/night cycle, start under the Palace, SEO and thumbnail, drivable cars, start screen with menus, pause on Esc, options (graphics, key bindings, mouse, language, privacy), driver views, English UI with Polish option, code split into modules, map editor with Select/Move/Rotate bar, movable Palace, roads, overlap check, top view, size sliders, underlay (file / OSM / Esri), remembered settings, dev reset. Details: `CHANGELOG.md`.

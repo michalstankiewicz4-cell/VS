@@ -2,7 +2,7 @@
 
 Post-apocalyptic Warsaw: a man with a rifle against zombies, top-down view, low-resolution 3D with a pixel-art filter (three.js). Points earned after you die pay for your base. Play: <https://michalstankiewicz4-cell.github.io/VS/>
 
-Default controls (all rebindable in Options): WASD move, left mouse fire, F enter/exit a car, C change camera view in a car (isometric / chase / cockpit), Q/E or right-mouse drag rotate the camera, wheel zoom, Esc pause.
+Default controls (all rebindable in Options): WASD move, left mouse fire, F enter/exit a car, C change camera view in a car (isometric / chase / cockpit), Q/E or right-mouse drag rotate the camera, wheel zoom, Esc pause. Map editor extras: T top view, R rotate.
 
 **Documentation:** [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) (context and files) · [`TODO.md`](TODO.md) · [`docs/MULTIPLAYER.md`](docs/MULTIPLAYER.md) · [`CLAUDE.md`](CLAUDE.md) (assistant rules) · [`CHANGELOG.md`](CHANGELOG.md)
 
@@ -34,7 +34,15 @@ The version lives in `js/version.js` (shown in the game and the FPS counter), hi
 Before every push: bump the version, add a changelog entry and run `node tools/check-version.mjs`.
 
 ## Map editor and transparency
-Main menu > Map Editor: place/remove buildings and cars, size, rotation, JSON export/import (saved locally in the browser). Buildings that hide the character become partly transparent in the isometric view.
+Main menu > Map Editor (panel on the right). Everything on the map is an ordinary object, including the Palace of Culture.
+- **Select** (default for changing things): click an object to select it; a small bar appears next to it with Move, Rotate, Taller/Lower/Bigger/Smaller (buildings), Longer/Shorter (roads) and Delete. Click empty ground to deselect. Move picks the object up (R rotates it, "Cancel move" puts it back).
+- **Building / Car / Road / Palace** place new objects (sliders for size; R rotates), **Remove** deletes the clicked object. Objects cannot overlap (roads may cross roads and lie under cars) and the base zone in the centre stays free; the ghost turns red and the reason is shown. Only one Palace can exist at a time.
+- **Top view (T)**: camera straight above (90°) for easier building.
+- **Size of things**: sliders for people, vehicles and enemies (0.5–2.0) with a preview at the centre of the view; they apply in play too. Collision radii of people/enemies are not scaled.
+- **Map underlay** (reference image, editor only, not saved): load a screenshot from a file, or opt in to online OpenStreetMap / Esri satellite tiles centred on the Palace spire; scale, rotate and fade it, and use "Our map opacity" to see it through the city. Remove it when done; the built map stays.
+- Settings (tool, rotation, top view, sliders) are remembered; "Reset settings" restores defaults, "Default map" restores the default city, Export/Import handle JSON (import does not check overlaps).
+- **Dev reset** (tiny button, top centre of every screen): two clicks wipe all data stored by the game in the browser and reload.
+Buildings that hide the character become partly transparent in the isometric view during a run.
 
 ## Attributions
 - Palace of Culture and Science: simplified model based on a SketchUp model (BezNazwy6.skp), author per file metadata: **kon.kp**, licence [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Only boxes derived from the storey outlines are used in the game (changed: simplification, scale, rotation).
