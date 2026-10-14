@@ -4,6 +4,10 @@ Versioning: `MAJOR.MINOR.PATCH`. Every push to the repository is a new version (
 The owner creates `vX.Y.Z` tags in GitHub Releases on commits from this history; pushing tags from a Claude session is blocked.
 Bug fix = PATCH, new feature = MINOR, big change to gameplay or the save format = MAJOR.
 
+## [0.16.1] - 2026-10-14
+### Added
+- Small "dev reset" button at the top centre (tooltip explains it): two clicks wipe all data stored in the browser (settings, map, editor settings, save) and reload. The in-game HUD moved 12 px down to make room.
+
 ## [0.16.0] - 2026-10-14
 ### Added
 - Map editor: **Select** tool — hover an object to get a floating options bar next to it: Move, Rotate, Taller/Lower/Bigger/Smaller (buildings), Longer/Shorter (roads), Delete. Move picks the object up and puts it down at the cursor (R rotates it, "Cancel move" restores it).

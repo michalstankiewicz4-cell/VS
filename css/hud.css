@@ -1,5 +1,7 @@
 /* In-game HUD, base builder and map editor panels. */
-#top{position:fixed;left:50%;top:10px;transform:translateX(-50%);z-index:2;text-align:center;pointer-events:none;min-width:260px}
+#devreset{position:fixed;left:50%;top:0;transform:translateX(-50%);z-index:7;padding:0 8px;font-size:10px;line-height:14px;opacity:.45;border-top:0}
+#devreset:hover,#devreset.on{opacity:1}
+#top{position:fixed;left:50%;top:22px;transform:translateX(-50%);z-index:2;text-align:center;pointer-events:none;min-width:260px}
 #hpbar{height:10px;background:#2a1018;border:1px solid #5a2030}
 #hpbar i{display:block;height:100%;width:100%;background:#c01838}
 #run{margin-top:4px;color:#e8d8e0;text-shadow:0 0 3px #000;white-space:pre}

@@ -13,6 +13,7 @@ import { createHud } from '../ui/hud.js';
 import { createMenu } from '../ui/menu.js';
 import { createBuilder } from '../modes/builder.js';
 import { createEditor } from '../modes/editor.js';
+import { createDevReset } from '../ui/devreset.js';
 import { VERSION } from '../version.js';
 
 const ZERO = { x: 0, z: 0 };
@@ -80,6 +81,7 @@ export function createApp({ appEl, uiEl }) {
   const isPaused = () => paused;
   const hud = createHud(uiEl);
   const builder = createBuilder({ root: uiEl, canvas, world, progress, settings, groundAt, isPaused, onPlay: () => startRun() });
+  createDevReset({ root: uiEl });
   const editor = createEditor({ scene, root: uiEl, canvas, world, settings, groundAt, pickIndex, project, isPaused, onPlay: () => startRun(), saveMap });
   const menu = createMenu(uiEl, {
     actions: { start: () => startRun(), build: () => openBuild(), editor: () => openEdit(), resume: () => resume(), quit: () => goMenu() },
