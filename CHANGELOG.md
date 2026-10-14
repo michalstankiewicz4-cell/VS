@@ -4,6 +4,10 @@ Versioning: `MAJOR.MINOR.PATCH`. Every push to the repository is a new version (
 The owner creates `vX.Y.Z` tags in GitHub Releases on commits from this history; pushing tags from a Claude session is blocked.
 Bug fix = PATCH, new feature = MINOR, big change to gameplay or the save format = MAJOR.
 
+## [0.14.2] - 2026-10-14
+### Added
+- Map editor: "Reset settings" button restores tool, rotation, top view and all sliders to defaults (the map itself is untouched; "Default map" resets the map).
+
 ## [0.14.1] - 2026-10-14
 ### Added
 - Map editor remembers its settings between sessions (tool, rotation, top view, building/road sliders, map and underlay opacity) in `localStorage` key `cq:editor:v1`. The underlay image is still not saved.

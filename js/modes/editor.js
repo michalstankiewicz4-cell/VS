@@ -60,6 +60,11 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
     h('div', { class: 'btns' }, mkTool('b', 'ed.building'), mkTool('c', 'ed.car'), mkTool('r', 'ed.road'), mkTool('x', 'ed.remove'), rotBtn, topBtn),
     W.el, D.el, H.el, RW.el, RL.el, underBox,
     h('div', { class: 'btns' }, btn('ed.play', onPlay),
+      btn('ed.resetSettings', () => {
+        tool = 'b'; rot = 0; top = false;
+        for (const [k, s] of Object.entries(sliders)) { s.inp.value = DEF[k]; s.inp.dispatchEvent(new Event('input')); }
+        world.setCityOpacity(1); note = t('ed.settingsReset'); refresh();
+      }),
       btn('ed.default', () => { world.map.reset(); saveMap(); note = t('ed.restored'); refresh(); }),
       btn('ed.export', async () => {
         const txt = JSON.stringify(world.map.list());
@@ -77,6 +82,7 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
       })),
     json, info);
   // Remember editor settings (tool, rotation, top view, sliders) between sessions; the underlay image itself is not saved.
+  const DEF = { w: 8, d: 8, h: 4, rw: 4, rl: 20, city: 1, uo: 0.6 };
   const sliders = { w: W, d: D, h: H, rw: RW, rl: RL, city: uCity, uo: uO };
   const sv = read(KEYS.editor), clampN = (v, s) => Math.min(+s.inp.max, Math.max(+s.inp.min, +v));
   if (sv && typeof sv === 'object') {

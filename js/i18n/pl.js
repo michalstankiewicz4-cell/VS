@@ -151,6 +151,8 @@ export default {
   'ed.u.net': 'Nie udało się wczytać kafelków (brak sieci lub blokada).',
   'ed.u.credit.osm': '© autorzy OpenStreetMap',
   'ed.u.credit.esri': 'Zdjęcia © Esri i współautorzy',
+  'ed.resetSettings': 'Resetuj ustawienia',
+  'ed.settingsReset': 'Ustawienia edytora przywrócone do domyślnych.',
   'ed.restored': 'Przywrócono domyślną mapę.',
   'ed.copied': 'Skopiowano JSON mapy do schowka.',
   'ed.selected': 'Zaznaczone — skopiuj Ctrl+C.',

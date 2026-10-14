@@ -151,6 +151,8 @@ export default {
   'ed.u.net': 'Could not load map tiles (offline or blocked).',
   'ed.u.credit.osm': '© OpenStreetMap contributors',
   'ed.u.credit.esri': 'Imagery © Esri and contributors',
+  'ed.resetSettings': 'Reset settings',
+  'ed.settingsReset': 'Editor settings reset to defaults.',
   'ed.restored': 'Default map restored.',
   'ed.copied': 'Map JSON copied to the clipboard.',
   'ed.selected': 'Selected — press Ctrl+C to copy.',
