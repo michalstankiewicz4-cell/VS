@@ -26,6 +26,8 @@ const bounds = (o) => o.t === 'b' ? { x: o.x, z: o.z, hw: o.w / 2, hd: o.d / 2, 
   : o.t === 'c' ? (o.r ? { x: o.x, z: o.z, hw: 1.95, hd: 0.95, h: 1.4 } : { x: o.x, z: o.z, hw: 0.95, hd: 1.95, h: 1.4 })
   : { x: o.x, z: o.z, hw: PALACE_HW, hd: PALACE_HD, h: PALACE_H };
 const inBase = (b) => Math.abs(b.x) - b.hw < BASE_ZONE && Math.abs(b.z) - b.hd < BASE_ZONE;
+// Footprint overlap with the Palace of Culture (no building, car or road on top of it).
+const onPalace = (b) => Math.abs(b.x - PALACE_POS.x) < b.hw + PALACE_HW && Math.abs(b.z - PALACE_POS.z) < b.hd + PALACE_HD;
 const inWorld = (b) => Math.abs(b.x) + b.hw <= EDGE && Math.abs(b.z) + b.hd <= EDGE;
 
 export function createCity({ scene, dummy, col, vehicles, nightU }) {
@@ -100,7 +102,7 @@ export function createCity({ scene, dummy, col, vehicles, nightU }) {
       const c = clean(o);
       if (!c || c.t === 'p' || items.length >= MAP_MAX) return false;
       const b = bounds(c);
-      return inWorld(b) && !inBase(b);
+      return inWorld(b) && !inBase(b) && !onPalace(b);
     },
     // Reason code for a refused placement ('' = fine); the UI translates it.
     why(o) {
@@ -111,6 +113,7 @@ export function createCity({ scene, dummy, col, vehicles, nightU }) {
       const b = bounds(c);
       if (!inWorld(b)) return 'edge';
       if (inBase(b)) return 'base';
+      if (onPalace(b)) return 'onPalace';
       return '';
     },
     add(o) { if (!map.canPlace(o)) return false; items.push(clean(o)); rebuild(); return true; },

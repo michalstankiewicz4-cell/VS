@@ -125,6 +125,7 @@ export default {
   'ed.why.palace': 'the Palace of Culture is fixed',
   'ed.why.limit': 'object limit reached',
   'ed.why.edge': 'outside the map edge',
+  'ed.why.onPalace': 'that spot is taken by the Palace of Culture',
   'ed.why.base': 'the base zone (centre) must stay free',
   'ed.u.title': 'Map underlay (reference image)',
   'ed.u.load': 'Load image',

@@ -4,6 +4,10 @@ Versioning: `MAJOR.MINOR.PATCH`. Every push to the repository is a new version (
 The owner creates `vX.Y.Z` tags in GitHub Releases on commits from this history; pushing tags from a Claude session is blocked.
 Bug fix = PATCH, new feature = MINOR, big change to gameplay or the save format = MAJOR.
 
+## [0.15.2] - 2026-10-14
+### Fixed
+- Map editor: buildings, cars and roads can no longer be placed on top of the Palace of Culture (footprint check; the ghost turns red with the reason). Maps already containing such objects still load unchanged.
+
 ## [0.15.1] - 2026-10-14
 ### Fixed
 - The player was invisible after starting a run: leaving the map editor hid the player model (the 0.15.0 size preview). The preview now restores the player's position and visibility.

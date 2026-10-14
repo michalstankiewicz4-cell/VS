@@ -125,6 +125,7 @@ export default {
   'ed.why.palace': 'Pałac Kultury jest stały',
   'ed.why.limit': 'limit obiektów',
   'ed.why.edge': 'poza granicą mapy',
+  'ed.why.onPalace': 'to miejsce zajmuje Pałac Kultury',
   'ed.why.base': 'strefa bazy (środek) musi zostać wolna',
   'ed.u.title': 'Podkładka mapy (obraz pomocniczy)',
   'ed.u.load': 'Wczytaj obraz',
