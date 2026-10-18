@@ -5,7 +5,9 @@ Status: **idea / not started**. The game is single-player today, fully client-si
 ## Starting constraints
 - Static hosting → no game server; networking needs either P2P (WebRTC) or an external relay/server.
 - Privacy rule: **no network requests without explicit consent**; the CSP has `connect-src 'self'` today. Every network feature must be opt-in, change the CSP deliberately and be described in the README.
-- The game is only partly deterministic (`rnd` in enemy spawns, `Math.random` in the editor) — this must be cleaned up before synchronising.
+- The game is only partly deterministic (`rnd` in enemy spawns, `Math.random` for the per-object seed `s` in the editor) — this must be cleaned up before synchronising.
+- The CSP still has `connect-src 'self'`; since 0.14.0 only `img-src` additionally allows the OSM / Esri tile hosts (opt-in, editor underlay). A multiplayer transport needs its own deliberate CSP change and README note.
+- Map editing now has move / rotate / resize / delete and a movable Palace (`map.replace`, `removeAt`, `restore`); a shared map would need these as events (add / replace / remove with indices, validated by `why()`), and the editor-only size multipliers (`world.setScales`) must be agreed between clients or kept local.
 
 ## Options (simplest first)
 | Option | Description | Pros | Cons |

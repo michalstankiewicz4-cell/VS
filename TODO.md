@@ -37,6 +37,7 @@ Legend: **P1** next, **P2** later, **P3** ideas. State as of v0.16.3. Context: [
 - [ ] P3 Several map slots, sharing by link/file
 
 ## Technical
+- [ ] P2 Keep `docs/HANDOFF.md` current (State and Decision log) with every notable change
 - [ ] P1 E2E test script in the repo (Playwright) instead of ad-hoc scripts in /tmp (editor flows: select/move/rotate/delete, Palace re-place, overlap, export/import, play after editor)
 - [ ] P2 Performance: profile on weaker GPUs; optional automatic lowering of `pixelH`
 - [ ] P3 Save format versioning (`gra:save:v1` → migrations)

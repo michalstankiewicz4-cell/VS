@@ -5,6 +5,7 @@ Browser game **Capital Quarantine**: post-apocalyptic Warsaw, a man with a rifle
 Published at: repo <https://github.com/michalstankiewicz4-cell/VS>, site <https://michalstankiewicz4-cell.github.io/VS/> (GitHub Pages, workflow `.github/workflows/static.yml`).
 
 ## Quick start for someone returning to the project
+0. Lost the context? Read [`HANDOFF.md`](HANDOFF.md) first (checklist, state, test recipe, traps, decision log).
 1. Read this file, then [`../TODO.md`](../TODO.md) and (for networking) [`MULTIPLAYER.md`](MULTIPLAYER.md).
 2. Run locally: `python -m http.server 8000` in the repo folder, open `http://localhost:8000` (ES modules do not work from `file://`).
 3. Standing rules: see "Rules" below.

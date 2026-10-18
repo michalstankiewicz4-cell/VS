@@ -4,6 +4,12 @@ Versioning: `MAJOR.MINOR.PATCH`. Every push to the repository is a new version (
 The owner creates `vX.Y.Z` tags in GitHub Releases on commits from this history; pushing tags from a Claude session is blocked.
 Bug fix = PATCH, new feature = MINOR, big change to gameplay or the save format = MAJOR.
 
+## [0.16.5] - 2026-10-18
+### Added
+- `docs/HANDOFF.md`: a resume guide for when the context is lost (checklist, project state, editor summary, headless test recipe, workflow traps, decision log); linked from README, CLAUDE.md and ARCHITECTURE.
+### Changed
+- All Markdown files reviewed and updated (CLAUDE.md rules, MULTIPLAYER notes, TODO). No code changes.
+
 ## [0.16.4] - 2026-10-14
 ### Changed
 - Documentation brought up to date (README, ARCHITECTURE, TODO): map editor tools, object types, overlap rules, size multipliers, underlay, persistence, dev reset, privacy/CSP note. No code changes.
