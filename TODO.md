@@ -1,6 +1,6 @@
 # TODO
 
-Legend: **P1** next, **P2** later, **P3** ideas. State as of v0.16.3. Context: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+Legend: **P1** next, **P2** later, **P3** ideas. State as of v0.17.0. Context: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ## Multiplayer (plan in [`docs/MULTIPLAYER.md`](docs/MULTIPLAYER.md))
 - [ ] P2 Decision: co-op/PvP, player count, shared bank, P2P or server (menu entries "PvE co-op" and "PvP" exist as "Soon")
@@ -19,6 +19,7 @@ Legend: **P1** next, **P2** later, **P3** ideas. State as of v0.16.3. Context: [
 - [ ] P2 Cars: damage/fuel, headlights at night, engine sound, car–car collisions, dashboard gauges
 
 ## Look
+- [ ] P2 Graphics styles: per-style materials/geometry (PBR weathering, toon light ramp) like in Battle; tune toon/watercolour for the dark ground texture
 - [ ] P2 Palace: close-up details (clock, arcades), proportion fixes against the model
 - [ ] P2 Destruction/ruins of buildings, fire, smoke
 - [ ] P2 Cockpit view: proper car interior (hide the bonnet box, dashboard gauges)

@@ -37,6 +37,13 @@ export default {
   'opt.tab.language': 'Language',
   'opt.tab.privacy': 'Privacy & data',
 
+  'gfx.style': 'Graphics style',
+  'gfx.styleNote': 'Switches instantly. Pixel art is the original look; the others are full-resolution filters.',
+  'style.pixel': 'Pixel art',
+  'style.real': 'Realistic',
+  'style.toon': 'Comic (cel)',
+  'style.paint': 'Watercolour',
+  'style.noir': 'Noir (VHS)',
   'gfx.pixelH': 'Pixel height',
   'gfx.levels': 'Colour levels',
   'gfx.dither': 'Dithering',

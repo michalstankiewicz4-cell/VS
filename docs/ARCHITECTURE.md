@@ -24,6 +24,7 @@ Published at: repo <https://github.com/michalstankiewicz4-cell/VS>, site <https:
 | `js/world/{terrain,sky,city,city-material,default-map,player,vehicles,enemies,projectiles,structures,collision,constants}.js` | World systems (see below) |
 | `js/world/data/palace.js` | Palace of Culture boxes — simplified model from a SketchUp file, CC BY 4.0 |
 | `js/render/pixel-pipeline.js` | `PixelPipeline`: low-res target + final shader (palette, dither, depth outline, vignette) |
+| `js/render/style-pipeline.js`, `look.js`, `pipeline.js` | `StylePipeline`: full-resolution MSAA target + shader for `real` / `toon` / `paint` / `noir`; `look.js` lists the styles; `Pipeline` picks the active one and switches live |
 | `js/input/bindings.js`, `input.js` | Rebindable actions and key labels; input + local action statistics |
 | `js/i18n/{index,en,pl}.js` | `t()`, `bind()`, `setLang()`; English (default/fallback) and Polish dictionaries |
 | `js/ui/{dom,hud,menu}.js`, `js/ui/options/*` | DOM builder `h()`, HUD, menu screens, options tabs |
@@ -45,12 +46,15 @@ All UI is built with `h(tag, props, ...kids)` (`js/ui/dom.js`) — no `innerHTML
 Screens (`js/ui/menu.js`): `main`, `single`, `multi`, `pause`, `dead`, `options`, with a small history stack (`go`/`back`). Options tabs (`js/ui/options/`): Graphics, Controls, Mouse, Language, Privacy & data.
 
 ## Settings (`js/core/settings.js`)
-Stored in `localStorage` key `cq:settings:v1`: `lang`, `gfx` (pixelH, levels, dither, edge, bright, fov, showFps), `mouse` (rotSens, zoomSens, invertRotate, invertZoom, fireButton, dragButton — the two buttons must differ), `privacy.stats`, `keys` (action → two `KeyboardEvent.code` slots). Everything passes through `sanitize()` (clamps, whitelists, a key code can be used by one slot only; `Escape` is reserved). Change settings only via `settings.update(draft => …)`; listeners via `settings.onChange`.
+Stored in `localStorage` key `cq:settings:v1`: `lang`, `gfx` (style, pixelH, levels, dither, edge, bright, fov, showFps), `mouse` (rotSens, zoomSens, invertRotate, invertZoom, fireButton, dragButton — the two buttons must differ), `privacy.stats`, `keys` (action → two `KeyboardEvent.code` slots). Everything passes through `sanitize()` (clamps, whitelists, a key code can be used by one slot only; `Escape` is reserved). Change settings only via `settings.update(draft => …)`; listeners via `settings.onChange`.
 Key actions (`js/input/bindings.js`): moveUp/Down/Left/Right, camLeft/camRight, interact, cameraView, editRotate, editTopView (T). Each has a statistics category (move / interact / camera) or none.
 
 ## Rendering (`js/render/pixel-pipeline.js`)
 - three.js scene → `WebGLRenderTarget` of height `pixelH` (default 200 px) with a `DepthTexture` → full-screen shader: brightness `bright`, quantisation to `levels` with 4×4 Bayer dithering (`dither`), outline from depth differences (`edge`), vignette. Parameters via `pipe.setParams()` (driven by settings).
 - Works with orthographic and perspective cameras: for perspective the shader linearises depth (`persp`, `near`, `far` uniforms) and thresholds the edge as a relative difference.
+
+### Graphics styles
+`settings.gfx.style` ∈ `pixel` (default) | `real` | `toon` | `paint` | `noir`. `Pipeline` (`render/pipeline.js`) creates the pipelines lazily, releases the previous render target on a switch and forwards `setParams / resize / render / rt`; `?style=` overrides the saved value without saving. Styles only post-process the frame (same materials/geometry), so no reload is needed. `StylePipeline` renders into an MSAA (4×; 0 for `paint`) half-float target with a depth texture and handles ortho and perspective cameras (depth linearised with `persp/near/far`; edge thresholds are absolute for ortho, relative for perspective). Real/toon/paint were ported from the Battle repo (858b4e0); noir is new. Add a style: extend `STYLES`/`STYLE_ID` in `look.js`, a branch in the shader, i18n `style.<id>`.
 
 ## Cameras (`js/core/cameras.js`)
 - **Iso** (on foot, building, editing): orthographic, offset `(0,14,10)` from the target, near/far −30/90, yaw (default 10°), user zoom 0.5–2.2× (wheel). Movement is rotated by `yaw`: `x = mx·cos + mz·sin`, `z = −mx·sin + mz·cos`. Rotate: camLeft/camRight keys or drag with the drag button. In the editor `rig.topDown` (set by the app from `editor.top`) puts the camera straight above the target (y = 24, `up` = −z rotated by yaw to avoid a lookAt degeneracy).

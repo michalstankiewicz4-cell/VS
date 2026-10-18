@@ -4,6 +4,14 @@ Versioning: `MAJOR.MINOR.PATCH`. Every push to the repository is a new version (
 The owner creates `vX.Y.Z` tags in GitHub Releases on commits from this history; pushing tags from a Claude session is blocked.
 Bug fix = PATCH, new feature = MINOR, big change to gameplay or the save format = MAJOR.
 
+## [0.17.0] - 2026-10-19
+### Added
+- Graphics style switch in Options > Graphics (applies instantly, saved): **Pixel art** (default, the original look), **Realistic** (full resolution, bloom, ACES tone mapping, vignette, grain), **Comic (cel)** (ink outlines, posterised colours), **Watercolour** (Kuwahara filter, paper grain, ink edges) and **Noir (VHS)** (a new style: high-contrast monochrome, red kept, scanlines, grain). Real / comic / watercolour are ported from the Battle repo (commit 858b4e0) and adapted to work with the driving (perspective) cameras.
+- `?style=pixel|real|toon|paint|noir` in the URL overrides the saved style for previews (not saved).
+### Changed
+- Pixel-art sliders (height, levels, dithering) show only for the pixel style; the outline slider is hidden for Realistic.
+- Rendering goes through `js/render/pipeline.js` (picks the pixel or the full-resolution pipeline). Only the post-process changes — materials and geometry are the same in every style.
+
 ## [0.16.5] - 2026-10-18
 ### Added
 - `docs/HANDOFF.md`: a resume guide for when the context is lost (checklist, project state, editor summary, headless test recipe, workflow traps, decision log); linked from README, CLAUDE.md and ARCHITECTURE.

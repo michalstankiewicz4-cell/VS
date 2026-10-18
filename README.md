@@ -12,7 +12,7 @@ ES modules need a web server (they do not work from `file://`):
 - or in the project folder: `python -m http.server 8000` and open `http://localhost:8000`.
 
 ## Menus and options
-Start screen: Single Player (Start run, Build base), Multiplayer (PvE co-op and PvP, coming soon), Map Editor, Options. Esc pauses a run (it never ends it); in menus Esc goes back. Options: Graphics, Controls (key bindings), Mouse, Language (English / Polski), Privacy & data.
+Start screen: Single Player (Start run, Build base), Multiplayer (PvE co-op and PvP, coming soon), Map Editor, Options. Esc pauses a run (it never ends it); in menus Esc goes back. Options: Graphics (style: Pixel art / Realistic / Comic / Watercolour / Noir, switched instantly), Controls (key bindings), Mouse, Language (English / Polski), Privacy & data.
 
 ## Structure
 - `js/main.js` – entry point; `js/core/` – app shell and mode state machine, camera rig, settings, storage,

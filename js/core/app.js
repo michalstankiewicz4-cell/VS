@@ -1,7 +1,8 @@
 // Application shell: owns the renderer, world, UI and the game-mode state machine
 // (menu -> play / build / edit -> dead) plus pause handling and the frame loop.
 import * as THREE from '../../vendor/three.module.js';
-import { PixelPipeline } from '../render/pixel-pipeline.js';
+import { Pipeline } from '../render/pipeline.js';
+import { isStyle } from '../render/look.js';
 import { createWorld } from '../world/index.js';
 import { Input } from '../input/input.js';
 import { moveLabel, camLabel, firstKey, BUTTON_NAMES } from '../input/bindings.js';
@@ -34,7 +35,9 @@ export function createApp({ appEl, uiEl }) {
   const world = createWorld(scene);
   const S = world.S;
   const input = new Input(canvas, settings);
-  const pipe = new PixelPipeline(renderer);
+  // Graphics style: Options > Graphics (live); ?style=… in the URL overrides it for previews (not saved).
+  const urlStyle = new URLSearchParams(location.search).get('style');
+  const pipe = new Pipeline(renderer, isStyle(urlStyle) ? urlStyle : settings.data.gfx.style);
   const rig = createCameraRig({ scene, settings, input });
 
   /* ---- persistent progress (points bank, best run, built structures) ---- */
@@ -129,6 +132,7 @@ export function createApp({ appEl, uiEl }) {
   /* ---- settings -> systems ---- */
   function applySettings() {
     const d = settings.data;
+    pipe.setStyle(isStyle(urlStyle) ? urlStyle : d.gfx.style);
     pipe.setParams(d.gfx);
     hud.showFps(d.gfx.showFps);
     setLang(d.lang);
