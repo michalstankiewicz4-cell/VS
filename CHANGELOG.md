@@ -4,6 +4,13 @@ Versioning: `MAJOR.MINOR.PATCH`. Every push to the repository is a new version (
 The owner creates `vX.Y.Z` tags in GitHub Releases on commits from this history; pushing tags from a Claude session is blocked.
 Bug fix = PATCH, new feature = MINOR, big change to gameplay or the save format = MAJOR.
 
+## [0.31.0] - 2026-10-19
+### Added
+- Wall lab (`labs/wall.html`, tile "Walls"): the barricade and the fences from the new WallKit (`js/wallkit/`): style, post height and width, wall height/thickness, orange top, wires, barbs, wire thickness, mesh size, top rail, barbed wire on top, rust; preview as a single piece, a line, a corner or a crossing; presets, random, export/import.
+- Two new base structures: barbed-wire fence (4 pts) and chain-link fence (5 pts). They are dragged out, joined, rotated and saved like the barricade, and join barricades too.
+### Changed
+- The barricade is now built by WallKit too (same look as before); each placed piece is one merged mesh.
+
 ## [0.30.0] - 2026-10-19
 ### Added
 - Base builder: barricades can be dragged out as a whole line (hold the button and move; each piece costs 8 and the drag stops when the bank runs out). Neighbouring pieces join by themselves (corners, T-junctions, crossings, end pieces), and a single piece can be rotated with R (key `buildRotate`, also a button). The ghost shows the piece's direction. Saves keep each barricade's rotation (`r`).

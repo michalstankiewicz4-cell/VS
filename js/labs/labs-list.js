@@ -5,7 +5,8 @@ export const LABS = [
   { file: '', name: 'Player', kit: 'PlayerKit', ready: false, game: false, art: 'soon', desc: 'The soldier: body, clothes, helmet, backpack, rifle and katana.' },
   { file: '', name: 'Zombies', kit: 'ZombieKit', ready: false, game: false, art: 'soon', desc: 'Zombie variants: build, wounds, walk cycle.' },
   { file: 'labs/car.html', name: 'Car', kit: 'CarKit', ready: true, game: true, art: 'car', desc: 'The cars of the city: sedan, hatch, pickup, van; cabin, wheels, lights, bumpers, rack, spoiler, stripe, paint.' },
-  { file: '', name: 'Base', kit: 'BaseKit', ready: false, game: false, art: 'soon', desc: 'Barricade, bunker and the starting bunker.' },
+  { file: 'labs/wall.html', name: 'Walls', kit: 'WallKit', ready: true, game: true, art: 'soon', desc: 'The barricade and the fences (barbed wire, chain-link): posts, wires, mesh, rust; pieces join into lines, corners and crossings.' },
+  { file: '', name: 'Base', kit: 'BaseKit', ready: false, game: false, art: 'soon', desc: 'Bunker and the starting bunker.' },
   { file: '', name: 'Buildings', kit: 'CityKit', ready: false, game: false, art: 'soon', desc: 'Warsaw blocks: facades, windows, roofs.' },
 ];
 export const ROOT = new URL('../../', import.meta.url).href;   // the site root, so the links work from labs/ and from the root

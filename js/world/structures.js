@@ -1,24 +1,18 @@
-// Player-built base structures on a 2-unit grid: sentry gun (tower), barricade (wall), bunker (crypt).
+// Player-built base structures on a 2-unit grid: sentry gun (tower), barricade (wall), fences (wire, mesh), bunker (crypt).
 import * as THREE from '../../vendor/three.module.js';
 import { buildTurret, DEFAULTS as TURRET } from '../turretkit/turretkit.js';
+import { buildWallPiece, typeParams, armsFor, DIRS } from '../wallkit/wallkit.js';
 import { COST, CRYPT_MAX, CELL, EDGE, START, START_CAR } from './constants.js';
 
 const lam = (c) => new THREE.MeshLambertMaterial({ color: c });
 const key = (gx, gz) => gx + ',' + gz;
 
-const DIRS = [[1, 0], [-1, 0], [0, 1], [0, -1]];   // +x, -x, +z, -z (index ^ 1 = the opposite direction)
-// Fills a barricade cell: a post in the middle and an arm towards each side listed in `arms` (booleans, DIRS order).
-function fillWall(grp, arms) {
-  for (const c of [...grp.children]) { grp.remove(c); c.geometry.dispose(); c.material.dispose(); }
-  const add = (w, h, d, c, x, y, z) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), lam(c)); m.position.set(x, y, z); m.castShadow = m.receiveShadow = true; grp.add(m); };
-  add(0.55, 1.15, 0.55, 0x4a4036, 0, 0.575, 0);
-  arms.forEach((on, i) => {
-    if (!on) return;
-    const [dx, dz] = DIRS[i], l = 1.02;
-    const sx = dx ? l : 0.7, sz = dz ? l : 0.7;
-    add(sx, 0.9, sz, 0x6b6860, dx * 0.5, 0.45, dz * 0.5);
-    add(dx ? l : 0.72, 0.16, dz ? l : 0.72, 0xc8682a, dx * 0.5, 0.78, dz * 0.5);
-  });
+// Barricades and fences (WallKit) form one family: each piece shows an arm towards every neighbour of the family, drawn in its own look.
+const FAMILY = new Set(['wall', 'wire', 'mesh']);
+// Replaces the piece's mesh (one merged mesh per cell, so a long fence stays cheap).
+function fillWall(grp, type, arms) {
+  for (const c of [...grp.children]) { grp.remove(c); c.geometry.dispose(); }
+  grp.add(buildWallPiece(typeParams(type), arms));
 }
 
 function makeObj(type) {
@@ -29,7 +23,7 @@ function makeObj(type) {
   };
   if (type === 'tower') {           // sentry gun: the model comes from TurretKit (tuned in labs/turret.html)
     turret = buildTurret(TURRET); head = turret.head; grp.add(turret.group);
-  } else if (type === 'wall') {     // barricade: its arms are (re)built by wallArms/fillWall once the neighbours are known
+  } else if (FAMILY.has(type)) {    // barricade / fences: their arms are (re)built by refreshWall once the neighbours are known
   } else if (type === 'hq') {       // starting bunker: bigger, with an orange roof and a beacon
     box(2.2, 1.3, 2.2, 0x3a4232, 0, 0.65, 0);
     box(2.3, 0.2, 2.3, 0xc8682a, 0, 1.4, 0);
@@ -69,15 +63,10 @@ export function createStructures({ scene, col }) {
     return !nearStart(gx * CELL, gz * CELL) && (type !== 'crypt' || count('crypt') < CRYPT_MAX);
   };
   // force: used when loading a save (the map may have changed since); only the basic validity is checked.
-  // Barricades join their neighbours on their own: an arm towards every adjacent barricade (so rows, corners, T-junctions and crossings
-  // need no manual rotation); a lone piece or an end piece also shows the opposite arm, a lone piece along its own `rot` axis (0 = x, 1 = z).
-  const wallAt = (gx, gz) => { const v = structs.get(key(gx, gz)); return v && v.type === 'wall' ? v : null; };
-  function refreshWall(v) {
-    const arms = DIRS.map(([dx, dz]) => !!wallAt(v.gx + dx, v.gz + dz)), n = arms.filter(Boolean).length;
-    if (n === 0) { if (v.rot) arms[2] = arms[3] = true; else arms[0] = arms[1] = true; }
-    else if (n === 1) arms[arms.indexOf(true) ^ 1] = true;
-    fillWall(v.grp, arms);
-  }
+  // Pieces of the wall family join their neighbours on their own (rows, corners, T-junctions, crossings need no manual rotation); a lone piece
+  // shows both ends of its own `rot` axis (0 = x, 1 = z), an end piece also the opposite arm (see armsFor in WallKit).
+  const wallAt = (gx, gz) => { const v = structs.get(key(gx, gz)); return v && FAMILY.has(v.type) ? v : null; };
+  function refreshWall(v) { fillWall(v.grp, v.type, armsFor(DIRS.map(([dx, dz]) => !!wallAt(v.gx + dx, v.gz + dz)), v.rot)); }
   const refreshAround = (gx, gz) => { for (const [dx, dz] of [[0, 0], ...DIRS]) { const w = wallAt(gx + dx, gz + dz); if (w) refreshWall(w); } };
   function place(type, gx, gz, force = false, rot = 0) {
     if (type === 'hq' && hqOf()) {   // only one starting bunker: placing it again moves it (the old one stays if the new spot is refused)
@@ -90,10 +79,10 @@ export function createStructures({ scene, col }) {
     const { grp, head, turret } = makeObj(type), x = gx * CELL, z = gz * CELL;
     grp.position.set(x, 0, z);
     scene.add(grp);
-    const blk = { x, z, r: type === 'tower' ? 0.8 : type === 'wall' ? 0.9 : type === 'hq' ? 1.2 : 1.0 };
+    const blk = { x, z, r: type === 'tower' ? 0.8 : FAMILY.has(type) ? 0.9 : type === 'hq' ? 1.2 : 1.0 };
     col.blockers.push(blk);
     structs.set(key(gx, gz), { type, gx, gz, grp, head, turret, blk, cd: 0, rot: rot === 1 ? 1 : 0 });
-    if (type === 'wall') refreshAround(gx, gz);
+    if (FAMILY.has(type)) refreshAround(gx, gz);
     return true;
   }
   function remove(gx, gz) {
@@ -102,10 +91,10 @@ export function createStructures({ scene, col }) {
     scene.remove(v.grp);
     col.blockers.splice(col.blockers.indexOf(v.blk), 1);
     structs.delete(key(gx, gz));
-    if (v.type === 'wall') refreshAround(gx, gz);
+    if (FAMILY.has(v.type)) refreshAround(gx, gz);
     return v.type;
   }
-  const list = () => [...structs.values()].map((v) => (v.type === 'wall' ? { t: v.type, gx: v.gx, gz: v.gz, r: v.rot } : { t: v.type, gx: v.gx, gz: v.gz }));
+  const list = () => [...structs.values()].map((v) => (FAMILY.has(v.type) ? { t: v.type, gx: v.gx, gz: v.gz, r: v.rot } : { t: v.type, gx: v.gx, gz: v.gz }));
   function load(arr) {
     for (const v of [...structs.values()]) remove(v.gx, v.gz);
     for (const o of arr) if (o && Number.isInteger(o.gx) && Number.isInteger(o.gz)) place(o.t, o.gx, o.gz, true, o.r);
@@ -117,7 +106,10 @@ export function createStructures({ scene, col }) {
   scene.add(ghost);
   function setGhost(show, gx, gz, ok, type = '', rot = 0) {   // a barricade ghost is a flat piece along its rotation axis
     ghost.visible = show;
-    if (type === 'wall') { ghost.scale.set(rot ? 0.7 / 1.8 : 2 / 1.8, 0.9 / 1.2, rot ? 2 / 1.8 : 0.7 / 1.8); ghost.position.set(gx * CELL, 0.45, gz * CELL); }
+    if (FAMILY.has(type)) {
+      const p = typeParams(type), th = p.style ? 0.25 : p.wallT, h = p.style ? p.postH : p.wallH;
+      ghost.scale.set(rot ? th / 1.8 : 2 / 1.8, h / 1.2, rot ? 2 / 1.8 : th / 1.8); ghost.position.set(gx * CELL, h / 2, gz * CELL);
+    }
     else { ghost.scale.set(1, 1, 1); ghost.position.set(gx * CELL, 0.6, gz * CELL); }
     ghost.material.color.setHex(ok ? 0x40ff80 : 0xff4050);
   }

@@ -10,7 +10,7 @@ export const CELL = 2;             // base-building grid size
 // Default size multiplier of people, vehicles and zombies (1 = the original size). Speeds, reach, hit radii and the driver camera all follow it.
 export const SIZE_DEFAULT = 0.5;
 
-export const COST = { tower: 25, wall: 8, crypt: 40, hq: 0 };   // hq = the free starting bunker (spawn point)
+export const COST = { tower: 25, wall: 8, wire: 4, mesh: 5, crypt: 40, hq: 0 };   // hq = the free starting bunker (spawn point)
 export const CRYPT_MAX = 3;
 
 export const MAP_MAX = 380;        // max objects in the city map

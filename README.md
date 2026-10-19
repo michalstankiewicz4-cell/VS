@@ -20,7 +20,7 @@ Start screen: Single Player (Start run; Build base opens after you die — the c
 - `js/render/` – pixel-art pipeline (low-res target + final shader),
 - `js/input/` – key bindings and input with local statistics (see below),
 - `js/i18n/` – English and Polish strings,
-- `js/carkit/` – the car model (parts from parameters), shared by the game and the car lab; `js/turretkit/` – the sentry-gun model (a function of its parameters), shared by the game and the model labs; `labs.html` + `labs/` + `js/labs/` + `css/lab.css` – the model labs (not part of the game; start at `labs.html`),
+- `js/wallkit/` – the barricade and fences (shared by the game and the wall lab); `js/carkit/` – the car model (parts from parameters), shared by the game and the car lab; `js/turretkit/` – the sentry-gun model (a function of its parameters), shared by the game and the model labs; `labs.html` + `labs/` + `js/labs/` + `css/lab.css` – the model labs (not part of the game; start at `labs.html`),
 - `js/ui/`, `js/modes/` – menus, options, HUD, base builder and map editor,
 - `vendor/` – three.js 0.186.1 (MIT) vendored locally; SHA-256 sums in `vendor/SHA256.txt`.
 

@@ -13,7 +13,7 @@ export function createBuilder({ root, canvas, world, progress, settings, groundA
   const rotBtn = btn('build.rotate', () => rotate());
   const mk = (id, key) => { const b = btn(key, () => { sel = id; refresh(); }); buttons[id] = b; return b; };
   const panel = h('div', { id: 'build', hidden: true }, bank,
-    h('div', { class: 'btns' }, mk('hq', 'build.hq'), mk('tower', 'build.tower'), mk('wall', 'build.wall'), rotBtn, mk('crypt', 'build.crypt'), mk('remove', 'build.remove'), btn('build.play', onPlay)), info);
+    h('div', { class: 'btns' }, mk('hq', 'build.hq'), mk('tower', 'build.tower'), mk('wall', 'build.wall'), mk('wire', 'build.wire'), mk('mesh', 'build.mesh'), rotBtn, mk('crypt', 'build.crypt'), mk('remove', 'build.remove'), btn('build.play', onPlay)), info);
   root.append(panel);
 
   function refresh() {
@@ -27,8 +27,9 @@ export function createBuilder({ root, canvas, world, progress, settings, groundA
 
   const rotate = () => { rot ^= 1; refresh(); };
   // Buys one barricade piece (the drag may place many; it stops by itself when the bank runs out).
+  const LINE = ['wall', 'wire', 'mesh'];   // pieces that can be dragged out into a line
   const putWall = (gx, gz, r) => {
-    if (progress.bank >= COST.wall && world.place('wall', gx, gz, false, r)) { progress.bank -= COST.wall; progress.save(); refresh(); }
+    if (progress.bank >= COST[sel] && world.place(sel, gx, gz, false, r)) { progress.bank -= COST[sel]; progress.save(); refresh(); }
   };
   window.addEventListener('mouseup', () => { drag = null; });
   canvas.addEventListener('mousedown', (e) => {
@@ -36,7 +37,7 @@ export function createBuilder({ root, canvas, world, progress, settings, groundA
     const p = groundAt(0);
     if (!p) return;
     const gx = Math.round(p.x / 2), gz = Math.round(p.z / 2);
-    if (sel === 'wall') { drag = { gx, gz }; putWall(gx, gz, rot); return; }
+    if (LINE.includes(sel)) { drag = { gx, gz }; putWall(gx, gz, rot); return; }
     if (sel === 'remove') {
       const type = world.remove(gx, gz);
       if (type) { progress.bank += Math.floor(COST[type] / 2); progress.save(); }
@@ -58,7 +59,7 @@ export function createBuilder({ root, canvas, world, progress, settings, groundA
       const p = groundAt(0);
       if (p) {
         const gx = Math.round(p.x / 2), gz = Math.round(p.z / 2);
-        if (drag && sel === 'wall') {   // dragging: walk from the last cell to this one, one grid step at a time (corners join by themselves)
+        if (drag && LINE.includes(sel)) {   // dragging: walk from the last cell to this one, one grid step at a time (corners join by themselves)
           while (drag.gx !== gx || drag.gz !== gz) {
             const ax = Math.abs(gx - drag.gx), az = Math.abs(gz - drag.gz), alongX = ax >= az;
             if (alongX) drag.gx += Math.sign(gx - drag.gx); else drag.gz += Math.sign(gz - drag.gz);
