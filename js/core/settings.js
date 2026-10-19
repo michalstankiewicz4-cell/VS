@@ -5,7 +5,7 @@ import { sanitizeKeys } from '../input/bindings.js';
 
 export const DEFAULTS = {
   lang: 'en',
-  gfx: { pixelH: 200, levels: 7, dither: 0.8, edge: 0.8, bright: 1.4, fov: 70, showFps: false },
+  gfx: { pixelH: 250, levels: 7, dither: 0.55, edge: 0.75, bright: 1.4, fov: 70, showFps: false },
   mouse: { rotSens: 1, zoomSens: 1, invertRotate: false, invertZoom: false, fireButton: 0, dragButton: 2 },
   privacy: { stats: true },
 };

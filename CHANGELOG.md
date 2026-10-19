@@ -4,6 +4,10 @@ Versioning: `MAJOR.MINOR.PATCH`. Every push to the repository is a new version (
 The owner creates `vX.Y.Z` tags in GitHub Releases on commits from this history; pushing tags from a Claude session is blocked.
 Bug fix = PATCH, new feature = MINOR, big change to gameplay or the save format = MAJOR.
 
+## [0.22.4] - 2026-10-19
+### Changed
+- Default graphics settings are now the owner's tuned values: pixel height 250, colour levels 7, dithering 0.55, outline 0.75, brightness 1.4, driving field of view 70°, FPS counter off. Settings already saved in a browser are kept; "Reset graphics" restores the new defaults.
+
 ## [0.22.3] - 2026-10-19
 ### Changed
 - Code cleanup, no behaviour change: removed unused imports (`START` in two files, `tx`/`t`/`onLang` in the options and builder modules), the dead `grace` and `barOver` state in the editor, the unused `getLang()`, four unused texts (`common.on`, `common.off`, `hud.bank`, `ed.json`) and unneeded `catch (e)` bindings. An ESLint pass (`no-undef`, `no-unused-vars`) is clean. File and folder layout checked and unchanged.

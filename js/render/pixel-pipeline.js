@@ -48,7 +48,7 @@ void main(){
 export class PixelPipeline {
   constructor(renderer) {
     this.r = renderer;
-    this.params = { pixelH: 200, levels: 7, dither: 0.8, edge: 0.8, bright: 1.4 };
+    this.params = { pixelH: 250, levels: 7, dither: 0.55, edge: 0.75, bright: 1.4 };
     this.mat = new THREE.ShaderMaterial({
       vertexShader: VERT,
       fragmentShader: FRAG,
@@ -57,7 +57,7 @@ export class PixelPipeline {
       uniforms: {
         tColor: { value: null }, tDepth: { value: null },
         texel: { value: new THREE.Vector2(1, 1) },
-        levels: { value: 7 }, dither: { value: 0.8 }, edge: { value: 0.8 }, bright: { value: 1.4 },
+        levels: { value: 7 }, dither: { value: 0.55 }, edge: { value: 0.75 }, bright: { value: 1.4 },
         persp: { value: 0 }, near: { value: 0.1 }, far: { value: 100 },
       },
     });
