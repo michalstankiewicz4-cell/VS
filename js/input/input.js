@@ -58,15 +58,15 @@ export class Input {
 
   #rebuild() {
     this.codeMap = new Map();
-    for (const a of ACTIONS) for (const c of this.settings.data.keys[a.id]) if (c) this.codeMap.set(c, a.id);
+    for (const a of ACTIONS) for (const c of this.settings.data.keys[a.id]) if (c) this.codeMap.set(c, [...(this.codeMap.get(c) || []), a.id]);
   }
 
   #key(e, down) {
     if (this.suspended || !this.acts || typing(e.target)) return;
     // Browser shortcuts (Ctrl+R, Ctrl+Shift+R, Ctrl+W, Alt+…) must keep working: the game does not swallow a key pressed with a modifier.
     if (down && (e.ctrlKey || e.metaKey || e.altKey) && !/^(Control|Alt|Meta|Shift)/.test(e.code)) return;
-    const act = this.codeMap.get(e.code);
-    if (!act || !this.acts.has(act)) return;   // a key whose action means nothing in this mode is left alone
+    const act = (this.codeMap.get(e.code) || []).find((x) => this.acts.has(x));
+    if (!act) return;   // a key whose action means nothing in this mode is left alone
     e.preventDefault();
     if (down) this.held.add(e.code); else this.held.delete(e.code);
     if (!down || e.repeat) return;

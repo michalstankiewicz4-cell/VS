@@ -44,3 +44,4 @@
 #inv .cell.item em{font-style:normal;color:#e8d8a0}
 #inv .cell.item small{position:absolute;right:3px;top:2px;color:#8f8396;font-size:8px}
 #inv .pic.bandage{width:20px;height:10px;border-radius:2px;background-image:linear-gradient(#c01838,#c01838);background-size:4px 100%;background-repeat:no-repeat;background-position:center}
+#inv .cell.item.sel{border-color:#e8d8a0;background:#1f1428}

@@ -61,6 +61,16 @@ export function createEnemies({ scene, rnd, dummy, col, S, around, vehicles, pla
       if (eh[j] <= 0) { S.kills++; S.pts++; spawn(j); }
     }
   }
+  // A melee swing from (x, z) along the unit vector (dx, dz): zombies within `reach` and inside the cone (cosHalf) take `dmg` and are knocked back.
+  function slash(x, z, dx, dz, reach, cosHalf, dmg) {
+    for (let j = 0; j < S.active; j++) {
+      const rx = ex[j] - x, rz = ez[j] - z, d = Math.hypot(rx, rz);
+      if (d > reach || d > 1e-4 && (rx * dx + rz * dz) / d < cosHalf) continue;
+      ex[j] += dx * 0.9 * sc; ez[j] += dz * 0.9 * sc;
+      eh[j] -= dmg;
+      if (eh[j] <= 0) { S.kills++; S.pts++; spawn(j); }
+    }
+  }
   // Advances all zombies; returns how many are touching the player.
   function update(dt, t) {
     const act = Math.min(ENEMIES, 18 + Math.floor(S.time));    // the wave grows over time
@@ -101,5 +111,5 @@ export function createEnemies({ scene, rnd, dummy, col, S, around, vehicles, pla
     else hide(0);
     mesh.instanceMatrix.needsUpdate = true;
   }
-  return { ex, ez, reset, hit, blast, update, preview, hitR2: () => 0.55 * sc * sc, setScale: (k) => { sc = k; } };
+  return { ex, ez, reset, hit, blast, slash, update, preview, hitR2: () => 0.55 * sc * sc, setScale: (k) => { sc = k; } };
 }

@@ -4,6 +4,13 @@ Versioning: `MAJOR.MINOR.PATCH`. Every push to the repository is a new version (
 The owner creates `vX.Y.Z` tags in GitHub Releases on commits from this history; pushing tags from a Claude session is blocked.
 Bug fix = PATCH, new feature = MINOR, big change to gameplay or the save format = MAJOR.
 
+## [0.26.0] - 2026-10-19
+### Added
+- Ammo and reload (`js/world/weapons.js`): the rifle has a 30-round magazine and 90 spare rounds per run; R (rebindable) reloads in 1.4 s, and firing with an empty magazine reloads by itself. Ammo is shown in the run line and as the Ammo cell of the backpack (click = reload).
+- Katana: X (rebindable) or a click on its cell switches rifle / katana. Hold the fire button to slash a cone in front (about 2 units at the default size, +-75 degrees, 0.45 s between swings); it deals 3 damage and knocks zombies back. The model switches (rifle hidden, katana swings).
+### Changed
+- Key bindings know in which modes an action works, so one key can serve two actions that never share a mode: R is reload in a run and rotate in the map editor. The key list per mode is derived from the bindings.
+
 ## [0.25.3] - 2026-10-19
 ### Fixed
 - The see-through hole opens earlier when the player walks behind a building (a margin of about 0.6 units around it, scaled with size), while standing in front of or touching a wall still leaves it solid.

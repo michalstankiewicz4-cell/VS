@@ -1,6 +1,7 @@
 // World facade: composes terrain, sky, city, vehicles, enemies, projectiles and structures
 // behind one small API used by the game modes.
 import { createSurvival } from './survival.js';
+import { createWeapons } from './weapons.js';
 import { mulberry32, clamp, wrapAngle } from '../core/util.js';
 import { EDGE, ENEMIES, COST } from './constants.js';
 import * as THREE from '../../vendor/three.module.js';
@@ -20,7 +21,7 @@ export { COST, DAY_LEN };
 export function createWorld(scene) {
   const rnd = mulberry32(1337);
   const dummy = new THREE.Object3D();
-  const S = { hp: 100, maxHp: 100, kills: 0, pts: 0, time: 0, mode: 'idle', fireCd: 0, active: 0, night: 0, driving: false, speed: 0, carNear: false, torch: true, hunger: 100, thirst: 100, items: { food: 0, water: 0, bandage: 0, grenade: 0 } };
+  const S = { hp: 100, maxHp: 100, kills: 0, pts: 0, time: 0, mode: 'idle', fireCd: 0, weapon: 'rifle', mag: 30, reserve: 90, reload: 0, active: 0, night: 0, driving: false, speed: 0, carNear: false, torch: true, hunger: 100, thirst: 100, items: { food: 0, water: 0, bandage: 0, grenade: 0 } };
   const survival = createSurvival(S);
 
   const col = createCollision();
@@ -31,6 +32,7 @@ export function createWorld(scene) {
   const city = createCity({ scene, dummy, col, vehicles, nightU: sky.nightU });
   const enemies = createEnemies({ scene, rnd, dummy, col, S, around: player.state.pos, vehicles, player: player.state });
   const bullets = createProjectiles({ scene, dummy, col, S, enemies });
+  const weapons = createWeapons({ S, player, bullets, enemies, rnd });
   const base = createStructures({ scene, col });
   base.setBlockTest((x, z) => city.map.blocksSquare(x, z, 1));
   city.setStartCar(() => ({ ...base.carSpot(base.spawn()), th: 0 }));
@@ -47,7 +49,7 @@ export function createWorld(scene) {
     player.state.face = 0; player.setVisible(live); player.animate(false, 0);
     S.maxHp = 100 + 25 * base.count('crypt'); S.hp = S.maxHp;
     S.kills = 0; S.pts = 0; S.time = 0; S.night = 0; S.fireCd = 0; S.active = 0; S.driving = false; S.speed = 0; S.carNear = false;
-    S.torch = true; survival.reset(); enemies.reset(); bullets.reset();
+    S.torch = true; survival.reset(); weapons.reset(); enemies.reset(); bullets.reset();
   }
 
   // inp: { mv: {x,z} walking vector, aim: {x,z}|null world point under the cursor, firing, drv: {thr, steer} }
@@ -76,14 +78,8 @@ export function createWorld(scene) {
       S.carNear = !!vehicles.nearest();
     }
 
-    // shooting (on foot only)
-    S.fireCd -= dt;
-    if (!vehicles.driving && firing && aim && S.fireCd <= 0) {
-      const a = Math.atan2(aim.x - p.x, aim.z - p.z) + (rnd() - 0.5) * 0.08;
-      const dx = Math.sin(a), dz = Math.cos(a);
-      bullets.shoot(p.x + dx * 0.7 * player.state.scale, p.z + dz * 0.7 * player.state.scale, dx, dz);
-      S.fireCd = 0.16;
-    }
+    // weapons (on foot only; a reload keeps running in the car, but nothing fires)
+    weapons.step(dt, p, vehicles.driving ? null : aim, firing);
 
     sky.follow(p.x, p.z, t, S.night, S.torch);
     terrain.follow(p.x, p.z);
@@ -105,6 +101,7 @@ export function createWorld(scene) {
     player: player.state, S, fade: city.fade, updateFade: city.updateFade, map: city.map, setCityOpacity: city.setOpacity, enemyCount: ENEMIES,
     nightAt: sky.nightAt, DAY_LEN,
     reset, update, driveState, use: survival.use,
+    reload: weapons.reload, selectWeapon: weapons.select, toggleWeapon: weapons.toggle,
     toggleTorch: () => { if (S.mode === 'play') S.torch = !S.torch; },
     // Throws a grenade from the player towards `aim` ({x, z}); false when none are left, driving or no target.
     throwGrenade: (aim) => {

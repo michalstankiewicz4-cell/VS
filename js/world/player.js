@@ -16,8 +16,13 @@ export function createPlayer({ scene }) {
   part(new THREE.CylinderGeometry(0.25, 0.28, 0.17, 8), 0x2f3a2a, 0, 1.72, 0);   // helmet
   part(new THREE.BoxGeometry(0.14, 0.14, 0.55), 0x4a5638, -0.3, 1.1, 0.32);      // left arm
   part(new THREE.BoxGeometry(0.14, 0.14, 0.45), 0x4a5638, 0.3, 1.05, 0.28);      // right arm
-  part(new THREE.BoxGeometry(0.1, 0.13, 1.25), 0x17181b, 0.05, 1.12, 0.6);       // rifle
-  part(new THREE.BoxGeometry(0.1, 0.22, 0.35), 0x3a2a1c, 0.05, 1.08, 0.0);       // stock
+  const rifle = [part(new THREE.BoxGeometry(0.1, 0.13, 1.25), 0x17181b, 0.05, 1.12, 0.6),        // rifle
+    part(new THREE.BoxGeometry(0.1, 0.22, 0.35), 0x3a2a1c, 0.05, 1.08, 0.0)];                        // stock
+  // Katana: pivots around the right hand; the swing turns it about the vertical axis.
+  const sword = new THREE.Group(); sword.position.set(0.3, 1.08, 0.3); rig.add(sword); sword.visible = false;
+  part(new THREE.BoxGeometry(0.05, 0.05, 1.15), 0xd8dde0, 0, 0, 0.75, sword);                       // blade
+  part(new THREE.BoxGeometry(0.16, 0.04, 0.05), 0xc8a040, 0, 0, 0.18, sword);                       // guard
+  part(new THREE.BoxGeometry(0.06, 0.06, 0.3), 0x1a1a1a, 0, 0, 0.0, sword);                         // grip
   const leg = (x) => {
     const pivot = new THREE.Group(); pivot.position.set(x, 0.65, 0); rig.add(pivot);
     part(new THREE.BoxGeometry(0.24, 0.65, 0.28), 0x2a2d36, 0, -0.325, 0, pivot);
@@ -30,8 +35,13 @@ export function createPlayer({ scene }) {
   const state = { pos: group.position, face: 0, speed: 5.2, scale: SIZE_DEFAULT };   // speed = walking speed at scale 1; reach and speed follow `scale`
   group.scale.setScalar(SIZE_DEFAULT);
 
+  let swing = 0, lastT = 0;   // seconds left of the katana swing
+  const SWING = 0.28;
   // Walking animation (moving) or a slow breathing idle.
   function animate(moving, t) {
+    if (swing > 0) swing = Math.max(0, swing - Math.min(0.1, Math.max(0, t - lastT)));
+    lastT = t;
+    sword.rotation.y = swing > 0 ? 1.3 - 2.6 * (1 - swing / SWING) : 0.25;
     group.rotation.y = state.face;
     if (moving) {
       rig.position.y = Math.abs(Math.sin(t * 11)) * 0.07;
@@ -42,5 +52,7 @@ export function createPlayer({ scene }) {
       legL.rotation.x = legR.rotation.x = 0;
     }
   }
-  return { state, group, animate, setScale: (k) => { state.scale = k; group.scale.setScalar(k); }, setVisible: (v) => { group.visible = v; } };
+  return { state, group, animate, swing: () => { swing = SWING; },
+    setWeapon: (w) => { rifle.forEach((m) => { m.visible = w === 'rifle'; }); sword.visible = w === 'katana'; },
+     setScale: (k) => { state.scale = k; group.scale.setScalar(k); }, setVisible: (v) => { group.visible = v; } };
 }

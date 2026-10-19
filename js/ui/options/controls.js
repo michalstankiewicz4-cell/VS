@@ -1,7 +1,7 @@
 // Options > Controls: click a key slot, press a key to rebind. Esc cancels, Backspace clears. Duplicates move the key.
 import { h, btn, tx } from '../dom.js';
 import { t, onLang } from '../../i18n/index.js';
-import { ACTIONS, RESERVED, keyLabel } from '../../input/bindings.js';
+import { ACTIONS, RESERVED, keyLabel, shareMode } from '../../input/bindings.js';
 
 export function buildControls({ settings, input }) {
   const slots = [];                       // [button, actionId, slotIndex]
@@ -28,7 +28,8 @@ export function buildControls({ settings, input }) {
     settings.update((d) => {
       if (e.code === 'Backspace') { d.keys[id][slot] = null; return; }
       if (RESERVED.has(e.code)) return;
-      for (const a of ACTIONS) d.keys[a.id] = d.keys[a.id].map((c) => (c === e.code ? null : c));   // a key belongs to one slot only
+      const cur = ACTIONS.find((x) => x.id === id);
+      for (const a of ACTIONS) if (shareMode(a, cur)) d.keys[a.id] = d.keys[a.id].map((c) => (c === e.code ? null : c));   // a key belongs to one slot per mode
       d.keys[id][slot] = e.code;
     });
     stop();

@@ -14,6 +14,12 @@ export function createHud(root, onUse) {
   const cell = (key, shape, color) => h('div', { class: 'cell' + (key ? '' : ' empty') }, key && pic(shape, color), key && tx(key, 'span'));
   // Backpack items: a clickable cell with a pictogram, name, count and the key that uses it.
   const bag = {};
+  const wc = {};
+  const weaponCell = (kind, shape, color) => {
+    const n = h('em'), k = h('small');
+    const c = h('div', { class: 'cell item', on: { click: () => onUse && onUse(kind) } }, pic(shape, color), tx('inv.' + kind, 'span'), n, k);
+    wc[kind] = { c, n, k }; return c;
+  };
   const tn = h('small'); let tc;
   const torchCell = () => { tc = h('div', { class: 'cell item', on: { click: () => onUse && onUse('torch') } }, pic('tube', '#d9c46a'), tx('inv.light', 'span'), tn); return tc; };
   const itemCell = (kind, shape, color) => {
@@ -25,15 +31,19 @@ export function createHud(root, onUse) {
   const close = tx('inv.close', 'div', { key: 'I' }); close.className = 'invkey'; let invKey = 'I';
   const inv = h('div', { id: 'inv', hidden: true },
     tx('inv.title', 'h4'),
-    tx('inv.hands', 'h5'), grid(cell('inv.rifle', 'long', '#17181b'), torchCell()),
+    tx('inv.hands', 'h5'), grid(weaponCell('rifle', 'long', '#17181b'), weaponCell('katana', 'long', '#d8dde0'), torchCell()),
     tx('inv.clothes', 'h5'), grid(cell('inv.helmet', 'dome', '#2f3a2a'), cell('inv.jacket', 'box', '#4a5638'), cell('inv.trousers', 'legs', '#2a2d36')),
-    tx('inv.pack', 'h5'), grid(itemCell('food', 'box', '#b8843c'), itemCell('water', 'tube', '#4a8fd0'), itemCell('bandage', 'bandage', '#e8e0d0'), itemCell('grenade', 'dome', '#3a4a2a'), ...Array.from({ length: 4 }, () => cell(null))), tx('inv.packNote', 'div'), close);
+    tx('inv.pack', 'h5'), grid(itemCell('food', 'box', '#b8843c'), itemCell('water', 'tube', '#4a8fd0'), itemCell('bandage', 'bandage', '#e8e0d0'), itemCell('grenade', 'dome', '#3a4a2a'), itemCell('ammo', 'box', '#c8a040'), ...Array.from({ length: 3 }, () => cell(null))), tx('inv.packNote', 'div'), close);
   root.append(top, hint, fps, inv);
   return {
     showTop: (on) => { top.hidden = !on; },
     showHint: (on) => { hint.hidden = !on; },
     showInv: (on) => { inv.hidden = !on; },
     toggleInv: () => { inv.hidden = !inv.hidden; },
+    setWeapons: (s, key) => {
+      for (const kind in wc) wc[kind].c.classList.toggle('sel', s.weapon === kind);
+      wc.rifle.n.textContent = s.reload > 0 ? '…' : s.mag + '/' + s.reserve; wc.katana.k.textContent = s.weapon === 'katana' ? '' : key;
+    },
     setTorch: (on, key) => { tn.textContent = key; tc.classList.toggle('none', !on); },
     setItems: (items, keys) => { for (const kind in bag) { const b = bag[kind], n = items[kind] || 0; b.n.textContent = '×' + n; b.k.textContent = keys[kind]; b.c.classList.toggle('none', n === 0); } },
     setInvKey: (k) => { if (k !== invKey) { invKey = k; bind(close, 'inv.close', undefined, { key: k }); } },

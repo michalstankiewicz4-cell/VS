@@ -4,7 +4,7 @@ import * as THREE from '../../vendor/three.module.js';
 import { PixelPipeline } from '../render/pixel-pipeline.js';
 import { createWorld } from '../world/index.js';
 import { Input } from '../input/input.js';
-import { moveLabel, camLabel, firstKey, BUTTON_NAMES } from '../input/bindings.js';
+import { ACTIONS, moveLabel, camLabel, firstKey, BUTTON_NAMES } from '../input/bindings.js';
 import { createSettings } from './settings.js';
 import { createCameraRig } from './cameras.js';
 import { read, write, KEYS } from './storage.js';
@@ -17,8 +17,7 @@ import { createDevReset } from '../ui/devreset.js';
 import { VERSION } from '../version.js';
 
 const ZERO = { x: 0, z: 0 };
-const MOVE_KEYS = ['moveUp', 'moveDown', 'moveLeft', 'moveRight', 'camLeft', 'camRight'];
-const KEYSETS = { play: new Set([...MOVE_KEYS, 'interact', 'cameraView', 'inventory', 'useFood', 'useBandage', 'useWater', 'useGrenade', 'toggleTorch']), build: new Set(MOVE_KEYS), edit: new Set([...MOVE_KEYS, 'editRotate', 'editTopView']) };
+const KEYSETS = Object.fromEntries(['play', 'build', 'edit'].map((m) => [m, new Set(ACTIONS.filter((a) => a.modes.includes(m)).map((a) => a.id))]));   // the keys that mean something in each mode
 const ZOOM = { menu: 1, play: 1.27, dead: 1.27, build: 0.55, edit: 0.55 };   // play/dead 1.27 = two default mouse-wheel steps closer than 1
 
 export function createApp({ appEl, uiEl }) {
@@ -83,7 +82,7 @@ export function createApp({ appEl, uiEl }) {
   /* ---- state machine ---- */
   let mode = 'menu', paused = false;
   const isPaused = () => paused;
-  const hud = createHud(uiEl, (kind) => (kind === 'grenade' ? world.throwGrenade(groundAt(0.9)) : kind === 'torch' ? world.toggleTorch() : world.use(kind)));
+  const hud = createHud(uiEl, (kind) => (kind === 'grenade' ? world.throwGrenade(groundAt(0.9)) : kind === 'torch' ? world.toggleTorch() : kind === 'reload' ? world.reload() : kind === 'rifle' || kind === 'katana' ? world.selectWeapon(kind) : world.use(kind)));
   const builder = createBuilder({ root: uiEl, canvas, world, progress, settings, groundAt, isPaused, onPlay: () => startRun() });
   createDevReset({ root: uiEl });
   const editor = createEditor({ scene, root: uiEl, canvas, world, settings, groundAt, pickIndex, project, isPaused, onPlay: () => startRun(), saveMap });
@@ -138,6 +137,8 @@ export function createApp({ appEl, uiEl }) {
     else if (act === 'useBandage' && mode === 'play') world.use('bandage');
     else if (act === 'useWater' && mode === 'play') world.use('water');
     else if (act === 'toggleTorch' && mode === 'play') world.toggleTorch();
+    else if (act === 'reload' && mode === 'play') world.reload();
+    else if (act === 'weapon' && mode === 'play') world.toggleWeapon();
     else if (act === 'useGrenade' && mode === 'play') world.throwGrenade(groundAt(0.9));
     else if (act === 'editRotate' && mode === 'edit') editor.rotate();
     else if (act === 'editTopView' && mode === 'edit') editor.toggleTop();
@@ -220,14 +221,15 @@ export function createApp({ appEl, uiEl }) {
     hud.showHint(mode === 'play' && !paused);
     if (mode !== 'play') return;
     const mm = Math.floor(S.time / 60), ss = String(Math.floor(S.time % 60)).padStart(2, '0');
-    let s = t('hud.run', { hp: Math.ceil(S.hp), max: S.maxHp, pts: S.pts, kills: S.kills, time: `${mm}:${ss}`, tod: t(S.night > 0.5 ? 'hud.night' : 'hud.day'), bank: progress.bank, hunger: Math.round(S.hunger), thirst: Math.round(S.thirst) });
+    let s = t('hud.run', { hp: Math.ceil(S.hp), max: S.maxHp, pts: S.pts, kills: S.kills, time: `${mm}:${ss}`, tod: t(S.night > 0.5 ? 'hud.night' : 'hud.day'), bank: progress.bank, ammo: S.weapon === 'rifle' ? (S.reload > 0 ? t('hud.reloading') : S.mag + '/' + S.reserve) : t('inv.katana'), hunger: Math.round(S.hunger), thirst: Math.round(S.thirst) });
     if (S.driving) s += t('hud.carIn', { kmh: Math.round(S.speed * 3.6), exit: firstKey(k, 'interact'), view: firstKey(k, 'cameraView') });
     else if (S.carNear) s += t('hud.carNear', { key: firstKey(k, 'interact') });
     hud.setRun(s);
     hud.setHint(t('hud.hint', { move: moveLabel(k), fire: BUTTON_NAMES[m.fireButton], cam: camLabel(k), drag: BUTTON_NAMES[m.dragButton], interact: firstKey(k, 'interact'), inv: firstKey(k, 'inventory') }));
     hud.setInvKey(firstKey(k, 'inventory'));
     hud.setTorch(S.torch, firstKey(k, 'toggleTorch'));
-    hud.setItems(S.items, { food: firstKey(k, 'useFood'), bandage: firstKey(k, 'useBandage'), water: firstKey(k, 'useWater'), grenade: firstKey(k, 'useGrenade') });
+    hud.setWeapons(S, firstKey(k, 'weapon'));
+    hud.setItems({ ...S.items, ammo: S.reserve }, { food: firstKey(k, 'useFood'), bandage: firstKey(k, 'useBandage'), water: firstKey(k, 'useWater'), grenade: firstKey(k, 'useGrenade'), ammo: firstKey(k, 'reload') });
   }
 
   goMenu();
