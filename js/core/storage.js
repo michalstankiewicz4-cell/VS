@@ -3,8 +3,8 @@
 export const KEYS = { save: 'gra:save:v1', map: 'gra:map:v1', settings: 'cq:settings:v1', editor: 'cq:editor:v1' };
 
 export function read(key) {
-  try { return JSON.parse(localStorage.getItem(key) || 'null'); } catch (e) { return null; }
+  try { return JSON.parse(localStorage.getItem(key) || 'null'); } catch { return null; }
 }
 export function write(key, value) {
-  try { localStorage.setItem(key, JSON.stringify(value)); return true; } catch (e) { return false; }
+  try { localStorage.setItem(key, JSON.stringify(value)); return true; } catch { return false; }
 }

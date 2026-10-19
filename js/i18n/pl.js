@@ -1,8 +1,6 @@
 // Polskie teksty interfejsu (opcjonalny język; domyślny jest angielski).
 export default {
   'common.back': 'Wstecz',
-  'common.on': 'Włączone',
-  'common.off': 'Wyłączone',
 
   'menu.tagline': 'Przetrwanie wśród zombie w ruinach Warszawy',
   'menu.single': 'Jeden gracz',
@@ -93,7 +91,6 @@ export default {
   'hud.run': 'HP {hp}/{max} · pkt {pts} · zabójstwa {kills} · {time} · {tod} · bank {bank}',
   'hud.day': 'dzień',
   'hud.night': 'noc',
-  'hud.bank': 'bank {bank} pkt',
   'hud.carIn': ' · auto {kmh} km/h · {exit}: wysiądź · {view}: kamera',
   'hud.carNear': ' · {key}: wsiądź do auta',
   'hud.fps': 'v{version} · {fps} fps · render {w}×{h}',
@@ -124,7 +121,6 @@ export default {
   'ed.default': 'Domyślna mapa',
   'ed.export': 'Eksport mapy',
   'ed.import': 'Import mapy',
-  'ed.json': 'JSON mapy',
   'ed.info': 'Obiekty: {n}/{max} · LPM: {action} · {move}: przesuń widok · kamera: {cam}, przeciągnięcie, kółko. Strefa bazy (środek) zostaje wolna.',
   'ed.act.remove': 'usuń',
   'ed.act.place': 'postaw',

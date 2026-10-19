@@ -8,7 +8,7 @@ import { moveLabel, camLabel, firstKey } from '../input/bindings.js';
 import { SIZE_DEFAULT } from '../world/constants.js';
 
 export function createEditor({ scene, root, canvas, world, settings, groundAt, pickIndex, project, isPaused, onPlay, saveMap }) {
-  let active = false, top = false, tool = 'b', hot = -1, grace = 0, barFor = '', barOver = false, moving = null, rot = 0, why = '', whyShown = '', note = '';
+  let active = false, top = false, tool = 'b', hot = -1, barFor = '', moving = null, rot = 0, why = '', whyShown = '', note = '';
   const pan = new THREE.Vector3(0, 0, 44);
 
   const slider = (labelKey, min, max, step, val) => {
@@ -40,7 +40,7 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
       const w = await under.loadTiles(prov, (d, n) => { note = t('ed.u.progress', { d, n }); refresh(); });
       uW.inp.step = 1; uW.inp.value = Math.round(w); uW.out.textContent = String(Math.round(w)); under.setWidth(w);
       note = t('ed.u.ok');
-    } catch (e) { note = t('ed.u.net'); }
+    } catch { note = t('ed.u.net'); }
     refresh();
   };
   const uOsm = btn('ed.u.osm', tiles('osm')), uEsri = btn('ed.u.esri', tiles('esri'));
@@ -63,8 +63,6 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
   cancelBtn.hidden = true;
   // Floating options next to the clicked (selected) object (Select tool): move, rotate, resize, delete.
   const bar = h('div', { id: 'edbar', hidden: true });
-  bar.addEventListener('mouseenter', () => { barOver = true; });
-  bar.addEventListener('mouseleave', () => { barOver = false; });
   const modify = (patch) => {
     const o = world.map.item(hot); if (!o) return;
     const n = { ...o, ...patch(o) };
@@ -87,7 +85,7 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
       add('ed.o.longer', () => modify((q) => ({ d: q.d + 2 })));
       add('ed.o.shorter', () => modify((q) => ({ d: q.d - 2 })));
     }
-    add('ed.o.delete', () => { if (world.map.removeAt(hot)) saveMap(); hot = -1; barFor = ''; barOver = false; note = ''; refresh(); });
+    add('ed.o.delete', () => { if (world.map.removeAt(hot)) saveMap(); hot = -1; barFor = ''; note = ''; refresh(); });
   };
   const topBtn = h('button', { type: 'button', on: { click: () => { top = !top; refresh(); } } });
   const rotBtn = h('button', { type: 'button', on: { click: () => { rot ^= 1; refresh(); } } });
@@ -96,7 +94,7 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
   const exportMap = btn('ed.export', async () => {
     const txt = JSON.stringify(world.map.list());
     json.hidden = false; json.value = txt;
-    let ok = false; try { await navigator.clipboard.writeText(txt); ok = true; } catch (e) { json.select(); }
+    let ok = false; try { await navigator.clipboard.writeText(txt); ok = true; } catch { json.select(); }
     note = t(ok ? 'ed.copied' : 'ed.selected'); refresh();
   });
   const importMap = btn('ed.import', () => {
@@ -106,7 +104,7 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
       if (json.value.length > 300000) throw new Error('too large');
       const n = world.map.set(JSON.parse(json.value));
       saveMap(); note = t('ed.loaded', { n }); refresh();
-    } catch (e) { note = t('ed.badJson'); refresh(); }
+    } catch { note = t('ed.badJson'); refresh(); }
   });
   const defaultMapBtn = btn('ed.default', () => { moving = null; world.map.reset(); saveMap(); note = t('ed.restored'); refresh(); });
   const resetBtn = btn('ed.resetSettings', () => {
@@ -118,7 +116,7 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
   const exportSet = btn('ed.exportSet', async () => {
     const txt = JSON.stringify(settingsObj());
     jsonS.hidden = false; jsonS.value = txt;
-    let ok = false; try { await navigator.clipboard.writeText(txt); ok = true; } catch (e) { jsonS.select(); }
+    let ok = false; try { await navigator.clipboard.writeText(txt); ok = true; } catch { jsonS.select(); }
     note = t(ok ? 'ed.copiedSet' : 'ed.selected'); refresh();
   });
   const importSet = btn('ed.importSet', () => {
@@ -128,7 +126,7 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
       const o = JSON.parse(jsonS.value);
       if (!o || typeof o !== 'object' || Array.isArray(o)) throw new Error('bad');
       applySettings(o, true); note = t('ed.setLoaded'); refresh();
-    } catch (e) { note = t('ed.badSet'); refresh(); }
+    } catch { note = t('ed.badSet'); refresh(); }
   });
   const panelR = h('div', { id: 'edr', class: 'edpanel', hidden: true },
     h('div', { class: 'btns tools' }, mkTool('s', 'ed.select'), mkTool('b', 'ed.building'), mkTool('c', 'ed.car'), mkTool('r', 'ed.road'), mkTool('p', 'ed.palace'), mkTool('x', 'ed.remove'), rotBtn, topBtn, cancelBtn),

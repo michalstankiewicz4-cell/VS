@@ -3,7 +3,6 @@
 // and a low perspective showcase camera for the start screen.
 import * as THREE from '../../vendor/three.module.js';
 import { clamp, wrapAngle } from './util.js';
-import { START } from '../world/constants.js';
 import { SEAT } from '../world/vehicles.js';
 
 const VIEW_H = 16;                              // visible world height of the isometric view

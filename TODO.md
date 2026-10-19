@@ -1,6 +1,6 @@
 # TODO
 
-Legend: **P1** next, **P2** later, **P3** ideas. State as of v0.19.0. Context: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+Legend: **P1** next, **P2** later, **P3** ideas. State as of v0.22.3. Context: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ## Multiplayer (plan in [`docs/MULTIPLAYER.md`](docs/MULTIPLAYER.md))
 - [ ] P2 Decision: co-op/PvP, player count, shared bank, P2P or server (menu entries "PvE co-op" and "PvP" exist as "Soon")
@@ -33,7 +33,7 @@ Legend: **P1** next, **P2** later, **P3** ideas. State as of v0.19.0. Context: [
 ## Map editor
 - [ ] P2 Underlay: save it between sessions (IndexedDB); verify real OSM/Esri tile loading and Esri CORS (only tested with mocked tiles)
 - [ ] P2 Copy/duplicate objects, multi-select, undo/redo
-- [ ] P2 Per-object scale (cars, people) instead of global size sliders; scale collision radii of people/enemies
+- [ ] P2 Per-object scale (cars, people) instead of global size sliders (the global sizes already scale speeds, reach and collision radii since 0.22.0)
 - [ ] P2 Editor: place base structures and enemy spawn points; roads that connect/auto-join
 - [ ] P3 Several map slots, sharing by link/file
 

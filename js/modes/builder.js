@@ -1,6 +1,6 @@
 // Base builder (available after a death): spend banked points on sentry guns, barricades and bunkers on a 2-unit grid anywhere on the map.
 import * as THREE from '../../vendor/three.module.js';
-import { h, btn, tx } from '../ui/dom.js';
+import { h, btn } from '../ui/dom.js';
 import { t, onLang } from '../i18n/index.js';
 import { COST } from '../world/index.js';
 

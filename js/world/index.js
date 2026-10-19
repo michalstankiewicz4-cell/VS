@@ -1,7 +1,7 @@
 // World facade: composes terrain, sky, city, vehicles, enemies, projectiles and structures
 // behind one small API used by the game modes.
 import { mulberry32, clamp, wrapAngle } from '../core/util.js';
-import { START, EDGE, ENEMIES, COST } from './constants.js';
+import { EDGE, ENEMIES, COST } from './constants.js';
 import * as THREE from '../../vendor/three.module.js';
 import { createCollision } from './collision.js';
 import { createTerrain } from './terrain.js';

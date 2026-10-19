@@ -10,8 +10,8 @@ export function createDevReset({ root }) {
   b.addEventListener('click', () => {
     if (!armed) { armed = 1; label(); timer = setTimeout(() => { armed = 0; label(); }, 3000); return; }
     clearTimeout(timer);
-    try { localStorage.clear(); } catch (e) { /* blocked storage: nothing to clear */ }
-    try { sessionStorage.clear(); } catch (e) { /* same */ }
+    try { localStorage.clear(); } catch { /* blocked storage: nothing to clear */ }
+    try { sessionStorage.clear(); } catch { /* same */ }
     location.reload();
   });
   onLang(label); label();

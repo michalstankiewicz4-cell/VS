@@ -8,7 +8,6 @@ let lang = 'en';
 const bound = new Map();       // element -> { key, attr, params }
 const subs = new Set();
 
-export const getLang = () => lang;
 export function t(key, params) {
   const s = dicts[lang][key] ?? dicts.en[key] ?? key;
   return params ? s.replace(/\{(\w+)\}/g, (m, k) => (params[k] ?? m)) : s;

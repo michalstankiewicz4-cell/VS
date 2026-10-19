@@ -1,6 +1,5 @@
 // Options > Mouse: sensitivity, inversion and button assignment.
-import { h, btn, tx } from '../dom.js';
-import { t, onLang } from '../../i18n/index.js';
+import { h, btn } from '../dom.js';
 import { RANGES } from '../../core/settings.js';
 import { slider, checkbox, choice } from './widgets.js';
 

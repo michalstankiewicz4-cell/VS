@@ -4,6 +4,10 @@ Versioning: `MAJOR.MINOR.PATCH`. Every push to the repository is a new version (
 The owner creates `vX.Y.Z` tags in GitHub Releases on commits from this history; pushing tags from a Claude session is blocked.
 Bug fix = PATCH, new feature = MINOR, big change to gameplay or the save format = MAJOR.
 
+## [0.22.3] - 2026-10-19
+### Changed
+- Code cleanup, no behaviour change: removed unused imports (`START` in two files, `tx`/`t`/`onLang` in the options and builder modules), the dead `grace` and `barOver` state in the editor, the unused `getLang()`, four unused texts (`common.on`, `common.off`, `hud.bank`, `ed.json`) and unneeded `catch (e)` bindings. An ESLint pass (`no-undef`, `no-unused-vars`) is clean. File and folder layout checked and unchanged.
+
 ## [0.22.2] - 2026-10-19
 ### Changed
 - Map editor settings (remembered between sessions and in "Export settings" / "Import settings") now also include the **underlay width and rotation**, so after setting them up they stay until you change or remove them. The underlay image itself is still never saved (load it again). The width slider now moves in steps of 1.

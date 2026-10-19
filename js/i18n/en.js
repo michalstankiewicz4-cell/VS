@@ -1,8 +1,6 @@
 // English strings (the default and fallback language).
 export default {
   'common.back': 'Back',
-  'common.on': 'On',
-  'common.off': 'Off',
 
   'menu.tagline': 'Zombie survival in ruined Warsaw',
   'menu.single': 'Single Player',
@@ -93,7 +91,6 @@ export default {
   'hud.run': 'HP {hp}/{max} · pts {pts} · kills {kills} · {time} · {tod} · bank {bank}',
   'hud.day': 'day',
   'hud.night': 'night',
-  'hud.bank': 'bank {bank} pts',
   'hud.carIn': ' · car {kmh} km/h · {exit}: exit · {view}: camera',
   'hud.carNear': ' · {key}: enter car',
   'hud.fps': 'v{version} · {fps} fps · render {w}×{h}',
@@ -124,7 +121,6 @@ export default {
   'ed.default': 'Default map',
   'ed.export': 'Export map',
   'ed.import': 'Import map',
-  'ed.json': 'Map JSON',
   'ed.info': 'Objects: {n}/{max} · LMB: {action} · {move}: pan view · camera: {cam}, drag, wheel. The base zone (centre) stays free.',
   'ed.act.remove': 'remove',
   'ed.act.place': 'place',
