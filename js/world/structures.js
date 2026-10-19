@@ -59,13 +59,6 @@ export function createStructures({ scene, col }) {
     }
     return !nearStart(gx * CELL, gz * CELL) && (type !== 'crypt' || count('crypt') < CRYPT_MAX);
   };
-  // Does any structure (or the reserved spawn / car spot of the starting bunker) overlap this footprint ({x,z,hw,hd})? Used by the map editor.
-  const overlapsBox = (b) => {
-    for (const v of structs.values()) if (Math.abs(v.gx * CELL - b.x) < b.hw + 1 && Math.abs(v.gz * CELL - b.z) < b.hd + 1) return true;
-    if (hqOf()) { const s = spawn(); if (Math.abs(s.x - b.x) < b.hw + 1.2 && Math.abs(s.z - b.z) < b.hd + 1.2) return true; if (Math.abs(s.x + 3 - b.x) < b.hw + 1.2 && Math.abs(s.z - b.z) < b.hd + 2.2) return true; }
-    return false;
-  };
-
   // force: used when loading a save (the map may have changed since); only the basic validity is checked.
   function place(type, gx, gz, force = false) {
     if (type === 'hq' && hqOf()) {   // only one starting bunker: placing it again moves it (the old one stays if the new spot is refused)
@@ -130,5 +123,5 @@ export function createStructures({ scene, col }) {
       if (v.cd <= 0) { shoot(tx + dx / l, tz + dz / l, dx / l, dz / l); v.cd = 0.75; }
     }
   }
-  return { place, remove, canPlace, overlapsBox, spawn, carSpot, hq: () => { const q = hqOf(); return q ? { gx: q.gx, gz: q.gz } : null; }, setBlockTest: (fn) => { blockTest = fn; }, list, load, count, setGhost, setGhostBox, updateTowers };
+  return { place, remove, canPlace, spawn, carSpot, hq: () => { const q = hqOf(); return q ? { gx: q.gx, gz: q.gz } : null; }, setBlockTest: (fn) => { blockTest = fn; }, list, load, count, setGhost, setGhostBox, updateTowers };
 }

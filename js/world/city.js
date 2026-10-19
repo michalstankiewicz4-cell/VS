@@ -3,7 +3,7 @@
 import * as THREE from '../../vendor/three.module.js';
 import { mulberry32 } from '../core/util.js';
 import { PALACE, PALACE_HW, PALACE_HD, PALACE_H } from './data/palace.js';
-import { MAP_MAX, BASE_ZONE, EDGE, START_CAR } from './constants.js';
+import { MAP_MAX, EDGE, START_CAR } from './constants.js';
 import { createCityMaterial } from './city-material.js';
 import { defaultMap } from './default-map.js';
 
@@ -25,7 +25,6 @@ const bounds = (o) => o.t === 'b' ? { x: o.x, z: o.z, hw: o.w / 2, hd: o.d / 2, 
   : o.t === 'r' ? (o.r ? { x: o.x, z: o.z, hw: o.d / 2, hd: o.w / 2, h: 0.1 } : { x: o.x, z: o.z, hw: o.w / 2, hd: o.d / 2, h: 0.1 })
   : o.t === 'c' ? (o.r ? { x: o.x, z: o.z, hw: 1.95, hd: 0.95, h: 1.4 } : { x: o.x, z: o.z, hw: 0.95, hd: 1.95, h: 1.4 })
   : { x: o.x, z: o.z, hw: PALACE_HW, hd: PALACE_HD, h: PALACE_H };
-const inBase = (b) => Math.abs(b.x) - b.hw < BASE_ZONE && Math.abs(b.z) - b.hd < BASE_ZONE;
 // Two footprints overlap (roads may cross roads and lie under cars; everything else is solid).
 const flat = (o) => o.t === 'r';
 const overlap = (a, b) => Math.abs(a.x - b.x) < a.hw + b.hw - 0.05 && Math.abs(a.z - b.z) < a.hd + b.hd - 0.05;
@@ -96,7 +95,6 @@ export function createCity({ scene, dummy, col, vehicles, nightU }) {
 
   const map = {
     max: MAP_MAX,
-    extra: null,   // set by the world: extra(b) is true when a base structure overlaps the footprint
     // Is a solid city object (not a road) within r of the point? Used to keep base structures off buildings, cars and the Palace.
     blocksSquare(x, z, r) {
       return items.some((o, i) => { if (o.t === 'r') return false; const b = bounds(o); return Math.abs(b.x - x) < b.hw + r && Math.abs(b.z - z) < b.hd + r; });
@@ -115,8 +113,6 @@ export function createCity({ scene, dummy, col, vehicles, nightU }) {
       if (c.t === 'p' && items.some((q, i) => i !== skip && q.t === 'p')) return 'palace';
       const b = bounds(c);
       if (!inWorld(b)) return 'edge';
-      if (inBase(b)) return 'base';
-      if (map.extra && map.extra(b)) return 'structure';
       for (let i = 0; i < items.length; i++) {
         if (i === skip) continue;
         const q = items[i];
@@ -137,7 +133,7 @@ export function createCity({ scene, dummy, col, vehicles, nightU }) {
       const hit = raycaster.intersectObject(mesh)[0];
       return hit && hit.instanceId !== undefined && owner[hit.instanceId] !== undefined ? owner[hit.instanceId] : -1;
     },
-    // Validated import: nothing outside the schema passes and the base zone always stays free.
+    // Validated import: nothing outside the schema passes and every object must fit inside the map edge.
     set(arr) {
       const out = []; let palace = false;
       for (const o of Array.isArray(arr) ? arr : []) {
@@ -146,7 +142,7 @@ export function createCity({ scene, dummy, col, vehicles, nightU }) {
         if (!c) continue;
         if (c.t === 'p') { if (palace) continue; palace = true; }
         const b = bounds(c);
-        if (!inWorld(b) || inBase(b)) continue;
+        if (!inWorld(b)) continue;
         out.push(c);
       }
       items = out; rebuild(); return out.length;

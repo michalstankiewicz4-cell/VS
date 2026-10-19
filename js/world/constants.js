@@ -14,7 +14,6 @@ export const COST = { tower: 25, wall: 8, crypt: 40, hq: 0 };   // hq = the free
 export const CRYPT_MAX = 3;
 
 export const MAP_MAX = 380;        // max objects in the city map
-export const BASE_ZONE = 30;       // half-size of the central zone kept free of city objects
 export const EDGE = 76;            // movement / placement limit
 
 export const PALACE_POS = { x: 0, z: -46 };

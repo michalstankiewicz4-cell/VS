@@ -34,9 +34,9 @@ The version lives in `js/version.js` (shown in the game and the FPS counter), hi
 Before every push: bump the version, add a changelog entry and run `node tools/check-version.mjs`.
 
 ## Map editor and transparency
-Main menu > Map Editor (panel on the right). Everything on the map is an ordinary object, including the Palace of Culture.
+Main menu > Map Editor (placing things and the map export/import on the right; sizes, underlay and settings on the left). The editor ignores the player's base completely: the player builds on the finished map later. Everything on the map is an ordinary object, including the Palace of Culture.
 - **Select** (default for changing things): click an object to select it; a small bar appears next to it with Move, Rotate, Taller/Lower/Bigger/Smaller (buildings), Longer/Shorter (roads) and Delete. Click empty ground to deselect. Move picks the object up (R rotates it, "Cancel move" puts it back).
-- **Building / Car / Road / Palace** place new objects (sliders for size; R rotates), **Remove** deletes the clicked object. Objects cannot overlap (roads may cross roads and lie under cars) and the base zone in the centre stays free; the ghost turns red and the reason is shown. Only one Palace can exist at a time.
+- **Building / Car / Road / Palace** place new objects (sliders for size; R rotates), **Remove** deletes the clicked object. Objects cannot overlap (roads may cross roads and lie under cars) (nothing else restricts placement, the centre included); the ghost turns red and the reason is shown. Only one Palace can exist at a time.
 - **Top view (T)**: camera straight above (90°) for easier building.
 - **Size of things**: sliders for people, vehicles and enemies (0.5–2.0, default 0.5) with a preview at the centre of the view; they apply in play too and also scale speeds, reach, collision and hit radii and the driver cameras (1.0 = the original tuning).
 - **Map underlay** (reference image, editor only, not saved): load a screenshot from a file, or opt in to online OpenStreetMap / Esri satellite tiles centred on the Palace spire; scale, rotate and fade it, and use "Our map opacity" to see it through the city. Remove it when done; the built map stays.

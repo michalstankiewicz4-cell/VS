@@ -4,6 +4,10 @@ Versioning: `MAJOR.MINOR.PATCH`. Every push to the repository is a new version (
 The owner creates `vX.Y.Z` tags in GitHub Releases on commits from this history; pushing tags from a Claude session is blocked.
 Bug fix = PATCH, new feature = MINOR, big change to gameplay or the save format = MAJOR.
 
+## [0.22.6] - 2026-10-19
+### Changed
+- The map editor **ignores the player's base completely**, as if it did not exist: the central base zone is gone (objects, also in imported JSON, can be placed anywhere inside the map edge) and objects are no longer refused over structures or the starting-bunker spawn / car spots. The player will not use the editor, so the base is built later on the finished map (structures still avoid city objects when the player builds).
+
 ## [0.22.5] - 2026-10-19
 ### Changed
 - Default pixel height is now 310 (was 250); the other graphics defaults are unchanged. Saved settings are kept; "Reset graphics" restores the new default.

@@ -11,7 +11,7 @@ Legend: **P1** next, **P2** later, **P3** ideas. State as of v0.22.3. Context: [
 
 ## Gameplay
 - [ ] P1 Zombies at night: more/faster after dusk (the day/night cycle is visual only today)
-- [ ] P2 Base: decide whether the editor's central BASE_ZONE should go now that the whole map is buildable; zombies path around structures
+- [ ] P2 Base: zombies path around structures (the editor's BASE_ZONE was removed in 0.22.6)
 - [ ] P1 Balance: structure costs, zombie HP, points pace, time bonus
 - [ ] P2 Base structures in the map editor (sentry/barricade/bunker as free tools) — to be confirmed
 - [ ] P2 More enemy types and weapons; upgrades for points
