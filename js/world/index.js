@@ -99,7 +99,7 @@ export function createWorld(scene) {
 
   return {
     player: player.state, S, fade: city.fade, updateFade: city.updateFade, map: city.map, setCityOpacity: city.setOpacity, enemyCount: ENEMIES,
-    nightAt: sky.nightAt, DAY_LEN,
+    nightAt: sky.nightAt, dayPart: sky.dayPart, DAY_LEN,
     reset, update, driveState, use: survival.use,
     reload: weapons.reload, selectWeapon: weapons.select, toggleWeapon: weapons.toggle,
     toggleTorch: () => { if (S.mode === 'play') S.torch = !S.torch; },

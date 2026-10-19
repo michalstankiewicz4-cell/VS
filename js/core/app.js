@@ -221,7 +221,7 @@ export function createApp({ appEl, uiEl }) {
     hud.showHint(mode === 'play' && !paused);
     if (mode !== 'play') return;
     const mm = Math.floor(S.time / 60), ss = String(Math.floor(S.time % 60)).padStart(2, '0');
-    let s = t('hud.run', { hp: Math.ceil(S.hp), max: S.maxHp, pts: S.pts, kills: S.kills, time: `${mm}:${ss}`, tod: t(S.night > 0.5 ? 'hud.night' : 'hud.day'), bank: progress.bank, ammo: S.weapon === 'rifle' ? (S.reload > 0 ? t('hud.reloading') : S.mag + '/' + S.reserve) : t('inv.katana'), hunger: Math.round(S.hunger), thirst: Math.round(S.thirst) });
+    let s = t('hud.run', { hp: Math.ceil(S.hp), max: S.maxHp, pts: S.pts, kills: S.kills, time: `${mm}:${ss}`, tod: t('hud.' + world.dayPart(S.time)), bank: progress.bank, ammo: S.weapon === 'rifle' ? (S.reload > 0 ? t('hud.reloading') : S.mag + '/' + S.reserve) : t('inv.katana'), hunger: Math.round(S.hunger), thirst: Math.round(S.thirst) });
     if (S.driving) s += t('hud.carIn', { kmh: Math.round(S.speed * 3.6), exit: firstKey(k, 'interact'), view: firstKey(k, 'cameraView') });
     else if (S.carNear) s += t('hud.carNear', { key: firstKey(k, 'interact') });
     hud.setRun(s);

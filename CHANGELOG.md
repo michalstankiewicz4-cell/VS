@@ -4,6 +4,10 @@ Versioning: `MAJOR.MINOR.PATCH`. Every push to the repository is a new version (
 The owner creates `vX.Y.Z` tags in GitHub Releases on commits from this history; pushing tags from a Claude session is blocked.
 Bug fix = PATCH, new feature = MINOR, big change to gameplay or the save format = MAJOR.
 
+## [0.26.1] - 2026-10-19
+### Changed
+- The run line names the part of the day instead of day/night: dawn, morning, noon, afternoon, evening, night.
+
 ## [0.26.0] - 2026-10-19
 ### Added
 - Ammo and reload (`js/world/weapons.js`): the rifle has a 30-round magazine and 90 spare rounds per run; R (rebindable) reloads in 1.4 s, and firing with an empty magazine reloads by itself. Ammo is shown in the run line and as the Ammo cell of the backpack (click = reload).

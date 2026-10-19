@@ -38,6 +38,9 @@ export function createSky({ scene }) {
     const x = Math.min(1, Math.max(0, (v + TRANSITION) / (2 * TRANSITION)));
     return x * x * (3 - 2 * x);
   };
+  // Name of the part of the day: dawn, morning, noon, afternoon, evening or night (the sun peaks at 1/4 of the cycle, the moon at 3/4).
+  const PARTS = [[0.17, 'morning'], [0.33, 'noon'], [0.42, 'afternoon'], [0.56, 'evening'], [0.94, 'night'], [1, 'dawn']];
+  const dayPart = (time) => { const p = (((time + T0) / CYCLE) % 1 + 1) % 1; return PARTS.find(([end]) => p < end)[1]; };
   function apply(n) {
     scene.background.copy(k.bgD).lerp(k.bgN, n);
     scene.fog.color.copy(scene.background);
@@ -54,5 +57,5 @@ export function createSky({ scene }) {
     moon.position.set(px - 10 + 8 * n, 18, pz + 8 - 4 * n);
     moon.target.position.set(px, 0, pz);
   }
-  return { nightU, nightAt, apply, follow };
+  return { nightU, nightAt, dayPart, apply, follow };
 }

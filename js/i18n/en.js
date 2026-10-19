@@ -115,7 +115,11 @@ export default {
   'priv.wiped': 'Progress deleted.',
 
   'hud.run': 'HP {hp}/{max} · pts {pts} · kills {kills} · {time} · {tod} · ammo {ammo} · bank {bank} · hunger {hunger}% · thirst {thirst}%',
-  'hud.day': 'day',
+  'hud.dawn': 'dawn',
+  'hud.morning': 'morning',
+  'hud.noon': 'noon',
+  'hud.afternoon': 'afternoon',
+  'hud.evening': 'evening',
   'hud.night': 'night',
   'hud.carIn': ' · car {kmh} km/h · {exit}: exit · {view}: camera',
   'hud.carNear': ' · {key}: enter car',
