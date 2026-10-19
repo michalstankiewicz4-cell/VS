@@ -49,7 +49,7 @@ Stored in `localStorage` key `cq:settings:v1`: `lang`, `gfx` (pixelH, levels, di
 Key actions (`js/input/bindings.js`): moveUp/Down/Left/Right, camLeft/camRight, interact, cameraView, editRotate, editTopView (T). Each has a statistics category (move / interact / camera) or none.
 
 ## Rendering (`js/render/pixel-pipeline.js`)
-- three.js scene → `WebGLRenderTarget` of height `pixelH` (default 250 px; defaults: 7 levels, dither 0.55, outline 0.75, brightness 1.4) with a `DepthTexture` → full-screen shader: brightness `bright`, quantisation to `levels` with 4×4 Bayer dithering (`dither`), outline from depth differences (`edge`), vignette. Parameters via `pipe.setParams()` (driven by settings).
+- three.js scene → `WebGLRenderTarget` of height `pixelH` (default 310 px; defaults: 7 levels, dither 0.55, outline 0.75, brightness 1.4) with a `DepthTexture` → full-screen shader: brightness `bright`, quantisation to `levels` with 4×4 Bayer dithering (`dither`), outline from depth differences (`edge`), vignette. Parameters via `pipe.setParams()` (driven by settings).
 - Works with orthographic and perspective cameras: for perspective the shader linearises depth (`persp`, `near`, `far` uniforms) and thresholds the edge as a relative difference.
 
 ## Cameras (`js/core/cameras.js`)

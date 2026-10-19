@@ -48,7 +48,7 @@ void main(){
 export class PixelPipeline {
   constructor(renderer) {
     this.r = renderer;
-    this.params = { pixelH: 250, levels: 7, dither: 0.55, edge: 0.75, bright: 1.4 };
+    this.params = { pixelH: 310, levels: 7, dither: 0.55, edge: 0.75, bright: 1.4 };
     this.mat = new THREE.ShaderMaterial({
       vertexShader: VERT,
       fragmentShader: FRAG,
