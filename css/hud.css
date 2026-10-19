@@ -28,8 +28,13 @@
 #inv{position:fixed;left:12px;top:50%;transform:translateY(-50%);z-index:3;width:min(250px,calc(100vw - 24px));box-sizing:border-box;background:rgba(8,5,12,.86);border:1px solid #3a2740;padding:10px 14px;color:#d9cfd6;pointer-events:none}
 #inv h4{margin:0 0 6px;color:#e8d8a0;font-size:14px}
 #inv h5{margin:10px 0 4px;color:#c9b5d6;font-size:11px;text-transform:uppercase;letter-spacing:.06em}
-#inv .invrow{display:flex;justify-content:space-between;gap:8px;margin:2px 0}
-#inv .invrow b{font-weight:normal;color:#e8d8e0;text-align:right}
-#inv .slots{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:6px}
-#inv .slots i{display:block;aspect-ratio:1;border:1px dashed #4a2d52;background:#120b18}
+#inv .slots{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:6px}
+#inv .cell{aspect-ratio:1;border:1px solid #4a2d52;background:#120b18;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:8px;line-height:1.1;text-align:center;color:#d9cfd6;padding:2px;overflow:hidden}
+#inv .cell.empty{border-style:dashed}
+#inv .pic{display:block;width:26px;height:14px;border:1px solid #000}
+#inv .pic.long{width:34px;height:6px}
+#inv .pic.tube{width:24px;height:8px;border-radius:2px}
+#inv .pic.dome{width:22px;height:12px;border-radius:11px 11px 2px 2px}
+#inv .pic.box{width:22px;height:20px}
+#inv .pic.legs{width:16px;height:22px}
 #inv .invkey{margin-top:8px;color:#8f8396;font-size:11px}

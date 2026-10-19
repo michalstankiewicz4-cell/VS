@@ -4,6 +4,13 @@ Versioning: `MAJOR.MINOR.PATCH`. Every push to the repository is a new version (
 The owner creates `vX.Y.Z` tags in GitHub Releases on commits from this history; pushing tags from a Claude session is blocked.
 Bug fix = PATCH, new feature = MINOR, big change to gameplay or the save format = MAJOR.
 
+## [0.23.1] - 2026-10-19
+### Fixed
+- The see-through hole no longer opens when the player stands right against a wall: the occluder test no longer inflates buildings, so touching a wall from the camera side leaves it solid; the test boxes are now slightly shrunk, so a building that only grazes the line near its edge or corner does not open a hole either.
+### Added
+- Equipment panel is now a grid of cells (rifle, flashlight, helmet, basic jacket and trousers, 8 empty backpack cells).
+- Tab pauses and resumes a run (like Esc).
+
 ## [0.23.0] - 2026-10-19
 ### Added
 - Equipment panel during a run (key I, rebindable in Options, closes on pause/death): hands (rifle in the right hand, left hand supports it), clothing (helmet, jacket, trousers) and an empty backpack with slots. It is read-only: the game has no items yet, so it shows what the soldier really has. HUD hint mentions the key.

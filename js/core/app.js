@@ -122,7 +122,8 @@ export function createApp({ appEl, uiEl }) {
   }
 
   addEventListener('keydown', (e) => {
-    if (e.code !== 'Escape' || e.repeat) return;
+    const tab = e.code === 'Tab' && mode === 'play' && !e.ctrlKey && !e.altKey && !e.metaKey && !e.target.closest?.('input,textarea,select,button');   // Tab pauses / resumes a run like Esc
+    if ((e.code !== 'Escape' && !tab) || e.repeat) return;
     e.preventDefault();
     if (mode === 'dead') return;
     if (mode === 'menu') { menu.back(); return; }
@@ -194,7 +195,7 @@ export function createApp({ appEl, uiEl }) {
     world.fade.fwd.copy(fwd);
     const fk = (mode === 'play' && world.driveState()?.sc) || world.player.scale;   // size of whoever is hidden: person or car
     world.fade.radius.value = 2.8 * fk; world.fade.player.set(world.player.pos.x, fk, world.player.pos.z);
-    if (mode === 'play' && view === 'iso') world.updateFade(world.player.pos.x, fk, world.player.pos.z, up.copy(fwd).negate(), 0.5 * fk);
+    if (mode === 'play' && view === 'iso') world.updateFade(world.player.pos.x, fk, world.player.pos.z, up.copy(fwd).negate(), -0.3 * fk);
     world.fade.setOn(mode === 'play' && view === 'iso' ? 1 : 0);
 
     pipe.render(scene, rig.camera);

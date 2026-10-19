@@ -2,7 +2,7 @@
 
 Post-apocalyptic Warsaw: a man with a rifle against zombies, top-down view, low-resolution 3D with a pixel-art filter (three.js). Points earned after you die pay for your base. Play: <https://michalstankiewicz4-cell.github.io/VS/>
 
-Default controls (all rebindable in Options): WASD move, left mouse fire, F enter/exit a car, C change camera view in a car (isometric / chase / cockpit), I equipment panel, Q/E or right-mouse drag rotate the camera, wheel zoom, Esc pause. Map editor extras: T top view, R rotate.
+Default controls (all rebindable in Options): WASD move, left mouse fire, F enter/exit a car, C change camera view in a car (isometric / chase / cockpit), I equipment panel, Q/E or right-mouse drag rotate the camera, wheel zoom, Esc or Tab pause. Map editor extras: T top view, R rotate.
 
 **Documentation:** [`docs/HANDOFF.md`](docs/HANDOFF.md) (resume after losing context) · [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) (context and files) · [`TODO.md`](TODO.md) · [`docs/MULTIPLAYER.md`](docs/MULTIPLAYER.md) · [`CLAUDE.md`](CLAUDE.md) (assistant rules) · [`CHANGELOG.md`](CHANGELOG.md)
 

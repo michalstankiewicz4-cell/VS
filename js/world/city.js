@@ -156,7 +156,7 @@ export function createCity({ scene, dummy, col, vehicles, nightU }) {
   return {
     map, fade, rebuild,
     // See-through hole: finds the buildings that the ray from the player towards the camera (direction `up`, a unit vector)
-    // really passes through and hands their ids to the shader. Standing in front of or beside a building selects nothing.
+    // really passes through and hands their ids to the shader. Standing in front of or beside a building (even touching it) selects nothing; `eps` < 0 shrinks the boxes so a wall merely grazed at a corner does not count.
     updateFade(px, py, pz, up, eps) {
       const out = fade.occ.value; let n = 0;
       const hit = (cx, cy, cz, hx, hy, hz) => {
@@ -170,7 +170,7 @@ export function createCity({ scene, dummy, col, vehicles, nightU }) {
       };
       for (let i = 0; i < items.length && n < 12; i++) {
         const o = items[i];
-        if (o.t === 'b') { if (hit(o.x, (o.h + 0.6) / 2, o.z, o.w / 2 + eps, (o.h + 0.6) / 2 + eps, o.d / 2 + eps)) out[n++] = i; }
+        if (o.t === 'b') { if (hit(o.x, (o.h + 0.6) / 2, o.z, Math.max(0.05, o.w / 2 + eps), Math.max(0.05, (o.h + 0.6) / 2 + eps), Math.max(0.05, o.d / 2 + eps))) out[n++] = i; }
         else if (o.t === 'p') { for (const [qx, qz, w, d, y1, , , y0 = 0] of PALACE) if (hit(o.x + qx, (y0 + y1) / 2, o.z + qz, w / 2 + eps, (y1 - y0) / 2 + eps, d / 2 + eps)) { out[n++] = i; break; } }
       }
       fade.occN.value = n;

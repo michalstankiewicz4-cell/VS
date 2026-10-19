@@ -9,14 +9,16 @@ export function createHud(root) {
   const hint = h('div', { id: 'hint', hidden: true });
   const fps = h('div', { id: 'fps', hidden: true });
   // Equipment panel (read-only): what the soldier holds, wears and carries. Toggled with the 'inventory' key during a run.
-  const row = (label, item) => h('div', { class: 'invrow' }, tx(label), tx(item, 'b'));
-  const slots = Array.from({ length: 8 }, () => h('i'));
+  // A grid cell: a small pictogram (a coloured shape) over a caption; no item = an empty dashed cell.
+  const pic = (shape, color) => { const i = h('i', { class: 'pic ' + shape }); i.style.background = color; return i; };   // via CSSOM: inline style attributes are blocked by the CSP
+  const cell = (key, shape, color) => h('div', { class: 'cell' + (key ? '' : ' empty') }, key && pic(shape, color), key && tx(key, 'span'));
+  const grid = (...cells) => h('div', { class: 'slots' }, cells);
   const close = tx('inv.close', 'div', { key: 'I' }); close.className = 'invkey'; let invKey = 'I';
   const inv = h('div', { id: 'inv', hidden: true },
     tx('inv.title', 'h4'),
-    tx('inv.hands', 'h5'), row('inv.right', 'inv.rifle'), row('inv.left', 'inv.support'),
-    tx('inv.clothes', 'h5'), row('inv.head', 'inv.helmet'), row('inv.body', 'inv.jacket'), row('inv.legs', 'inv.trousers'),
-    tx('inv.pack', 'h5'), h('div', { class: 'slots' }, slots), tx('inv.packNote', 'div'), close);
+    tx('inv.hands', 'h5'), grid(cell('inv.rifle', 'long', '#17181b'), cell('inv.light', 'tube', '#d9c46a')),
+    tx('inv.clothes', 'h5'), grid(cell('inv.helmet', 'dome', '#2f3a2a'), cell('inv.jacket', 'box', '#4a5638'), cell('inv.trousers', 'legs', '#2a2d36')),
+    tx('inv.pack', 'h5'), grid(...Array.from({ length: 8 }, () => cell(null))), tx('inv.packNote', 'div'), close);
   root.append(top, hint, fps, inv);
   return {
     showTop: (on) => { top.hidden = !on; },
