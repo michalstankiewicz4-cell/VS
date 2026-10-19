@@ -1,6 +1,6 @@
 // Player-built base structures on a 2-unit grid: sentry gun (tower), barricade (wall), bunker (crypt).
 import * as THREE from '../../vendor/three.module.js';
-import { COST, CRYPT_MAX, CELL } from './constants.js';
+import { COST, CRYPT_MAX, CELL, EDGE, START, START_CAR } from './constants.js';
 
 const lam = (c) => new THREE.MeshLambertMaterial({ color: c });
 const key = (gx, gz) => gx + ',' + gz;
@@ -34,11 +34,19 @@ function makeObj(type) {
 export function createStructures({ scene, col }) {
   const structs = new Map();
   const count = (t) => { let n = 0; for (const v of structs.values()) if (v.type === t) n++; return n; };
-  const canPlace = (type, gx, gz) => COST[type] !== undefined && Math.abs(gx) <= 14 && Math.abs(gz) <= 14 &&
-    !structs.has(key(gx, gz)) && Math.hypot(gx * CELL, gz * CELL) > 3 && (type !== 'crypt' || count('crypt') < CRYPT_MAX);
+  // The whole map is buildable (inside the movement limit), except the player's start spot and its car.
+  let blockTest = () => false;       // set by the world: true when a city object is in the way
+  const inMap = (gx, gz) => Math.abs(gx * CELL) <= EDGE - 1 && Math.abs(gz * CELL) <= EDGE - 1;
+  const validCell = (type, gx, gz) => COST[type] !== undefined && Number.isInteger(gx) && Number.isInteger(gz) && inMap(gx, gz) && !structs.has(key(gx, gz));
+  const nearStart = (x, z) => Math.hypot(x - START.x, z - START.z) < 4 || Math.hypot(x - START_CAR.x, z - START_CAR.z) < 4;
+  const canPlace = (type, gx, gz) => validCell(type, gx, gz) && !nearStart(gx * CELL, gz * CELL) &&
+    !blockTest(gx * CELL, gz * CELL) && (type !== 'crypt' || count('crypt') < CRYPT_MAX);
+  // Does any structure overlap this footprint ({x,z,hw,hd})? Used by the map editor.
+  const overlapsBox = (b) => { for (const v of structs.values()) if (Math.abs(v.gx * CELL - b.x) < b.hw + 1 && Math.abs(v.gz * CELL - b.z) < b.hd + 1) return true; return false; };
 
-  function place(type, gx, gz) {
-    if (!canPlace(type, gx, gz)) return false;
+  // force: used when loading a save (the map may have changed since); only the basic validity is checked.
+  function place(type, gx, gz, force = false) {
+    if (force ? !validCell(type, gx, gz) : !canPlace(type, gx, gz)) return false;
     const { grp, head } = makeObj(type), x = gx * CELL, z = gz * CELL;
     grp.position.set(x, 0, z);
     scene.add(grp);
@@ -58,7 +66,7 @@ export function createStructures({ scene, col }) {
   const list = () => [...structs.values()].map((v) => ({ t: v.type, gx: v.gx, gz: v.gz }));
   function load(arr) {
     for (const v of [...structs.values()]) remove(v.gx, v.gz);
-    for (const o of arr) if (o && Number.isInteger(o.gx) && Number.isInteger(o.gz)) place(o.t, o.gx, o.gz);
+    for (const o of arr) if (o && Number.isInteger(o.gx) && Number.isInteger(o.gz)) place(o.t, o.gx, o.gz, true);
   }
 
   // Placement ghost (grid cell or arbitrary box, used by the base builder and the map editor).
@@ -94,5 +102,5 @@ export function createStructures({ scene, col }) {
       if (v.cd <= 0) { shoot(tx + dx / l, tz + dz / l, dx / l, dz / l); v.cd = 0.75; }
     }
   }
-  return { place, remove, canPlace, list, load, count, setGhost, setGhostBox, updateTowers };
+  return { place, remove, canPlace, overlapsBox, setBlockTest: (fn) => { blockTest = fn; }, list, load, count, setGhost, setGhostBox, updateTowers };
 }

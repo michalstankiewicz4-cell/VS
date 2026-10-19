@@ -95,6 +95,11 @@ export function createCity({ scene, dummy, col, vehicles, nightU }) {
 
   const map = {
     max: MAP_MAX,
+    extra: null,   // set by the world: extra(b) is true when a base structure overlaps the footprint
+    // Is a solid city object (not a road) within r of the point? Used to keep base structures off buildings, cars and the Palace.
+    blocksSquare(x, z, r) {
+      return items.some((o, i) => { if (o.t === 'r') return false; const b = bounds(o); return Math.abs(b.x - x) < b.hw + r && Math.abs(b.z - z) < b.hd + r; });
+    },
     list: () => items.map((o) => ({ ...o })),
     count: () => items.length,
     bounds: (i) => bounds(items[i]),
@@ -110,6 +115,7 @@ export function createCity({ scene, dummy, col, vehicles, nightU }) {
       const b = bounds(c);
       if (!inWorld(b)) return 'edge';
       if (inBase(b)) return 'base';
+      if (map.extra && map.extra(b)) return 'structure';
       for (let i = 0; i < items.length; i++) {
         if (i === skip) continue;
         const q = items[i];

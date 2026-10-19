@@ -14,6 +14,8 @@ export default {
 
   'single.title': 'Jeden gracz',
   'single.start': 'Zacznij grę',
+  'single.buildLocked': 'Budowa bazy otwiera się po śmierci; można budować na całej mapie.',
+  'ed.why.structure': 'stoi tam element bazy',
   'single.build': 'Buduj bazę',
 
   'multi.title': 'Wielu graczy',
@@ -94,6 +96,7 @@ export default {
   'hud.fps': 'v{version} · {fps} fps · render {w}×{h}',
   'hud.hint': 'Ruch: {move} · strzał: {fire} · kamera: {cam} lub {drag}+przeciągnięcie · zoom: kółko · {interact}: auto · Esc: pauza',
 
+  'build.pan': 'Widok przesuwasz klawiszami ruchu; budować można na całej mapie.',
   'build.bank': 'Bank: {bank} pkt · schrony: {n}/3',
   'build.tower': 'Stanowisko (25)',
   'build.wall': 'Barykada (8)',

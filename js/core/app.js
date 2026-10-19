@@ -17,7 +17,7 @@ import { createDevReset } from '../ui/devreset.js';
 import { VERSION } from '../version.js';
 
 const ZERO = { x: 0, z: 0 };
-const ZOOM = { menu: 1, play: 1, dead: 1, build: 0.7, edit: 0.55 };
+const ZOOM = { menu: 1, play: 1, dead: 1, build: 0.55, edit: 0.55 };
 
 export function createApp({ appEl, uiEl }) {
   const settings = createSettings();
@@ -39,16 +39,17 @@ export function createApp({ appEl, uiEl }) {
 
   /* ---- persistent progress (points bank, best run, built structures) ---- */
   const progress = {
-    bank: 0, best: 0,
-    save() { write(KEYS.save, { bank: this.bank, best: this.best, s: world.list() }); },
+    bank: 0, best: 0, pending: false,   // pending: base building is open (set by a death, cleared when a run starts)
+    save() { write(KEYS.save, { bank: this.bank, best: this.best, s: world.list(), pb: this.pending }); },
     load() {
       const d = read(KEYS.save);
       if (!d || typeof d !== 'object') return;
       this.bank = Math.max(0, Math.floor(+d.bank) || 0);
       this.best = Math.max(0, Math.floor(+d.best) || 0);
+      this.pending = d.pb === true;
       world.load(Array.isArray(d.s) ? d.s.slice(0, 200) : []);
     },
-    wipe() { this.bank = 0; this.best = 0; world.load([]); this.save(); menu.refresh(); },
+    wipe() { this.bank = 0; this.best = 0; this.pending = false; world.load([]); this.save(); menu.refresh(); },
   };
   progress.load();
   const savedMap = read(KEYS.map);
@@ -96,15 +97,15 @@ export function createApp({ appEl, uiEl }) {
     hud.showTop(m === 'play'); menu.hide();
   }
   function goMenu() { enter('menu', 'menu'); menu.show('main'); }
-  function startRun() { enter('play', 'play'); }
-  function openBuild() { enter('build', 'idle'); builder.open(); }
+  function startRun() { if (progress.pending) { progress.pending = false; progress.save(); } enter('play', 'play'); }
+  function openBuild() { if (!progress.pending) return; enter('build', 'idle'); builder.open(); }
   function openEdit() { enter('edit', 'idle'); editor.open(); }
   function pause() { paused = true; input.clear(); menu.show('pause'); }
   function resume() { paused = false; input.clear(); menu.hide(); }
   function die() {
     mode = 'dead';
     const bonus = Math.floor(S.time / 10), total = S.pts + bonus;
-    progress.bank += total; progress.best = Math.max(progress.best, total); progress.save();
+    progress.bank += total; progress.best = Math.max(progress.best, total); progress.pending = true; progress.save();
     menu.setDeath({ kills: S.kills, time: Math.floor(S.time), pts: S.pts, bonus, total, bank: progress.bank });
     hud.showTop(false);
     menu.show('dead');
@@ -156,7 +157,7 @@ export function createApp({ appEl, uiEl }) {
     last = now;
     const t0 = now / 1000;
     const sdt = paused ? 0 : dt;
-    const running = !paused && (mode === 'play' || mode === 'edit');
+    const running = !paused && (mode === 'play' || mode === 'edit' || mode === 'build');
     const raw = running ? input.moveVector() : ZERO;
     const yaw = rig.yaw, cy = Math.cos(yaw), sy = Math.sin(yaw);
     const mv = rig.camera.isOrthographicCamera ? { x: raw.x * cy + raw.z * sy, z: -raw.x * sy + raw.z * cy } : raw;
@@ -170,11 +171,11 @@ export function createApp({ appEl, uiEl }) {
 
     if (!paused) {
       if (mode === 'edit') editor.update(dt, mv, rig.zoom);
-      else if (mode === 'build') builder.update();
+      else if (mode === 'build') builder.update(dt, mv, rig.zoom);
     }
 
     rig.topDown = mode === 'edit' && editor.top;
-    const target = mode === 'play' || mode === 'dead' ? world.player.pos : mode === 'edit' ? editor.pan : origin;
+    const target = mode === 'play' || mode === 'dead' ? world.player.pos : mode === 'edit' ? editor.pan : mode === 'build' ? builder.pan : origin;
     const view = rig.update(sdt, t0, { mode, target, zoomT: ZOOM[mode], car: mode === 'play' ? world.driveState() : null });
     rig.camera.getWorldDirection(fwd);
     world.fade.fwd.copy(fwd);

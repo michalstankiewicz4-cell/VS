@@ -1,6 +1,6 @@
 # TODO
 
-Legend: **P1** next, **P2** later, **P3** ideas. State as of v0.17.1. Context: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+Legend: **P1** next, **P2** later, **P3** ideas. State as of v0.18.0. Context: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ## Multiplayer (plan in [`docs/MULTIPLAYER.md`](docs/MULTIPLAYER.md))
 - [ ] P2 Decision: co-op/PvP, player count, shared bank, P2P or server (menu entries "PvE co-op" and "PvP" exist as "Soon")
@@ -11,6 +11,7 @@ Legend: **P1** next, **P2** later, **P3** ideas. State as of v0.17.1. Context: [
 
 ## Gameplay
 - [ ] P1 Zombies at night: more/faster after dusk (the day/night cycle is visual only today)
+- [ ] P2 Base: decide whether the editor's central BASE_ZONE should go now that the whole map is buildable; zombies path around structures
 - [ ] P1 Balance: structure costs, zombie HP, points pace, time bonus
 - [ ] P2 Base structures in the map editor (sentry/barricade/bunker as free tools) — to be confirmed
 - [ ] P2 More enemy types and weapons; upgrades for points

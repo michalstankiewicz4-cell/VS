@@ -15,6 +15,8 @@ export default {
   'single.title': 'Single Player',
   'single.start': 'Start run',
   'single.build': 'Build base',
+  'single.buildLocked': 'Base building opens after you die; you can build anywhere on the map.',
+  'ed.why.structure': 'a base structure is there',
 
   'multi.title': 'Multiplayer',
   'multi.pve': 'PvE co-op',
@@ -94,6 +96,7 @@ export default {
   'hud.fps': 'v{version} · {fps} fps · render {w}×{h}',
   'hud.hint': 'Move: {move} · fire: {fire} · camera: {cam} or {drag}-drag · zoom: wheel · {interact}: car · Esc: pause',
 
+  'build.pan': 'Move the view with the movement keys; you can build anywhere on the map.',
   'build.bank': 'Bank: {bank} pts · bunkers: {n}/3',
   'build.tower': 'Sentry gun (25)',
   'build.wall': 'Barricade (8)',

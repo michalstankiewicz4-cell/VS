@@ -4,6 +4,12 @@ Versioning: `MAJOR.MINOR.PATCH`. Every push to the repository is a new version (
 The owner creates `vX.Y.Z` tags in GitHub Releases on commits from this history; pushing tags from a Claude session is blocked.
 Bug fix = PATCH, new feature = MINOR, big change to gameplay or the save format = MAJOR.
 
+## [0.18.0] - 2026-10-19
+### Changed
+- **Base building opens after a death**: "Build base" is available on the death screen (and from Single Player until the next run starts); it is disabled otherwise. The unlock is saved (`pb` in the save) and cleared when a run starts.
+- **The whole map is buildable** (was ±14 cells around the centre): the builder camera now pans with the movement keys (zoomed out like the editor). Structures cannot be placed on city objects (buildings, cars, the Palace; roads are fine), within 4 units of the player start or the start car, or outside the map edge.
+- The map editor refuses objects that overlap base structures ("a base structure is there"). Loading a save keeps structures even if the map changed since.
+
 ## [0.17.1] - 2026-10-19
 ### Removed
 - The graphics style switch from 0.17.0 (realistic / comic / watercolour / noir) was rolled back at the owner's request: the game keeps only the pixel-art look. Code, options and docs are back to the 0.16.5 state (the 0.17.0 entry below stays as history; the Battle styles remain available in that repo and in commit 2d04f4e here).

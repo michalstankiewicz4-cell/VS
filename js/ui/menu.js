@@ -29,8 +29,9 @@ export function createMenu(root, { actions, ctx, progress }) {
       btn('menu.options', () => menu.go('options'))),
     bankLine(),
     h('p', { class: 'foot' }, 'v' + VERSION, ' · ', tx('menu.credit')));
+  const buildBtn = btn('single.build', actions.build), buildNote = h('p', { class: 'note' }, tx('single.buildLocked'));
   screen('single', tx('single.title', 'h2'),
-    h('div', { class: 'stack' }, btn('single.start', actions.start), btn('single.build', actions.build), back()), bankLine());
+    h('div', { class: 'stack' }, btn('single.start', actions.start), buildBtn, back()), buildNote, bankLine());
   screen('multi', tx('multi.title', 'h2'),
     h('div', { class: 'stack' }, soon('multi.pve'), soon('multi.pvp'), back()), tx('multi.note', 'p'));
   screen('pause', tx('pause.title', 'h2'),
@@ -46,6 +47,7 @@ export function createMenu(root, { actions, ctx, progress }) {
   function refreshInfo() {
     const s = t('menu.bank', { bank: progress.bank, best: progress.best });
     root.querySelectorAll('.info.bank').forEach((e) => { e.textContent = s; });
+    buildBtn.disabled = !progress.pending; buildNote.hidden = progress.pending;   // base building opens after a death
   }
 
   const menu = {

@@ -30,6 +30,8 @@ export function createWorld(scene) {
   const enemies = createEnemies({ scene, rnd, dummy, col, S, around: player.state.pos, vehicles });
   const bullets = createProjectiles({ scene, dummy, col, S, enemies });
   const base = createStructures({ scene, col });
+  base.setBlockTest((x, z) => city.map.blocksSquare(x, z, 1));
+  city.map.extra = (b) => base.overlapsBox(b);
 
   let saved = null;   // player position stashed while the editor size preview borrows the player model
   function reset(mode) {
