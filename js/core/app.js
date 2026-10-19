@@ -18,7 +18,7 @@ import { VERSION } from '../version.js';
 
 const ZERO = { x: 0, z: 0 };
 const MOVE_KEYS = ['moveUp', 'moveDown', 'moveLeft', 'moveRight', 'camLeft', 'camRight'];
-const KEYSETS = { play: new Set([...MOVE_KEYS, 'interact', 'cameraView']), build: new Set(MOVE_KEYS), edit: new Set([...MOVE_KEYS, 'editRotate', 'editTopView']) };
+const KEYSETS = { play: new Set([...MOVE_KEYS, 'interact', 'cameraView', 'inventory']), build: new Set(MOVE_KEYS), edit: new Set([...MOVE_KEYS, 'editRotate', 'editTopView']) };
 const ZOOM = { menu: 1, play: 1.27, dead: 1.27, build: 0.55, edit: 0.55 };   // play/dead 1.27 = two default mouse-wheel steps closer than 1
 
 export function createApp({ appEl, uiEl }) {
@@ -97,7 +97,7 @@ export function createApp({ appEl, uiEl }) {
     mode = m; paused = false;
     world.reset(worldMode); input.clear();
     builder.close(); editor.close();
-    hud.showTop(m === 'play'); menu.hide();
+    hud.showTop(m === 'play'); hud.showInv(false); menu.hide();
   }
   function goMenu() { enter('menu', 'menu'); menu.show('main'); }
   function startRun() { if (progress.pending) { progress.pending = false; progress.save(); } enter('play', 'play'); }
@@ -109,7 +109,7 @@ export function createApp({ appEl, uiEl }) {
     builder.open(at);
   }
   function openEdit() { enter('edit', 'idle'); editor.open(); }
-  function pause() { paused = true; input.clear(); menu.show('pause'); }
+  function pause() { paused = true; input.clear(); hud.showInv(false); menu.show('pause'); }
   function resume() { paused = false; input.clear(); menu.hide(); }
   function die() {
     mode = 'dead';
@@ -117,7 +117,7 @@ export function createApp({ appEl, uiEl }) {
     progress.bank += total; progress.best = Math.max(progress.best, total); progress.pending = true;
     progress.deathAt = [Math.round(world.player.pos.x * 10) / 10, Math.round(world.player.pos.z * 10) / 10]; progress.save();
     menu.setDeath({ kills: S.kills, time: Math.floor(S.time), pts: S.pts, bonus, total, bank: progress.bank });
-    hud.showTop(false);
+    hud.showTop(false); hud.showInv(false);
     menu.show('dead');
   }
 
@@ -133,6 +133,7 @@ export function createApp({ appEl, uiEl }) {
     if (paused) return;
     if (act === 'interact' && mode === 'play') world.toggleCar();
     else if (act === 'cameraView' && mode === 'play' && S.driving) rig.cycleView();
+    else if (act === 'inventory' && mode === 'play') hud.toggleInv();
     else if (act === 'editRotate' && mode === 'edit') editor.rotate();
     else if (act === 'editTopView' && mode === 'edit') editor.toggleTop();
   };
@@ -218,7 +219,8 @@ export function createApp({ appEl, uiEl }) {
     if (S.driving) s += t('hud.carIn', { kmh: Math.round(S.speed * 3.6), exit: firstKey(k, 'interact'), view: firstKey(k, 'cameraView') });
     else if (S.carNear) s += t('hud.carNear', { key: firstKey(k, 'interact') });
     hud.setRun(s);
-    hud.setHint(t('hud.hint', { move: moveLabel(k), fire: BUTTON_NAMES[m.fireButton], cam: camLabel(k), drag: BUTTON_NAMES[m.dragButton], interact: firstKey(k, 'interact') }));
+    hud.setHint(t('hud.hint', { move: moveLabel(k), fire: BUTTON_NAMES[m.fireButton], cam: camLabel(k), drag: BUTTON_NAMES[m.dragButton], interact: firstKey(k, 'interact'), inv: firstKey(k, 'inventory') }));
+    hud.setInvKey(firstKey(k, 'inventory'));
   }
 
   goMenu();

@@ -25,3 +25,11 @@
 #ed details.under,#edr details.under{margin:6px 0;text-align:left}
 #ed details.under summary,#edr details.under summary{cursor:pointer;color:#c9b5d6}
 #ed,#edr{max-height:calc(100vh - 24px);overflow:auto}
+#inv{position:fixed;left:12px;top:50%;transform:translateY(-50%);z-index:3;width:min(250px,calc(100vw - 24px));box-sizing:border-box;background:rgba(8,5,12,.86);border:1px solid #3a2740;padding:10px 14px;color:#d9cfd6;pointer-events:none}
+#inv h4{margin:0 0 6px;color:#e8d8a0;font-size:14px}
+#inv h5{margin:10px 0 4px;color:#c9b5d6;font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+#inv .invrow{display:flex;justify-content:space-between;gap:8px;margin:2px 0}
+#inv .invrow b{font-weight:normal;color:#e8d8e0;text-align:right}
+#inv .slots{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:6px}
+#inv .slots i{display:block;aspect-ratio:1;border:1px dashed #4a2d52;background:#120b18}
+#inv .invkey{margin-top:8px;color:#8f8396;font-size:11px}

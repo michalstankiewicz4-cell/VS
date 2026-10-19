@@ -9,6 +9,7 @@ export const ACTIONS = [
   { id: 'camRight', keys: ['KeyE', null], stat: 'camera' },
   { id: 'interact', keys: ['KeyF', null], stat: 'interact' },
   { id: 'cameraView', keys: ['KeyC', null], stat: 'camera' },
+  { id: 'inventory', keys: ['KeyI', null], stat: null },
   { id: 'editRotate', keys: ['KeyR', null], stat: null },
   { id: 'editTopView', keys: ['KeyT', null], stat: null },
 ];
