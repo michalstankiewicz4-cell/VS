@@ -48,7 +48,7 @@ Buildings that hide the character become partly transparent in the isometric vie
 - Palace of Culture and Science: simplified model based on a SketchUp model (BezNazwy6.skp), author per file metadata: **kon.kp**, licence [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Only boxes derived from the storey outlines are used in the game (changed: simplification, scale, rotation).
 
 ## Day and night
-A run has about 5 min of day and 5 min of night, alternating (menu, building and the editor are always daytime).
+A run has 3 min of day and 3 min of night, alternating (menu, building and the editor are always daytime).
 
 ## SEO
 Tags in `index.html`, thumbnail `assets/og-image.png`, `sitemap.xml`. After deployment add the site in Google Search Console ("URL prefix" type) and submit the sitemap.

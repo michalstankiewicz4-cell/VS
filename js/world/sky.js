@@ -1,9 +1,9 @@
-// Lighting, fog and the day/night cycle (about 5 min of day + 5 min of night).
+// Lighting, fog and the day/night cycle (3 min of day + 3 min of night).
 import * as THREE from '../../vendor/three.module.js';
 
-export const DAY_LEN = 300;                 // seconds of day (and of night)
+export const DAY_LEN = 180;                 // seconds of day (and of night)
 const CYCLE = DAY_LEN * 2;
-const T0 = 40;                               // runs start in daylight
+const T0 = 24;                               // runs start in daylight
 const TRANSITION = 0.2;                      // half-width of the dusk/dawn blend (sine units, about 40 s total)
 
 // The torch is a point light a few units above the player: right next to a wall the 1/d² falloff made a blinding orange hotspot.

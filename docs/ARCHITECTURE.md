@@ -70,7 +70,7 @@ Key actions (`js/input/bindings.js`): moveUp/Down/Left/Right, camLeft/camRight, 
 - **Enemies** (`enemies.js`): the active count grows with time (`18 + S.time`, up to 110), HP grows (`hpFor`: 2/3/4), speed up to +80%. A kill = 1 point.
 - **Survival** (`survival.js`): `S.hunger`/`S.thirst` (0–100) drain over time, empty needs cost HP; `S.items` {food, water, bandage} are used with `world.use(kind)` (keys 1/2/3 or a click; grenades via `world.throwGrenade(aim)` → `projectiles.js` arc + `enemies.blast`; keys 1–4 or a click on the equipment cell in `ui/hud.js`).
 - **Vehicles** (`vehicles.js`): in live modes (`play`, `menu`) map cars become vehicles (separate `InstancedMesh`, 8 boxes per car, max 64) plus the start car. `toggle()` (interact key) enters/exits; `step()` simple physics (accel 14, brake 28, max 15 u/s, speed-dependent steering), two-circle collision via `push()`, `runsOver()` for zombies. A parked car is an axis-aligned AABB (angle snapped to 90° on exit); you get out on the driver's (left) side. Input: `Input.axes()`.
-- **Day/night** (`sky.js`): period 600 s (about 5 min day + 5 min night), transitions about 40 s, `nightAt(time)`; a run starts in daylight; menu/build/editor are always day.
+- **Day/night** (`sky.js`): period 360 s (3 min day + 3 min night), transitions about 24 s, `nightAt(time)`; a run starts in daylight; menu/build/editor are always day.
 
 ## Persistence (localStorage)
 - `gra:save:v1` — `{ bank, best, s: base structures }`
