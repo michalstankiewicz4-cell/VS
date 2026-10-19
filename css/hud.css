@@ -8,8 +8,11 @@
 #hint{position:fixed;left:10px;bottom:8px;z-index:2;color:#8f8396;text-shadow:0 0 3px #000;pointer-events:none;font-size:11px}
 #fps{position:fixed;left:10px;top:10px;z-index:6;color:#e8a0b0;text-shadow:0 0 3px #000;pointer-events:none}
 #build,#ed{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:2;background:rgba(8,5,12,.82);border:1px solid #3a2740;padding:10px 14px;text-align:center}
+#build{left:auto;right:12px;top:12px;bottom:auto;transform:none;width:min(280px,calc(100vw - 24px));box-sizing:border-box;text-align:left}
+#build .btns{flex-direction:column;align-items:stretch;margin-top:6px}
+#build .btns button{text-align:left}
 #bank{color:#e8d8a0;margin-bottom:4px}
-#ed{left:auto;right:12px;top:12px;bottom:auto;transform:none;width:min(320px,calc(100vw - 24px));box-sizing:border-box}
+#ed{left:12px;right:auto;top:12px;bottom:auto;transform:none;width:min(320px,calc(100vw - 24px));box-sizing:border-box}
 #ed .tools{flex-direction:column;align-items:stretch;margin-top:0}
 #ed .tools button{text-align:left}
 #ed .row{display:grid;grid-template-columns:90px 1fr 34px;gap:6px;align-items:center;margin:4px 0;text-align:left}

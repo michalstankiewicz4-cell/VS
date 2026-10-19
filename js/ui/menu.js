@@ -30,8 +30,18 @@ export function createMenu(root, { actions, ctx, progress }) {
     bankLine(),
     h('p', { class: 'foot' }, 'v' + VERSION, ' · ', tx('menu.credit')));
   const buildBtn = btn('single.build', actions.build), buildNote = h('p', { class: 'note' }, tx('single.buildLocked'));
+  // "New game": two-step confirmation (no blocking confirm()); erases points, best score, base and the starting bunker, not the map or settings.
+  const newBtn = h('button', { type: 'button' }), newDone = h('p', { class: 'note', hidden: true }, tx('single.newDone'));
+  let newArmed = false, newTimer = 0;
+  const newLabel = () => bind(newBtn, newArmed ? 'single.newSure' : 'single.new');
+  newLabel();
+  newBtn.addEventListener('click', () => {
+    clearTimeout(newTimer);
+    if (!newArmed) { newArmed = true; newLabel(); newTimer = setTimeout(() => { newArmed = false; newLabel(); }, 4000); newBtn.blur(); return; }
+    newArmed = false; newLabel(); progress.wipe(); newDone.hidden = false; setTimeout(() => { newDone.hidden = true; }, 2500); newBtn.blur();
+  });
   screen('single', tx('single.title', 'h2'),
-    h('div', { class: 'stack' }, btn('single.start', actions.start), buildBtn, back()), buildNote, bankLine());
+    h('div', { class: 'stack' }, btn('single.start', actions.start), buildBtn, newBtn, back()), buildNote, newDone, bankLine());
   screen('multi', tx('multi.title', 'h2'),
     h('div', { class: 'stack' }, soon('multi.pve'), soon('multi.pvp'), back()), tx('multi.note', 'p'));
   screen('pause', tx('pause.title', 'h2'),

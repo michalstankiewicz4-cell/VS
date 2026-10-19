@@ -4,6 +4,12 @@ Versioning: `MAJOR.MINOR.PATCH`. Every push to the repository is a new version (
 The owner creates `vX.Y.Z` tags in GitHub Releases on commits from this history; pushing tags from a Claude session is blocked.
 Bug fix = PATCH, new feature = MINOR, big change to gameplay or the save format = MAJOR.
 
+## [0.21.0] - 2026-10-19
+### Added
+- **Start over**: new button on the single-player screen (two clicks to confirm) that erases the banked points, best score, base structures, the starting bunker and the saved death position. The map and settings are kept.
+### Changed
+- Layout: the map editor panel is now on the **left**, the base builder panel is on the **right** (a vertical list instead of the bottom bar).
+
 ## [0.20.0] - 2026-10-19
 ### Added
 - Map editor: **editor settings are exported/imported separately from the map contents**. "Export map" / "Import map" handle only objects (buildings, cars, roads, Palace); new "Export settings" / "Import settings" handle only the editor settings (tool, rotation, top view, size and opacity sliders). Neither touches the other, so you no longer paste everything at once.

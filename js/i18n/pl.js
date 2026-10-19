@@ -16,6 +16,9 @@ export default {
   'single.start': 'Zacznij grę',
   'single.buildLocked': 'Budowa bazy otwiera się po śmierci; można budować na całej mapie.',
   'ed.why.structure': 'stoi tam element bazy',
+  'single.new': 'Zacznij od nowa',
+  'single.newSure': 'Kliknij jeszcze raz, by skasować cały postęp',
+  'single.newDone': 'Postęp skasowany. Nowa gra zaczyna się od zera.',
   'single.build': 'Buduj bazę',
 
   'multi.title': 'Wielu graczy',

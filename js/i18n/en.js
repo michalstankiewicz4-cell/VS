@@ -14,6 +14,9 @@ export default {
 
   'single.title': 'Single Player',
   'single.start': 'Start run',
+  'single.new': 'Start over',
+  'single.newSure': 'Click again to erase all progress',
+  'single.newDone': 'Progress erased. A new game starts from scratch.',
   'single.build': 'Build base',
   'single.buildLocked': 'Base building opens after you die; you can build anywhere on the map.',
   'ed.why.structure': 'a base structure is there',
