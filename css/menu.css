@@ -6,6 +6,7 @@
 .screen{width:min(380px,calc(100vw - 32px));box-sizing:border-box;padding:24px 28px;margin-left:clamp(16px,6vw,90px)}
 #menu[data-screen=pause] .screen,#menu[data-screen=dead] .screen,#menu[data-screen=options] .screen{margin-left:0;background:#120b18;border:1px solid #4a2d52;text-align:center}
 #menu[data-screen=options] .screen{width:min(560px,calc(100vw - 24px));max-height:calc(100vh - 24px);overflow:auto}
+.logo .ver{font-size:13px;letter-spacing:.04em;color:#8f8396;text-shadow:none;vertical-align:baseline}
 .logo{margin:0 0 6px;font-size:34px;line-height:1.05;letter-spacing:.12em;color:#e8a0b0;text-shadow:3px 3px 0 #5a1626}
 .screen h2{margin:0 0 14px;font-size:20px;color:#e8a0b0;letter-spacing:.06em}
 .screen p{margin:6px 0;color:#c9bcd0;white-space:pre-line}

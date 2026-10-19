@@ -20,7 +20,7 @@ export function createMenu(root, { actions, ctx, progress }) {
   };
 
   screen('main',
-    h('h1', { class: 'logo' }, 'CAPITAL', h('br'), 'QUARANTINE'),
+    h('h1', { class: 'logo' }, 'CAPITAL', h('br'), 'QUARANTINE', h('small', { class: 'ver' }, ' v' + VERSION)),
     tx('menu.tagline', 'p'),
     h('div', { class: 'stack' },
       btn('menu.single', () => menu.go('single')),

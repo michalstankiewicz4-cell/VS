@@ -4,6 +4,10 @@ Versioning: `MAJOR.MINOR.PATCH`. Every push to the repository is a new version (
 The owner creates `vX.Y.Z` tags in GitHub Releases on commits from this history; pushing tags from a Claude session is blocked.
 Bug fix = PATCH, new feature = MINOR, big change to gameplay or the save format = MAJOR.
 
+## [0.21.1] - 2026-10-19
+### Changed
+- The game version is now shown next to the title on the main menu (it is still in the footer too).
+
 ## [0.21.0] - 2026-10-19
 ### Added
 - **Start over**: new button on the single-player screen (two clicks to confirm) that erases the banked points, best score, base structures, the starting bunker and the saved death position. The map and settings are kept.
