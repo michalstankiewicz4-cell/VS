@@ -4,6 +4,10 @@ Versioning: `MAJOR.MINOR.PATCH`. Every push to the repository is a new version (
 The owner creates `vX.Y.Z` tags in GitHub Releases on commits from this history; pushing tags from a Claude session is blocked.
 Bug fix = PATCH, new feature = MINOR, big change to gameplay or the save format = MAJOR.
 
+## [0.20.0] - 2026-10-19
+### Added
+- Map editor: **editor settings are exported/imported separately from the map contents**. "Export map" / "Import map" handle only objects (buildings, cars, roads, Palace); new "Export settings" / "Import settings" handle only the editor settings (tool, rotation, top view, size and opacity sliders). Neither touches the other, so you no longer paste everything at once.
+
 ## [0.19.1] - 2026-10-19
 ### Changed
 - **Default map** is now the owner's hand-tuned layout exported from the map editor (66 buildings, 30 cars, the Palace at its usual spot) instead of the generated one. Data lives in `js/world/data/default-layout.js`; `default-map.js` just returns a copy. Saved maps in the browser are not affected (use dev reset or the editor's reset to get the new default).

@@ -54,7 +54,7 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
   });
   const underBox = h('details', { class: 'under' }, h('summary', {}, tx('ed.u.title')),
     h('div', { class: 'btns' }, uLoad, uCenter, uClear), h('p', { class: 'note' }, tx('ed.u.online')), h('div', { class: 'btns' }, uOsm, uEsri), credit, file, uCity.el, uW.el, uO.el, uR.el, h('p', { class: 'note' }, tx('ed.u.hint')));
-  const info = h('p', { class: 'note' }), json = h('textarea', { rows: 5, spellcheck: 'false', hidden: true, 'aria-label': 'Map JSON' });
+  const info = h('p', { class: 'note' }), json = h('textarea', { rows: 5, spellcheck: 'false', hidden: true, 'aria-label': 'Map JSON' }), jsonS = h('textarea', { rows: 5, spellcheck: 'false', hidden: true, 'aria-label': 'Editor settings JSON' });
   const tools = {};
   const mkTool = (id, key) => { const b = btn(key, () => { cancelMove(); tool = id; note = ''; refresh(); }); tools[id] = b; return b; };
   const cancelMove = () => { if (moving) { world.map.restore(moving.orig); moving = null; } };
@@ -116,25 +116,46 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
           saveMap(); note = t('ed.loaded', { n }); refresh();
         } catch (e) { note = t('ed.badJson'); refresh(); }
       })),
-    json, info);
+    // Editor settings (sliders, tool, view) travel separately from the map contents.
+    h('div', { class: 'btns' },
+      btn('ed.exportSet', async () => {
+        const txt = JSON.stringify(settingsObj());
+        jsonS.hidden = false; jsonS.value = txt;
+        let ok = false; try { await navigator.clipboard.writeText(txt); ok = true; } catch (e) { jsonS.select(); }
+        note = t(ok ? 'ed.copiedSet' : 'ed.selected'); refresh();
+      }),
+      btn('ed.importSet', () => {
+        if (jsonS.hidden) { jsonS.hidden = false; jsonS.value = ''; note = t('ed.pasteHintSet'); refresh(); return; }
+        try {
+          if (jsonS.value.length > 5000) throw new Error('too large');
+          const o = JSON.parse(jsonS.value);
+          if (!o || typeof o !== 'object' || Array.isArray(o)) throw new Error('bad');
+          applySettings(o, true); note = t('ed.setLoaded'); refresh();
+        } catch (e) { note = t('ed.badSet'); refresh(); }
+      })),
+    json, jsonS, info);
   // Remember editor settings (tool, rotation, top view, sliders) between sessions; the underlay image itself is not saved.
   const DEF = { sp: 1, sv: 1, se: 1, w: 8, d: 8, h: 4, rw: 4, rl: 20, city: 1, uo: 0.6 };
   const sliders = { sp: SP, sv: SV, se: SE, w: W, d: D, h: H, rw: RW, rl: RL, city: uCity, uo: uO };
-  const sv = read(KEYS.editor), clampN = (v, s) => Math.min(+s.inp.max, Math.max(+s.inp.min, +v));
-  if (sv && typeof sv === 'object') {
+  const clampN = (v, s) => Math.min(+s.inp.max, Math.max(+s.inp.min, +v));
+  // Apply a settings object (from storage or an import); live = the editor is open, so the city opacity applies at once.
+  function applySettings(sv, live) {
+    if (!sv || typeof sv !== 'object') return;
     if (['s', 'b', 'c', 'r', 'p', 'x'].includes(sv.tool)) tool = sv.tool;
     rot = sv.rot ? 1 : 0; top = !!sv.top;
     for (const [k, s] of Object.entries(sliders)) {
       if (!Number.isFinite(+sv[k]) || sv[k] === null) continue;
       s.inp.value = clampN(sv[k], s);
       if (s === SP || s === SV || s === SE) { s.inp.dispatchEvent(new Event('input')); continue; }
-      if (s === uCity) s.out.textContent = (+s.inp.value).toFixed(2);   // applied on open(), not now
+      if (s === uCity && !live) s.out.textContent = (+s.inp.value).toFixed(2);   // applied on open(), not now
       else s.inp.dispatchEvent(new Event('input'));
     }
   }
+  applySettings(read(KEYS.editor), false);
+  const settingsObj = () => { const o = { tool, rot, top }; for (const [k, s] of Object.entries(sliders)) o[k] = +s.inp.value; return o; };
   let saved = '';
   const persist = () => {
-    const o = { tool, rot, top }; for (const [k, s] of Object.entries(sliders)) o[k] = +s.inp.value;
+    const o = settingsObj();
     const j = JSON.stringify(o); if (j !== saved) { saved = j; write(KEYS.editor, o); }
   };
   panel.addEventListener('input', persist);

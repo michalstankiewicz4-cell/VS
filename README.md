@@ -40,7 +40,7 @@ Main menu > Map Editor (panel on the right). Everything on the map is an ordinar
 - **Top view (T)**: camera straight above (90°) for easier building.
 - **Size of things**: sliders for people, vehicles and enemies (0.5–2.0) with a preview at the centre of the view; they apply in play too. Collision radii of people/enemies are not scaled.
 - **Map underlay** (reference image, editor only, not saved): load a screenshot from a file, or opt in to online OpenStreetMap / Esri satellite tiles centred on the Palace spire; scale, rotate and fade it, and use "Our map opacity" to see it through the city. Remove it when done; the built map stays.
-- Settings (tool, rotation, top view, sliders) are remembered; "Reset settings" restores defaults, "Default map" restores the default city, Export/Import handle JSON (import does not check overlaps).
+- Settings (tool, rotation, top view, sliders) are remembered; "Reset settings" restores defaults, "Default map" restores the default city, "Export/Import map" handle the map contents as JSON (import does not check overlaps), "Export/Import settings" handle only the editor settings.
 - **Dev reset** (tiny button, top centre of every screen): two clicks wipe all data stored by the game in the browser and reload.
 Buildings that hide the character become partly transparent in the isometric view during a run.
 
