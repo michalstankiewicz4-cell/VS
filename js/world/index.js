@@ -1,5 +1,6 @@
 // World facade: composes terrain, sky, city, vehicles, enemies, projectiles and structures
 // behind one small API used by the game modes.
+import { createSurvival } from './survival.js';
 import { mulberry32, clamp, wrapAngle } from '../core/util.js';
 import { EDGE, ENEMIES, COST } from './constants.js';
 import * as THREE from '../../vendor/three.module.js';
@@ -19,7 +20,8 @@ export { COST, DAY_LEN };
 export function createWorld(scene) {
   const rnd = mulberry32(1337);
   const dummy = new THREE.Object3D();
-  const S = { hp: 100, maxHp: 100, kills: 0, pts: 0, time: 0, mode: 'idle', fireCd: 0, active: 0, night: 0, driving: false, speed: 0, carNear: false };
+  const S = { hp: 100, maxHp: 100, kills: 0, pts: 0, time: 0, mode: 'idle', fireCd: 0, active: 0, night: 0, driving: false, speed: 0, carNear: false, hunger: 100, thirst: 100, items: { food: 0, water: 0, bandage: 0 } };
+  const survival = createSurvival(S);
 
   const col = createCollision();
   const sky = createSky({ scene });
@@ -45,7 +47,7 @@ export function createWorld(scene) {
     player.state.face = 0; player.setVisible(live); player.animate(false, 0);
     S.maxHp = 100 + 25 * base.count('crypt'); S.hp = S.maxHp;
     S.kills = 0; S.pts = 0; S.time = 0; S.night = 0; S.fireCd = 0; S.active = 0; S.driving = false; S.speed = 0; S.carNear = false;
-    enemies.reset(); bullets.reset();
+    survival.reset(); enemies.reset(); bullets.reset();
   }
 
   // inp: { mv: {x,z} walking vector, aim: {x,z}|null world point under the cursor, firing, drv: {thr, steer} }
@@ -88,6 +90,7 @@ export function createWorld(scene) {
 
     const { touching, car } = enemies.update(dt, t);
     S.hp -= touching * 8 * dt * (car ? 0.5 : 1);
+    survival.update(dt);
     if (S.hp <= 0) { S.hp = 0; S.mode = 'dead'; }
     base.updateTowers(dt, enemies, S, bullets.shoot);
     bullets.update(dt);
@@ -101,7 +104,7 @@ export function createWorld(scene) {
   return {
     player: player.state, S, fade: city.fade, updateFade: city.updateFade, map: city.map, setCityOpacity: city.setOpacity, enemyCount: ENEMIES,
     nightAt: sky.nightAt, DAY_LEN,
-    reset, update, driveState,
+    reset, update, driveState, use: survival.use,
     // Editor size multipliers for people (player), vehicles and enemies.
     setScales: ({ p, v, e }) => { player.setScale(p); vehicles.setScale(v); enemies.setScale(e); bullets.setScale(p); },
     // Editor preview: shows the player and a zombie at (x, z) so sizes can be compared with buildings.

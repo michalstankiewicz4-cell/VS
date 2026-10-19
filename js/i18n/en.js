@@ -71,7 +71,13 @@ export default {
   'inv.trousers': 'Basic trousers',
   'inv.pack': 'Backpack',
   'inv.empty': 'Empty',
-  'inv.packNote': 'Nothing to carry yet: items are not in the game.',
+  'inv.food': 'Food',
+  'inv.water': 'Water',
+  'inv.bandage': 'Bandage',
+  'inv.packNote': 'Click an item or press its key: food restores hunger, water thirst, bandages health.',
+  'act.useFood': 'Eat food (restores hunger)',
+  'act.useBandage': 'Use a bandage (restores health)',
+  'act.useWater': 'Drink water (restores thirst)',
   'inv.close': '{key}: close',
   'act.editRotate': 'Rotate object (map editor)',
 
@@ -100,7 +106,7 @@ export default {
   'priv.wipeSure': 'Click again to confirm',
   'priv.wiped': 'Progress deleted.',
 
-  'hud.run': 'HP {hp}/{max} · pts {pts} · kills {kills} · {time} · {tod} · bank {bank}',
+  'hud.run': 'HP {hp}/{max} · pts {pts} · kills {kills} · {time} · {tod} · bank {bank} · hunger {hunger}% · thirst {thirst}%',
   'hud.day': 'day',
   'hud.night': 'night',
   'hud.carIn': ' · car {kmh} km/h · {exit}: exit · {view}: camera',

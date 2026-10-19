@@ -18,7 +18,7 @@ import { VERSION } from '../version.js';
 
 const ZERO = { x: 0, z: 0 };
 const MOVE_KEYS = ['moveUp', 'moveDown', 'moveLeft', 'moveRight', 'camLeft', 'camRight'];
-const KEYSETS = { play: new Set([...MOVE_KEYS, 'interact', 'cameraView', 'inventory']), build: new Set(MOVE_KEYS), edit: new Set([...MOVE_KEYS, 'editRotate', 'editTopView']) };
+const KEYSETS = { play: new Set([...MOVE_KEYS, 'interact', 'cameraView', 'inventory', 'useFood', 'useBandage', 'useWater']), build: new Set(MOVE_KEYS), edit: new Set([...MOVE_KEYS, 'editRotate', 'editTopView']) };
 const ZOOM = { menu: 1, play: 1.27, dead: 1.27, build: 0.55, edit: 0.55 };   // play/dead 1.27 = two default mouse-wheel steps closer than 1
 
 export function createApp({ appEl, uiEl }) {
@@ -83,7 +83,7 @@ export function createApp({ appEl, uiEl }) {
   /* ---- state machine ---- */
   let mode = 'menu', paused = false;
   const isPaused = () => paused;
-  const hud = createHud(uiEl);
+  const hud = createHud(uiEl, (kind) => world.use(kind));
   const builder = createBuilder({ root: uiEl, canvas, world, progress, settings, groundAt, isPaused, onPlay: () => startRun() });
   createDevReset({ root: uiEl });
   const editor = createEditor({ scene, root: uiEl, canvas, world, settings, groundAt, pickIndex, project, isPaused, onPlay: () => startRun(), saveMap });
@@ -135,6 +135,9 @@ export function createApp({ appEl, uiEl }) {
     if (act === 'interact' && mode === 'play') world.toggleCar();
     else if (act === 'cameraView' && mode === 'play' && S.driving) rig.cycleView();
     else if (act === 'inventory' && mode === 'play') hud.toggleInv();
+    else if (act === 'useFood' && mode === 'play') world.use('food');
+    else if (act === 'useBandage' && mode === 'play') world.use('bandage');
+    else if (act === 'useWater' && mode === 'play') world.use('water');
     else if (act === 'editRotate' && mode === 'edit') editor.rotate();
     else if (act === 'editTopView' && mode === 'edit') editor.toggleTop();
   };
@@ -216,12 +219,13 @@ export function createApp({ appEl, uiEl }) {
     hud.showHint(mode === 'play' && !paused);
     if (mode !== 'play') return;
     const mm = Math.floor(S.time / 60), ss = String(Math.floor(S.time % 60)).padStart(2, '0');
-    let s = t('hud.run', { hp: Math.ceil(S.hp), max: S.maxHp, pts: S.pts, kills: S.kills, time: `${mm}:${ss}`, tod: t(S.night > 0.5 ? 'hud.night' : 'hud.day'), bank: progress.bank });
+    let s = t('hud.run', { hp: Math.ceil(S.hp), max: S.maxHp, pts: S.pts, kills: S.kills, time: `${mm}:${ss}`, tod: t(S.night > 0.5 ? 'hud.night' : 'hud.day'), bank: progress.bank, hunger: Math.round(S.hunger), thirst: Math.round(S.thirst) });
     if (S.driving) s += t('hud.carIn', { kmh: Math.round(S.speed * 3.6), exit: firstKey(k, 'interact'), view: firstKey(k, 'cameraView') });
     else if (S.carNear) s += t('hud.carNear', { key: firstKey(k, 'interact') });
     hud.setRun(s);
     hud.setHint(t('hud.hint', { move: moveLabel(k), fire: BUTTON_NAMES[m.fireButton], cam: camLabel(k), drag: BUTTON_NAMES[m.dragButton], interact: firstKey(k, 'interact'), inv: firstKey(k, 'inventory') }));
     hud.setInvKey(firstKey(k, 'inventory'));
+    hud.setItems(S.items, { food: firstKey(k, 'useFood'), bandage: firstKey(k, 'useBandage'), water: firstKey(k, 'useWater') });
   }
 
   goMenu();

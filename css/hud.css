@@ -25,7 +25,7 @@
 #ed details.under,#edr details.under{margin:6px 0;text-align:left}
 #ed details.under summary,#edr details.under summary{cursor:pointer;color:#c9b5d6}
 #ed,#edr{max-height:calc(100vh - 24px);overflow:auto}
-#inv{position:fixed;left:12px;top:50%;transform:translateY(-50%);z-index:3;width:min(250px,calc(100vw - 24px));box-sizing:border-box;background:rgba(8,5,12,.86);border:1px solid #3a2740;padding:10px 14px;color:#d9cfd6;pointer-events:none}
+#inv{position:fixed;left:12px;top:50%;transform:translateY(-50%);z-index:3;width:min(250px,calc(100vw - 24px));box-sizing:border-box;background:rgba(8,5,12,.86);border:1px solid #3a2740;padding:10px 14px;color:#d9cfd6}
 #inv h4{margin:0 0 6px;color:#e8d8a0;font-size:14px}
 #inv h5{margin:10px 0 4px;color:#c9b5d6;font-size:11px;text-transform:uppercase;letter-spacing:.06em}
 #inv .slots{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:6px}
@@ -38,3 +38,9 @@
 #inv .pic.box{width:22px;height:20px}
 #inv .pic.legs{width:16px;height:22px}
 #inv .invkey{margin-top:8px;color:#8f8396;font-size:11px}
+#inv .cell.item{cursor:pointer;position:relative}
+#inv .cell.item:hover{border-color:#c9b5d6}
+#inv .cell.item.none{opacity:.35}
+#inv .cell.item em{font-style:normal;color:#e8d8a0}
+#inv .cell.item small{position:absolute;right:3px;top:2px;color:#8f8396;font-size:8px}
+#inv .pic.bandage{width:20px;height:10px;border-radius:2px;background-image:linear-gradient(#c01838,#c01838);background-size:4px 100%;background-repeat:no-repeat;background-position:center}
