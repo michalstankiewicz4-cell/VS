@@ -2,23 +2,24 @@
 import * as THREE from '../../vendor/three.module.js';
 import { clamp } from '../core/util.js';
 import { EDGE, SIZE_DEFAULT } from './constants.js';
+import { carParts, partColor, DEFAULTS as CAR_DEFAULTS } from '../carkit/carkit.js';
 
 const VMAX = 64;
-// [dx (side, + = left), dy, dz (forward), sx, sy, sz, kind]  kind: 0 body, 1 glass, 2 wheels, 3 lights
-const PARTS = [
-  [0, 0.65, 0, 1.8, 0.7, 3.8, 0], [0, 1.25, -0.2, 1.5, 0.5, 2.0, 1],
-  [-0.95, 0.35, 1.25, 0.3, 0.7, 0.7, 2], [0.95, 0.35, 1.25, 0.3, 0.7, 0.7, 2],
-  [-0.95, 0.35, -1.25, 0.3, 0.7, 0.7, 2], [0.95, 0.35, -1.25, 0.3, 0.7, 0.7, 2],
-  [-0.6, 0.7, 1.92, 0.4, 0.22, 0.1, 3], [0.6, 0.7, 1.92, 0.4, 0.22, 0.1, 3],
-];
+// The car's boxes come from CarKit (tuned in labs/car.html): [dx (side, + = left), dy, dz (forward), sx, sy, sz, kind].
+const MODEL = carParts(CAR_DEFAULTS), PARTS = MODEL.parts;
 const CAR = { max: 15, rev: 6, acc: 14, racc: 9, brake: 28, coast: 4, turn: 1.9 };
 // Driver seat (car-local, + x = left) used by the cockpit camera.
-export const SEAT = { dx: 0.42, dy: 1.4, dz: 0.15 };
+export const SEAT = MODEL.seat;
 
 export function createVehicles({ scene, dummy, col, S, player }) {
-  const mesh = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshLambertMaterial({ color: 0xffffff }), VMAX * PARTS.length);
-  mesh.castShadow = mesh.receiveShadow = true; mesh.frustumCulled = false; mesh.count = 0;
-  scene.add(mesh);
+  // Three instanced meshes: the box parts, the round wheels (cylinders along x) and the roof slabs, each with one colour per part.
+  const lam = new THREE.MeshLambertMaterial({ color: 0xffffff });
+  const groups = [
+    { parts: PARTS.filter((p) => !p[7]), mesh: new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), lam, VMAX * PARTS.length) },
+    { parts: PARTS.filter((p) => p[7] === 1), mesh: new THREE.InstancedMesh(new THREE.CylinderGeometry(0.5, 0.5, 1, 14).rotateZ(Math.PI / 2), lam, VMAX * PARTS.length) },
+    { parts: PARTS.filter((p) => p[7] === 2), mesh: new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), lam, VMAX * PARTS.length) },   // the roof
+  ];
+  for (const g of groups) { g.mesh.castShadow = g.mesh.receiveShadow = true; g.mesh.frustumCulled = false; g.mesh.count = 0; scene.add(g.mesh); }
   const list = [];
   const cc = new THREE.Color();
   let driving = null, sc = SIZE_DEFAULT;   // sc: size multiplier (1 = original); CAR speeds, reach and steering follow it
@@ -26,28 +27,33 @@ export function createVehicles({ scene, dummy, col, S, player }) {
 
   function place(v) {
     const c = Math.cos(v.th), sn = Math.sin(v.th);
-    PARTS.forEach(([dx, dy, dz, sx, sy, sz], k) => {
-      dummy.position.set(v.x + (dx * c + dz * sn) * sc, dy * sc, v.z + (dz * c - dx * sn) * sc);
-      dummy.rotation.set(0, v.th, 0); dummy.scale.set(sx * sc, sy * sc, sz * sc); dummy.updateMatrix();
-      mesh.setMatrixAt(v.i * PARTS.length + k, dummy.matrix);
-    });
-    mesh.instanceMatrix.needsUpdate = true;
+    for (const { parts, mesh } of groups) {
+      parts.forEach(([dx, dy, dz, sx, sy, sz], k) => {
+        dummy.position.set(v.x + (dx * c + dz * sn) * sc, dy * sc, v.z + (dz * c - dx * sn) * sc);
+        dummy.rotation.set(0, v.th, 0); dummy.scale.set(sx * sc, sy * sc, sz * sc); dummy.updateMatrix();
+        mesh.setMatrixAt(v.i * parts.length + k, dummy.matrix);
+      });
+      mesh.instanceMatrix.needsUpdate = true;
+    }
   }
   function paint(v) {
-    PARTS.forEach((p, k) => {
-      const c = p[6] === 0 ? cc.setHSL(v.hue, v.sa, v.l) : p[6] === 1 ? cc.setHSL(0.6, 0.2, 0.1) : p[6] === 2 ? cc.setHSL(0, 0, 0.04) : cc.setHSL(0.13, 0.9, 0.6);
-      mesh.setColorAt(v.i * PARTS.length + k, c);
-    });
-    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+    for (const { parts, mesh } of groups) {
+      parts.forEach((p, k) => {
+        const [h, sa, l] = partColor(p[6], v.hue, v.sa, v.l);
+        mesh.setColorAt(v.i * parts.length + k, cc.setHSL(h, sa, l));
+      });
+      if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+    }
   }
   // A parked car is snapped to the axes and blocks movement and bullets.
   const park = (v) => {
     const alongZ = Math.abs(Math.sin(v.th)) < 0.5;
-    v.blk.x = v.x; v.blk.z = v.z; v.blk.hw = (alongZ ? 0.95 : 1.95) * sc; v.blk.hd = (alongZ ? 1.95 : 0.95) * sc;
+    v.blk.x = v.x; v.blk.z = v.z; const hw = MODEL.width / 2 + 0.05, hd = MODEL.length / 2 + 0.05;   // the footprint follows the model
+    v.blk.hw = (alongZ ? hw : hd) * sc; v.blk.hd = (alongZ ? hd : hw) * sc;
   };
 
   // Called by the city before it re-creates its objects (its obstacle list is cleared separately).
-  function clear() { list.length = 0; driving = null; S.driving = false; mesh.count = 0; }
+  function clear() { list.length = 0; driving = null; S.driving = false; for (const g of groups) g.mesh.count = 0; }
   function spawn({ x, z, th, hue, sa, l }) {
     if (list.length >= VMAX) return null;
     const v = { i: list.length, x, z, th, vel: 0, steer: 0, hue, sa, l, blk: {} };
@@ -56,7 +62,7 @@ export function createVehicles({ scene, dummy, col, S, player }) {
   }
   function finish() {
     for (const v of list) park(v);
-    mesh.count = list.length * PARTS.length;
+    for (const g of groups) g.mesh.count = list.length * g.parts.length;
     for (const v of list) { place(v); paint(v); }
   }
 
@@ -123,6 +129,7 @@ export function createVehicles({ scene, dummy, col, S, player }) {
     setScale(k) { sc = k; for (const v of list) { if (v !== driving) park(v); place(v); } },
     get scale() { return sc; }, reach,
     list, clear, spawn, finish, nearest, toggle, exit, step, runsOver,
+    setRoof: (on) => { groups[2].mesh.visible = on; },   // hidden in the cockpit view
     get driving() { return driving; },
   };
 }

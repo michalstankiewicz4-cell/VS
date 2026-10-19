@@ -101,6 +101,7 @@ export function createWorld(scene) {
     player: player.state, S, fade: city.fade, updateFade: city.updateFade, map: city.map, setCityOpacity: city.setOpacity, enemyCount: ENEMIES,
     nightAt: sky.nightAt, dayPart: sky.dayPart, DAY_LEN,
     reset, update, driveState, use: survival.use,
+    setRoof: vehicles.setRoof,
     reload: weapons.reload, selectWeapon: weapons.select, toggleWeapon: weapons.toggle,
     toggleTorch: () => { if (S.mode === 'play') S.torch = !S.torch; },
     // Throws a grenade from the player towards `aim` ({x, z}); false when none are left, driving or no target.

@@ -197,6 +197,7 @@ export function createApp({ appEl, uiEl }) {
     const target = mode === 'play' || mode === 'dead' || mode === 'menu' ? world.player.pos : mode === 'edit' ? editor.pan : mode === 'build' ? builder.pan : origin;
     const view = rig.update(sdt, t0, { mode, target, zoomT: ZOOM[mode], car: mode === 'play' ? world.driveState() : null });
     rig.camera.getWorldDirection(fwd);
+    world.setRoof(view !== 'cockpit');
     world.fade.fwd.copy(fwd);
     const fk = (mode === 'play' && world.driveState()?.sc) || world.player.scale;   // size of whoever is hidden: person or car
     world.fade.radius.value = 2.8 * fk; world.fade.player.set(world.player.pos.x, fk, world.player.pos.z);

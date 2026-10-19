@@ -4,6 +4,7 @@
 //  - `head` turns about the vertical axis (the game points it at the nearest zombie, +z is the barrel direction),
 //  - `gun` is the barrel cradle on `head` (recoil slides it back), `fire()` starts a recoil + muzzle flash, `update(dt)` plays them.
 import * as THREE from '../../vendor/three.module.js';
+import { schemaDefaults, makeSanitize } from '../core/params.js';
 
 // Parameter schema: [key, label, min, max, step, default]. The lab builds its sliders from this list (a toggle is 0..1).
 export const SCHEMA = [
@@ -32,8 +33,8 @@ export const SCHEMA = [
   ['Look'],
   ['palette', 'Palette (0 olive, 1 desert, 2 urban, 3 rust)', 0, 3, 1, 0],
 ];
-export const KEYS = SCHEMA.filter((s) => s.length > 1).map((s) => s[0]);
-export const DEFAULTS = Object.fromEntries(SCHEMA.filter((s) => s.length > 1).map((s) => [s[0], s[5]]));
+export const DEFAULTS = schemaDefaults(SCHEMA);
+export const sanitize = makeSanitize(SCHEMA);
 
 // base, dark base, metal, head, dark head, accent, sandbag, lamp
 export const PALETTES = [
@@ -42,19 +43,6 @@ export const PALETTES = [
   { base: 0x6a6c72, dark: 0x3c3e44, metal: 0x101216, head: 0x4a4e58, headDark: 0x2e3138, accent: 0xd8d048, bag: 0x7c7e84, lamp: 0x40d0ff },
   { base: 0x6a4a3a, dark: 0x40291f, metal: 0x1a1412, head: 0x7a4a30, headDark: 0x4e2e1e, accent: 0x9aa0a8, bag: 0x7a6a50, lamp: 0xff3030 },
 ];
-
-// A sanitised parameter set: unknown keys dropped, numbers clamped and snapped to the step, missing ones taken from the defaults.
-export function sanitize(raw) {
-  const out = { ...DEFAULTS };
-  if (!raw || typeof raw !== 'object') return out;
-  for (const s of SCHEMA) {
-    if (s.length < 2) continue;
-    const [k, , lo, hi, step] = s, v = Number(raw[k]);
-    if (Number.isFinite(v)) out[k] = Math.round(Math.min(hi, Math.max(lo, v)) / step) * step;
-    out[k] = +out[k].toFixed(3);
-  }
-  return out;
-}
 
 export const PRESETS = {
   Sentry: {},

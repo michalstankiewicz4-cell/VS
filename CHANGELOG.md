@@ -4,6 +4,13 @@ Versioning: `MAJOR.MINOR.PATCH`. Every push to the repository is a new version (
 The owner creates `vX.Y.Z` tags in GitHub Releases on commits from this history; pushing tags from a Claude session is blocked.
 Bug fix = PATCH, new feature = MINOR, big change to gameplay or the save format = MAJOR.
 
+## [0.29.0] - 2026-10-19
+### Added
+- Car lab (`labs/car.html`): sliders for body style (sedan/hatch/pickup/van), cabin, wheels, bumpers, grille, roof rack, spoiler, stripe, antenna, exhaust; paint preview and night headlights; presets, random, export/import JSON.
+- `js/carkit/` (CarKit) and `js/labs/labcore.js` / `js/core/params.js`: shared by the car and turret labs.
+### Changed
+- Cars in the game are built by CarKit (more detail) and have round wheels (instanced cylinders); the roof is hidden in the cockpit view so the dashboard and wheel stay visible.
+
 ## [0.28.1] - 2026-10-19
 ### Added
 - Main menu: a separate "Model Labs" button under "Map Editor" opens the model labs (`labs.html`).
