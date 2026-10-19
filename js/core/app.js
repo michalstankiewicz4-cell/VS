@@ -17,7 +17,7 @@ import { createDevReset } from '../ui/devreset.js';
 import { VERSION } from '../version.js';
 
 const ZERO = { x: 0, z: 0 };
-const ZOOM = { menu: 1, play: 1, dead: 1, build: 0.55, edit: 0.55 };
+const ZOOM = { menu: 1, play: 1.27, dead: 1.27, build: 0.55, edit: 0.55 };   // play/dead 1.27 = two default mouse-wheel steps closer than 1
 
 export function createApp({ appEl, uiEl }) {
   const settings = createSettings();

@@ -4,6 +4,10 @@ Versioning: `MAJOR.MINOR.PATCH`. Every push to the repository is a new version (
 The owner creates `vX.Y.Z` tags in GitHub Releases on commits from this history; pushing tags from a Claude session is blocked.
 Bug fix = PATCH, new feature = MINOR, big change to gameplay or the save format = MAJOR.
 
+## [0.22.9] - 2026-10-19
+### Changed
+- A run now starts slightly more zoomed in (×1.27, about two mouse-wheel steps); the wheel still zooms from there (the death screen keeps the same zoom so the view does not jump).
+
 ## [0.22.8] - 2026-10-19
 ### Changed
 - Keyboard shortcuts of the game (movement, F, C, R, T, camera keys) are **off in the main menu** (and its sub-screens): they no longer react, are no longer blocked from normal browser use and are not counted in the local input statistics. Esc still goes back; they work again as soon as a run, the builder or the editor starts, and in the pause menu.
