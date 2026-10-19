@@ -6,6 +6,7 @@ export default {
   'menu.single': 'Jeden gracz',
   'menu.multi': 'Wielu graczy',
   'menu.editor': 'Edytor map',
+  'menu.labs': 'Laboratorium modeli',
   'menu.options': 'Opcje',
   'menu.bank': 'Bank: {bank} pkt · rekord: {best}',
   'menu.credit': 'Model Pałacu Kultury i Nauki: kon.kp, CC BY 4.0 (uproszczony)',

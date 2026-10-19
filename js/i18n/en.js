@@ -6,6 +6,7 @@ export default {
   'menu.single': 'Single Player',
   'menu.multi': 'Multiplayer',
   'menu.editor': 'Map Editor',
+  'menu.labs': 'Model Labs',
   'menu.options': 'Options',
   'menu.bank': 'Bank: {bank} pts · best run: {best}',
   'menu.credit': 'Palace of Culture and Science model: kon.kp, CC BY 4.0 (simplified)',

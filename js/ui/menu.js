@@ -26,6 +26,7 @@ export function createMenu(root, { actions, ctx, progress }) {
       btn('menu.single', () => menu.go('single')),
       btn('menu.multi', () => menu.go('multi')),
       btn('menu.editor', actions.editor),
+      btn('menu.labs', () => location.assign('labs.html')),   // the model labs are separate pages
       btn('menu.options', () => menu.go('options'))),
     bankLine(),
     h('p', { class: 'foot' }, 'v' + VERSION, ' · ', tx('menu.credit')));

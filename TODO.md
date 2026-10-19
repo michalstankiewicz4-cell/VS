@@ -20,7 +20,7 @@ Legend: **P1** next, **P2** later, **P3** ideas. State as of v0.22.3. Context: [
 - [ ] P2 Cars: damage/fuel, headlights at night, engine sound, car–car collisions, dashboard gauges
 
 ## Look
-- [ ] P2 Model labs: Player, Zombies, Vehicles, Base (barricade, bunkers), Buildings (`labs.html` has dimmed tiles); lab menu button in the game (Dev?)
+- [ ] P2 Model labs: Player, Zombies, Vehicles, Base (barricade, bunkers), Buildings (`labs.html` has dimmed tiles)
 - [ ] P2 Palace: close-up details (clock, arcades), proportion fixes against the model
 - [ ] P2 Destruction/ruins of buildings, fire, smoke
 - [ ] P2 Cockpit view: proper car interior (hide the bonnet box, dashboard gauges)
