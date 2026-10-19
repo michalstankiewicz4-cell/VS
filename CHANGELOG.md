@@ -4,6 +4,10 @@ Versioning: `MAJOR.MINOR.PATCH`. Every push to the repository is a new version (
 The owner creates `vX.Y.Z` tags in GitHub Releases on commits from this history; pushing tags from a Claude session is blocked.
 Bug fix = PATCH, new feature = MINOR, big change to gameplay or the save format = MAJOR.
 
+## [0.22.12] - 2026-10-19
+### Fixed
+- Standing right next to a wall no longer lights it with a blinding orange hotspot: the player's torch falloff is now capped at close range.
+
 ## [0.22.11] - 2026-10-19
 ### Fixed
 - The see-through hole around the player no longer opens where nothing hides him: standing in front of or beside a building (for the current camera angle) leaves its wall and roof solid. Each frame the game checks which buildings the line from the player towards the camera really passes through and only those are faded. The hole also follows the size of the person (or of the car while driving) instead of being sized for a full-size character.

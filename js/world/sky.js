@@ -6,6 +6,10 @@ const CYCLE = DAY_LEN * 2;
 const T0 = 40;                               // runs start in daylight
 const TRANSITION = 0.2;                      // half-width of the dusk/dawn blend (sine units, about 40 s total)
 
+// The torch is a point light a few units above the player: right next to a wall the 1/d² falloff made a blinding orange hotspot.
+// Floor the falloff at 2.5 units so the light stays soft up close (the only point light in the game).
+THREE.ShaderChunk.lights_pars_begin = THREE.ShaderChunk.lights_pars_begin.replace('max( pow( lightDistance, decayExponent ), 0.01 )', 'max( pow( lightDistance, decayExponent ), 6.25 )');
+
 export function createSky({ scene }) {
   scene.background = new THREE.Color(0x07040b);
   scene.fog = new THREE.Fog(0x07040b, 20, 46);
