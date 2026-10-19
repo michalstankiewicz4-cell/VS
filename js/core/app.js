@@ -140,6 +140,7 @@ export function createApp({ appEl, uiEl }) {
     else if (act === 'reload' && mode === 'play') world.reload();
     else if (act === 'weapon' && mode === 'play') world.toggleWeapon();
     else if (act === 'useGrenade' && mode === 'play') world.throwGrenade(groundAt(0.9));
+    else if (act === 'buildRotate' && mode === 'build') builder.rotate();
     else if (act === 'editRotate' && mode === 'edit') editor.rotate();
     else if (act === 'editTopView' && mode === 'edit') editor.toggleTop();
   };

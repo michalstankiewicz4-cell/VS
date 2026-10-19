@@ -61,6 +61,7 @@ export default {
   'act.camRight': 'Obrót kamery w prawo',
   'act.interact': 'Wsiądź / wysiądź z auta',
   'act.cameraView': 'Widok kamery (w aucie)',
+  'act.buildRotate': 'Obróć barykadę (budowa bazy)',
   'act.editRotate': 'Obróć obiekt (edytor map)',
 
   'mouse.rot': 'Szybkość obrotu kamery',
@@ -137,7 +138,8 @@ export default {
   'build.remove': 'Usuń',
   'build.play': 'Zagraj',
   'build.info.tower': 'Stanowisko CKM: samo strzela do zombie.',
-  'build.info.wall': 'Barykada: blokuje zombie i pociski.',
+  'build.info.wall': 'Barykada: blokuje zombie i pociski. Przytrzymaj przycisk i przeciągnij, by zbudować całą linię; sąsiednie elementy łączą się i skręcają same. {key} obraca pojedynczy element.',
+  'build.rotate': 'Obróć ({key})',
   'build.info.crypt': 'Schron: +25 maks. HP w kolejnych rundach (max 3).',
   'build.info.remove': 'Usuń: zwraca połowę kosztu.',
 

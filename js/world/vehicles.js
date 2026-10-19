@@ -2,7 +2,7 @@
 import * as THREE from '../../vendor/three.module.js';
 import { clamp } from '../core/util.js';
 import { EDGE, SIZE_DEFAULT } from './constants.js';
-import { carParts, partColor, DEFAULTS as CAR_DEFAULTS } from '../carkit/carkit.js';
+import { carParts, partColor, shapeGeo, DEFAULTS as CAR_DEFAULTS } from '../carkit/carkit.js';
 
 const VMAX = 64;
 // The car's boxes come from CarKit (tuned in labs/car.html): [dx (side, + = left), dy, dz (forward), sx, sy, sz, kind].
@@ -12,13 +12,10 @@ const CAR = { max: 15, rev: 6, acc: 14, racc: 9, brake: 28, coast: 4, turn: 1.9 
 export const SEAT = MODEL.seat;
 
 export function createVehicles({ scene, dummy, col, S, player }) {
-  // Three instanced meshes: the box parts, the round wheels (cylinders along x) and the roof slabs, each with one colour per part.
+  // One instanced mesh per part shape (box, round wheel, roof, two wedges), each with one colour per part.
   const lam = new THREE.MeshLambertMaterial({ color: 0xffffff });
-  const groups = [
-    { parts: PARTS.filter((p) => !p[7]), mesh: new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), lam, VMAX * PARTS.length) },
-    { parts: PARTS.filter((p) => p[7] === 1), mesh: new THREE.InstancedMesh(new THREE.CylinderGeometry(0.5, 0.5, 1, 14).rotateZ(Math.PI / 2), lam, VMAX * PARTS.length) },
-    { parts: PARTS.filter((p) => p[7] === 2), mesh: new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), lam, VMAX * PARTS.length) },   // the roof
-  ];
+  const groups = [0, 1, 2, 3, 4].map((shape) => ({ shape, parts: PARTS.filter((p) => p[7] === shape) })).filter((g) => g.parts.length)
+    .map((g) => ({ ...g, mesh: new THREE.InstancedMesh(shapeGeo(g.shape), lam, VMAX * g.parts.length) }));
   for (const g of groups) { g.mesh.castShadow = g.mesh.receiveShadow = true; g.mesh.frustumCulled = false; g.mesh.count = 0; scene.add(g.mesh); }
   const list = [];
   const cc = new THREE.Color();
@@ -129,7 +126,7 @@ export function createVehicles({ scene, dummy, col, S, player }) {
     setScale(k) { sc = k; for (const v of list) { if (v !== driving) park(v); place(v); } },
     get scale() { return sc; }, reach,
     list, clear, spawn, finish, nearest, toggle, exit, step, runsOver,
-    setRoof: (on) => { groups[2].mesh.visible = on; },   // hidden in the cockpit view
+    setRoof: (on) => { for (const g of groups) if (g.shape === 2) g.mesh.visible = on; },   // hidden in the cockpit view
     get driving() { return driving; },
   };
 }

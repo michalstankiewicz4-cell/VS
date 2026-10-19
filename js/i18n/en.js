@@ -88,6 +88,7 @@ export default {
   'act.useBandage': 'Use a bandage (restores health)',
   'act.useWater': 'Drink water (restores thirst)',
   'inv.close': '{key}: close',
+  'act.buildRotate': 'Rotate barricade (base builder)',
   'act.editRotate': 'Rotate object (map editor)',
 
   'mouse.rot': 'Camera rotation speed',
@@ -137,7 +138,8 @@ export default {
   'build.remove': 'Remove',
   'build.play': 'Play',
   'build.info.tower': 'Machine-gun nest: shoots zombies on its own.',
-  'build.info.wall': 'Barricade: blocks zombies and bullets.',
+  'build.info.wall': 'Barricade: blocks zombies and bullets. Hold the button and drag to build a whole line; neighbouring pieces join and turn corners on their own. {key} rotates a single piece.',
+  'build.rotate': 'Rotate ({key})',
   'build.info.crypt': 'Bunker: +25 max HP in later runs (max 3).',
   'build.info.remove': 'Remove: refunds half the cost.',
 

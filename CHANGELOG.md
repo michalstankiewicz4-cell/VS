@@ -4,6 +4,12 @@ Versioning: `MAJOR.MINOR.PATCH`. Every push to the repository is a new version (
 The owner creates `vX.Y.Z` tags in GitHub Releases on commits from this history; pushing tags from a Claude session is blocked.
 Bug fix = PATCH, new feature = MINOR, big change to gameplay or the save format = MAJOR.
 
+## [0.30.0] - 2026-10-19
+### Added
+- Base builder: barricades can be dragged out as a whole line (hold the button and move; each piece costs 8 and the drag stops when the bank runs out). Neighbouring pieces join by themselves (corners, T-junctions, crossings, end pieces), and a single piece can be rotated with R (key `buildRotate`, also a button). The ghost shows the piece's direction. Saves keep each barricade's rotation (`r`).
+### Changed
+- Car model (CarKit) is much more detailed: sloped windshield and rear window (wedge shapes), a lower hood and trunk, chrome-framed headlights, door seams and handles, side skirts, fog lights, front plate, rim centre caps, mirror stalks. New sliders: hood length, trunk length, window slope, door seams/handles/skirts toggle.
+
 ## [0.29.0] - 2026-10-19
 ### Added
 - Car lab (`labs/car.html`): sliders for body style (sedan/hatch/pickup/van), cabin, wheels, bumpers, grille, roof rack, spoiler, stripe, antenna, exhaust; paint preview and night headlights; presets, random, export/import JSON.

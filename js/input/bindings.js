@@ -19,6 +19,7 @@ export const ACTIONS = [
   { id: 'useGrenade', keys: ['Digit4', null], stat: null, modes: P },
   { id: 'toggleTorch', keys: ['KeyL', null], stat: null, modes: P },
   { id: 'inventory', keys: ['KeyI', null], stat: null, modes: P },
+  { id: 'buildRotate', keys: ['KeyR', null], stat: null, modes: ['build'] },
   { id: 'editRotate', keys: ['KeyR', null], stat: null, modes: E },
   { id: 'editTopView', keys: ['KeyT', null], stat: null, modes: E },
 ];
