@@ -156,7 +156,7 @@ export function createCity({ scene, dummy, col, vehicles, nightU }) {
   return {
     map, fade, rebuild,
     // See-through hole: finds the buildings that the ray from the player towards the camera (direction `up`, a unit vector)
-    // really passes through and hands their ids to the shader. Standing in front of or beside a building (even touching it) selects nothing; `eps` < 0 shrinks the boxes so a wall merely grazed at a corner does not count.
+    // really passes through and hands their ids to the shader. Standing in front of or beside a building (even touching it) selects nothing; `eps` is a margin that opens the hole slightly early when approaching from behind.
     updateFade(px, py, pz, up, eps) {
       const out = fade.occ.value; let n = 0;
       const hit = (cx, cy, cz, hx, hy, hz) => {
@@ -168,10 +168,14 @@ export function createCity({ scene, dummy, col, vehicles, nightU }) {
         }
         return true;
       };
+      // The real box counts always; the box inflated by `eps` counts too, but only while the player is outside it, so the hole opens a little
+      // before the player is actually hidden and never when he stands (even touching) in front of or beside a wall.
+      const near = (cx, cy, cz, hx, hy, hz) => hit(cx, cy, cz, hx, hy, hz)
+        || ((Math.abs(px - cx) > hx + eps || Math.abs(pz - cz) > hz + eps) && hit(cx, cy, cz, hx + eps, hy + eps, hz + eps));
       for (let i = 0; i < items.length && n < 12; i++) {
         const o = items[i];
-        if (o.t === 'b') { if (hit(o.x, (o.h + 0.6) / 2, o.z, Math.max(0.05, o.w / 2 + eps), Math.max(0.05, (o.h + 0.6) / 2 + eps), Math.max(0.05, o.d / 2 + eps))) out[n++] = i; }
-        else if (o.t === 'p') { for (const [qx, qz, w, d, y1, , , y0 = 0] of PALACE) if (hit(o.x + qx, (y0 + y1) / 2, o.z + qz, w / 2 + eps, (y1 - y0) / 2 + eps, d / 2 + eps)) { out[n++] = i; break; } }
+        if (o.t === 'b') { if (near(o.x, (o.h + 0.6) / 2, o.z, o.w / 2, (o.h + 0.6) / 2, o.d / 2)) out[n++] = i; }
+        else if (o.t === 'p') { for (const [qx, qz, w, d, y1, , , y0 = 0] of PALACE) if (near(o.x + qx, (y0 + y1) / 2, o.z + qz, w / 2, (y1 - y0) / 2, d / 2)) { out[n++] = i; break; } }
       }
       fade.occN.value = n;
     },

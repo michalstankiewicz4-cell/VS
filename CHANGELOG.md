@@ -4,6 +4,10 @@ Versioning: `MAJOR.MINOR.PATCH`. Every push to the repository is a new version (
 The owner creates `vX.Y.Z` tags in GitHub Releases on commits from this history; pushing tags from a Claude session is blocked.
 Bug fix = PATCH, new feature = MINOR, big change to gameplay or the save format = MAJOR.
 
+## [0.25.3] - 2026-10-19
+### Fixed
+- The see-through hole opens earlier when the player walks behind a building (a margin of about 0.6 units around it, scaled with size), while standing in front of or touching a wall still leaves it solid.
+
 ## [0.25.2] - 2026-10-19
 ### Changed
 - Day and night are now 3 minutes each (was 5); the run still starts in daylight at the same point of the day.
