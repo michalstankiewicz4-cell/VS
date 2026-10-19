@@ -29,7 +29,7 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
     inp.addEventListener('input', () => { out.textContent = fmt(+inp.value); fn(+inp.value); });
     return { el: h('label', { class: 'row' }, tx(key), inp, out), inp, out };
   };
-  const uW = uSlider('ed.u.width', 20, 400, 5, under.width, (v) => String(v), (v) => under.setWidth(v));
+  const uW = uSlider('ed.u.width', 20, 400, 1, under.width, (v) => String(v), (v) => under.setWidth(v));
   const uO = uSlider('ed.u.opacity', 0.1, 1, 0.05, 0.6, (v) => v.toFixed(2), (v) => under.setOpacity(v));
   const uR = uSlider('ed.u.rotate', -180, 180, 1, 0, (v) => v + '°', (v) => under.setRotation(v));
   const credit = h('p', { class: 'note' });
@@ -141,8 +141,8 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
     h('div', { class: 'btns' }, exportSet, importSet),
     jsonS);
   // Remember editor settings (tool, rotation, top view, sliders) between sessions; the underlay image itself is not saved.
-  const DEF = { sp: SIZE_DEFAULT, sv: SIZE_DEFAULT, se: SIZE_DEFAULT, w: 8, d: 8, h: 4, rw: 4, rl: 20, city: 1, uo: 0.6 };
-  const sliders = { sp: SP, sv: SV, se: SE, w: W, d: D, h: H, rw: RW, rl: RL, city: uCity, uo: uO };
+  const DEF = { sp: SIZE_DEFAULT, sv: SIZE_DEFAULT, se: SIZE_DEFAULT, w: 8, d: 8, h: 4, rw: 4, rl: 20, city: 1, uo: 0.6, uw: under.width, ur: 0 };
+  const sliders = { sp: SP, sv: SV, se: SE, w: W, d: D, h: H, rw: RW, rl: RL, city: uCity, uo: uO, uw: uW, ur: uR };   // underlay width / rotation too (the image itself is never saved)
   const clampN = (v, s) => Math.min(+s.inp.max, Math.max(+s.inp.min, +v));
   // Apply a settings object (from storage or an import); live = the editor is open, so the city opacity applies at once.
   function applySettings(sv, live) {

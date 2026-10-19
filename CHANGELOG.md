@@ -4,6 +4,10 @@ Versioning: `MAJOR.MINOR.PATCH`. Every push to the repository is a new version (
 The owner creates `vX.Y.Z` tags in GitHub Releases on commits from this history; pushing tags from a Claude session is blocked.
 Bug fix = PATCH, new feature = MINOR, big change to gameplay or the save format = MAJOR.
 
+## [0.22.2] - 2026-10-19
+### Changed
+- Map editor settings (remembered between sessions and in "Export settings" / "Import settings") now also include the **underlay width and rotation**, so after setting them up they stay until you change or remove them. The underlay image itself is still never saved (load it again). The width slider now moves in steps of 1.
+
 ## [0.22.1] - 2026-10-19
 ### Fixed
 - Roofs: coplanar surfaces that z-fought (the Palace cornice tops vs. the roofs they sit on, the small cap on the clock tower, the collapsed-roof boxes vs. building tops) are separated by a hair, and the shadow light got a `normalBias` against shadow-map acne on flat tops.
