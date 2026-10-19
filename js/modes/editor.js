@@ -108,7 +108,7 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
   });
   const defaultMapBtn = btn('ed.default', () => { moving = null; world.map.reset(); saveMap(); note = t('ed.restored'); refresh(); });
   const resetBtn = btn('ed.resetSettings', () => {
-    tool = 'b'; rot = 0; top = false;
+    tool = 'b'; rot = 0; top = DEF.top;
     for (const [k, s] of Object.entries(sliders)) { s.inp.value = DEF[k]; s.inp.dispatchEvent(new Event('input')); }
     world.setCityOpacity(1); note = t('ed.settingsReset'); refresh();
   });
@@ -139,7 +139,7 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
     h('div', { class: 'btns' }, exportSet, importSet),
     jsonS);
   // Remember editor settings (tool, rotation, top view, sliders) between sessions; the underlay image itself is not saved.
-  const DEF = { sp: SIZE_DEFAULT, sv: SIZE_DEFAULT, se: SIZE_DEFAULT, w: 8, d: 8, h: 4, rw: 4, rl: 20, city: 1, uo: 0.6, uw: under.width, ur: 0 };
+  const DEF = { sp: SIZE_DEFAULT, sv: SIZE_DEFAULT, se: SIZE_DEFAULT, w: 8, d: 8, h: 4, rw: 4, rl: 20, city: 1, uo: 1, uw: 223, ur: -110, top: true };   // defaults: the owner's tuned editor setup (top view, underlay 223 wide, rotated -110°)
   const sliders = { sp: SP, sv: SV, se: SE, w: W, d: D, h: H, rw: RW, rl: RL, city: uCity, uo: uO, uw: uW, ur: uR };   // underlay width / rotation too (the image itself is never saved)
   const clampN = (v, s) => Math.min(+s.inp.max, Math.max(+s.inp.min, +v));
   // Apply a settings object (from storage or an import); live = the editor is open, so the city opacity applies at once.
@@ -156,6 +156,7 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
       else s.inp.dispatchEvent(new Event('input'));
     }
   }
+  applySettings({ ver: 2, tool: 'b', rot: 0, ...DEF }, false);   // defaults first, then whatever was saved
   applySettings(read(KEYS.editor), false);
   const settingsObj = () => { const o = { ver: 2, tool, rot, top }; for (const [k, s] of Object.entries(sliders)) o[k] = +s.inp.value; return o; };
   let saved = '';
