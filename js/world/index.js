@@ -58,7 +58,7 @@ export function createWorld(scene) {
     sky.apply(S.night);
     const p = player.state.pos;
     if (S.mode === 'menu') { player.animate(false, t); sky.follow(p.x, p.z, t, 0, false); terrain.follow(p.x, p.z); return; }
-    if (S.mode !== 'play') { sky.follow(p.x, p.z, t, S.night, false); terrain.follow(p.x, p.z); return; }
+    if (S.mode !== 'play') { sky.follow(p.x, p.z, t, S.night, false, S.mode === 'dead' ? S.time : null); terrain.follow(p.x, p.z); return; }
     S.time += dt;
     const { mv, aim, firing, drv } = inp;
 
@@ -81,7 +81,7 @@ export function createWorld(scene) {
     // weapons (on foot only; a reload keeps running in the car, but nothing fires)
     weapons.step(dt, p, vehicles.driving ? null : aim, firing);
 
-    sky.follow(p.x, p.z, t, S.night, S.torch);
+    sky.follow(p.x, p.z, t, S.night, S.torch, S.time);
     terrain.follow(p.x, p.z);
 
     const { touching, car } = enemies.update(dt, t);

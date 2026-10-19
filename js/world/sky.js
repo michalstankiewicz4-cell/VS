@@ -44,18 +44,30 @@ export function createSky({ scene }) {
   function apply(n) {
     scene.background.copy(k.bgD).lerp(k.bgN, n);
     scene.fog.color.copy(scene.background);
-    scene.fog.far = 74 - 28 * n; scene.fog.near = 30 - 10 * n;
+    scene.fog.far = 74 - 34 * n; scene.fog.near = 30 - 12 * n;
     hemi.color.copy(k.hsD).lerp(k.hsN, n); hemi.groundColor.copy(k.hgD).lerp(k.hgN, n);
-    hemi.intensity = 3.0 - 1.7 * n;
-    moon.color.copy(k.dlD).lerp(k.dlN, n); moon.intensity = 2.8 - 1.2 * n;
+    hemi.intensity = 3.0 - 2.4 * n;                                   // nights are dark: the torch and the moon do the work
+    moon.color.copy(k.dlD).lerp(k.dlN, n); moon.intensity = 2.8 - 2.0 * n;
     nightU.value = n;
   }
-  // Moves the shadow-casting light and the torch with the player.
-  function follow(px, pz, t, n, torchOn) {
+  const warm = new THREE.Color(0xff9a55);
+  const ORBIT = 22;                                                     // distance of the shadow-casting light from the player (the shadow camera is tuned for it)
+  // Moves the shadow-casting light along its arc: the sun by day, the moon by night. `time` is the run clock (null = a fixed late-morning sun).
+  function orbit(px, pz, time, n) {
+    const p = time == null ? 0.2 : (((time + T0) / CYCLE) % 1 + 1) % 1;
+    const q = (p % 0.5) * 2;                                            // 0..1 across the sky: rises in the east, sets in the west
+    const el = 0.3 + 0.9 * Math.sin(Math.PI * q);                       // elevation in radians: low (long shadows) at the horizon, high at noon
+    const hx = -Math.cos(Math.PI * q), hz = 0.6, hl = Math.hypot(hx, hz);
+    moon.position.set(px + hx / hl * Math.cos(el) * ORBIT, Math.sin(el) * ORBIT, pz + hz / hl * Math.cos(el) * ORBIT);
+    moon.intensity *= 0.55 + 0.45 * Math.sin(Math.PI * q);              // dimmer near the horizon
+    moon.color.lerp(warm, (1 - Math.sin(Math.PI * q)) * 0.6 * (1 - n)); // warm light at sunrise and sunset
+  }
+  // Moves the shadow-casting light (sun / moon) and the torch with the player.
+  function follow(px, pz, t, n, torchOn, time = null) {
     torch.position.set(px, 2.6, pz);
     torch.intensity = torchOn ? (30 + Math.sin(t * 13) * 3 + Math.sin(t * 7.3) * 2) * (0.15 + 0.85 * n) : 0;
-    moon.position.set(px - 10 + 8 * n, 18, pz + 8 - 4 * n);
     moon.target.position.set(px, 0, pz);
+    orbit(px, pz, time, n);
   }
   return { nightU, nightAt, dayPart, apply, follow };
 }
