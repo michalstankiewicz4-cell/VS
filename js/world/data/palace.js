@@ -24,9 +24,9 @@ out.push([CX, CZ, 0.34, 0.34, 34.5, 0, 0, 32.6], [CX, CZ, 0.24, 0.24, 37.5, 0, 0
 for (const [x, z, w, d, y1, , k, y0] of MAIN) {
   if (k === 5 || (y0 || 0) > 0 && k !== 5) continue;
   const t = k === 3 ? 0.4 : 0.3;
-  out.push([x, z, w + t * 1.2, d + t * 1.2, y1, 0, 0, y1 - t]);
+  out.push([x, z, w + t * 1.2, d + t * 1.2, y1 + 0.03, 0, 0, y1 - t]);   // 0.03 above the roof: a coplanar top would z-fight with it
 }
-out.push([CX, CZ, 2.3, 2.3, 30.6, 0, 0, 30.3]);
+out.push([CX, CZ, 2.3, 2.3, 30.63, 0, 0, 30.3]);   // slightly above the clock-tower top (30.6) to avoid z-fighting
 // pinnacles on the main storey and battlements on the towers
 const ring = (x, z, w, d, y, s, h, n) => {
   for (let i = 0; i <= n; i++) {

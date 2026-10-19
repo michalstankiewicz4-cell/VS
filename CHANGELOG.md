@@ -4,6 +4,10 @@ Versioning: `MAJOR.MINOR.PATCH`. Every push to the repository is a new version (
 The owner creates `vX.Y.Z` tags in GitHub Releases on commits from this history; pushing tags from a Claude session is blocked.
 Bug fix = PATCH, new feature = MINOR, big change to gameplay or the save format = MAJOR.
 
+## [0.22.1] - 2026-10-19
+### Fixed
+- Roofs: coplanar surfaces that z-fought (the Palace cornice tops vs. the roofs they sit on, the small cap on the clock tower, the collapsed-roof boxes vs. building tops) are separated by a hair, and the shadow light got a `normalBias` against shadow-map acne on flat tops.
+
 ## [0.22.0] - 2026-10-19
 ### Changed
 - **People, vehicles and zombies are now half size by default** (`SIZE_DEFAULT = 0.5` in `js/world/constants.js`; the editor sliders start at 0.5, and sizes saved by older versions are ignored once).

@@ -16,6 +16,7 @@ export function createSky({ scene }) {
   moon.shadow.mapSize.set(1024, 1024);
   Object.assign(moon.shadow.camera, { left: -16, right: 16, top: 16, bottom: -16, near: 1, far: 60 });
   moon.shadow.bias = -0.0008;
+  moon.shadow.normalBias = 0.04;   // flat roofs: avoids shadow-map acne (stripes / dither on lit tops)
   scene.add(moon, moon.target);
   const torch = new THREE.PointLight(0xff8a44, 30, 16, 2);       // the player's flashlight/torch
   scene.add(torch);

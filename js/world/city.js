@@ -61,7 +61,7 @@ export function createCity({ scene, dummy, col, vehicles, nightU }) {
         add(i, o.x, h / 2, o.z, w, h, d, 0, hue, 0.1, li);
         add(i, o.x, h * 0.55, o.z + d * 0.51, w * 0.7, h * 0.5, 0.15, 0, 0, 0, 0.05);   // dark broken windows
         const roof = r() < 0.6, ax = (r() - 0.5) * w * 0.4, az = (r() - 0.5) * d * 0.4, ry = r() * 3;
-        if (roof) add(i, o.x + ax, h + 0.3, o.z + az, w * 0.5, 0.6, d * 0.5, ry, hue, 0.08, li * 0.8);   // collapsed roof
+        if (roof) add(i, o.x + ax, h + 0.28, o.z + az, w * 0.5, 0.6, d * 0.5, ry, hue, 0.08, li * 0.8);   // collapsed roof
       } else if (o.t === 'r') {   // road: flat asphalt slab with a centre line; no collision
         const b = bounds(o), L = o.d * 0.96;
         add(i, o.x, 0.04, o.z, b.hw * 2, 0.08, b.hd * 2, 0, 0.66, 0.06, 0.09);
