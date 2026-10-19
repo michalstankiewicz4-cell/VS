@@ -15,6 +15,7 @@ Project: browser game "Capital Quarantine" (three.js, pixel-art filter). **Start
 ## Practice
 - The remote `main` may be ahead (workflow changes): `git pull --rebase origin main`.
 - The "unpushed commit" hook can be a false positive when the local `origin/main` is stale: `git fetch origin +refs/heads/main:refs/remotes/origin/main` and compare `git rev-parse HEAD origin/main`.
-- Keep `docs/HANDOFF.md` (State + Decision log), `CHANGELOG.md`, `TODO.md` and the README/ARCHITECTURE sections in step with the code whenever a feature changes.
+- Keep `docs/HANDOFF.md` (State + Decision log), `CHANGELOG.md`, `TODO.md` and the README/ARCHITECTURE sections in step with the code whenever the *behaviour* of a feature changes; a small fix needs only the version bump and the `CHANGELOG.md` entry. `HANDOFF.md` keeps only the current version number (history lives in the changelog).
+- Several small requests may be released together as one version.
 - Security-sensitive changes (CSP, network access, storage of data) need the owner's explicit approval; if a change is blocked, stop and ask — do not work around it.
 - Headless tests: see "Testing" in `docs/ARCHITECTURE.md` (Playwright + SwiftShader).

@@ -4,6 +4,10 @@ Versioning: `MAJOR.MINOR.PATCH`. Every push to the repository is a new version (
 The owner creates `vX.Y.Z` tags in GitHub Releases on commits from this history; pushing tags from a Claude session is blocked.
 Bug fix = PATCH, new feature = MINOR, big change to gameplay or the save format = MAJOR.
 
+## [0.27.1] - 2026-10-19
+### Changed
+- Docs only: `docs/HANDOFF.md` no longer repeats the version history (the changelog has it); `CLAUDE.md` says small fixes need only the version bump and a changelog entry.
+
 ## [0.27.0] - 2026-10-19
 ### Added
 - Moving sun and moon: the shadow-casting light travels along an arc through the day (rises in the east, high at noon, sets in the west; the moon takes over at night), so shadows turn and shorten/lengthen with the time of day. The light is warmer and dimmer near the horizon.
