@@ -4,6 +4,10 @@ Versioning: `MAJOR.MINOR.PATCH`. Every push to the repository is a new version (
 The owner creates `vX.Y.Z` tags in GitHub Releases on commits from this history; pushing tags from a Claude session is blocked.
 Bug fix = PATCH, new feature = MINOR, big change to gameplay or the save format = MAJOR.
 
+## [0.21.2] - 2026-10-19
+### Changed
+- Map editor menu split in two panels. **Right** (`#edr`): everything placed on the map — tools (Select, Building, Car, Road, Palace, Remove, Rotate, Top view), object size sliders, map Export / Import / Default map. **Left** (`#ed`): the rest — Size of things, Map underlay (reference image), Play, Reset settings, settings Export / Import.
+
 ## [0.21.1] - 2026-10-19
 ### Changed
 - The game version is now shown next to the title on the main menu (it is still in the footer too).

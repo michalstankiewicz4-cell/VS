@@ -7,19 +7,21 @@
 #run{margin-top:4px;color:#e8d8e0;text-shadow:0 0 3px #000;white-space:pre}
 #hint{position:fixed;left:10px;bottom:8px;z-index:2;color:#8f8396;text-shadow:0 0 3px #000;pointer-events:none;font-size:11px}
 #fps{position:fixed;left:10px;top:10px;z-index:6;color:#e8a0b0;text-shadow:0 0 3px #000;pointer-events:none}
-#build,#ed{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:2;background:rgba(8,5,12,.82);border:1px solid #3a2740;padding:10px 14px;text-align:center}
+#build,#ed,#edr{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:2;background:rgba(8,5,12,.82);border:1px solid #3a2740;padding:10px 14px;text-align:center}
 #build{left:auto;right:12px;top:12px;bottom:auto;transform:none;width:min(280px,calc(100vw - 24px));box-sizing:border-box;text-align:left}
 #build .btns{flex-direction:column;align-items:stretch;margin-top:6px}
 #build .btns button{text-align:left}
 #bank{color:#e8d8a0;margin-bottom:4px}
-#ed{left:12px;right:auto;top:12px;bottom:auto;transform:none;width:min(320px,calc(100vw - 24px));box-sizing:border-box}
-#ed .tools{flex-direction:column;align-items:stretch;margin-top:0}
-#ed .tools button{text-align:left}
-#ed .row{display:grid;grid-template-columns:90px 1fr 34px;gap:6px;align-items:center;margin:4px 0;text-align:left}
-#ed .row span:last-child{text-align:right;color:#8f8396}
-#ed textarea{width:100%;box-sizing:border-box;background:#120b18;color:#d9cfd6;border:1px solid #4a2d52;font:11px ui-monospace,Consolas,monospace;margin-top:6px}
+#ed,#edr{top:12px;bottom:auto;transform:none;width:min(300px,calc(46vw - 18px));box-sizing:border-box}
+#ed{left:12px;right:auto}
+#edr{left:auto;right:12px}
+#ed .tools,#edr .tools{flex-direction:column;align-items:stretch;margin-top:0}
+#ed .tools button,#edr .tools button{text-align:left}
+#ed .row,#edr .row{display:grid;grid-template-columns:90px 1fr 34px;gap:6px;align-items:center;margin:4px 0;text-align:left}
+#ed .row span:last-child,#edr .row span:last-child{text-align:right;color:#8f8396}
+#ed textarea,#edr textarea{width:100%;box-sizing:border-box;background:#120b18;color:#d9cfd6;border:1px solid #4a2d52;font:11px ui-monospace,Consolas,monospace;margin-top:6px}
 #edbar{position:fixed;z-index:3;display:flex;flex-direction:column;gap:4px;padding:6px;background:rgba(8,5,12,.9);border:1px solid #3a2740}
 #edbar button{padding:4px 10px;text-align:left}
-#ed details.under{margin:6px 0;text-align:left}
-#ed details.under summary{cursor:pointer;color:#c9b5d6}
-#ed{max-height:calc(100vh - 24px);overflow:auto}
+#ed details.under,#edr details.under{margin:6px 0;text-align:left}
+#ed details.under summary,#edr details.under summary{cursor:pointer;color:#c9b5d6}
+#ed,#edr{max-height:calc(100vh - 24px);overflow:auto}

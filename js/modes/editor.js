@@ -91,49 +91,54 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
   const topBtn = h('button', { type: 'button', on: { click: () => { top = !top; refresh(); } } });
   const rotBtn = h('button', { type: 'button', on: { click: () => { rot ^= 1; refresh(); } } });
 
-  const panel = h('div', { id: 'ed', hidden: true },
+  // Right panel: everything placed on the map (tools, object sizes, map export/import). Left panel: the rest (sizes of things, underlay, settings).
+  const exportMap = btn('ed.export', async () => {
+    const txt = JSON.stringify(world.map.list());
+    json.hidden = false; json.value = txt;
+    let ok = false; try { await navigator.clipboard.writeText(txt); ok = true; } catch (e) { json.select(); }
+    note = t(ok ? 'ed.copied' : 'ed.selected'); refresh();
+  });
+  const importMap = btn('ed.import', () => {
+    cancelMove();
+    if (json.hidden) { json.hidden = false; json.value = ''; note = t('ed.pasteHint'); refresh(); return; }
+    try {
+      if (json.value.length > 300000) throw new Error('too large');
+      const n = world.map.set(JSON.parse(json.value));
+      saveMap(); note = t('ed.loaded', { n }); refresh();
+    } catch (e) { note = t('ed.badJson'); refresh(); }
+  });
+  const defaultMapBtn = btn('ed.default', () => { moving = null; world.map.reset(); saveMap(); note = t('ed.restored'); refresh(); });
+  const resetBtn = btn('ed.resetSettings', () => {
+    tool = 'b'; rot = 0; top = false;
+    for (const [k, s] of Object.entries(sliders)) { s.inp.value = DEF[k]; s.inp.dispatchEvent(new Event('input')); }
+    world.setCityOpacity(1); note = t('ed.settingsReset'); refresh();
+  });
+  // Editor settings (sliders, tool, view) travel separately from the map contents.
+  const exportSet = btn('ed.exportSet', async () => {
+    const txt = JSON.stringify(settingsObj());
+    jsonS.hidden = false; jsonS.value = txt;
+    let ok = false; try { await navigator.clipboard.writeText(txt); ok = true; } catch (e) { jsonS.select(); }
+    note = t(ok ? 'ed.copiedSet' : 'ed.selected'); refresh();
+  });
+  const importSet = btn('ed.importSet', () => {
+    if (jsonS.hidden) { jsonS.hidden = false; jsonS.value = ''; note = t('ed.pasteHintSet'); refresh(); return; }
+    try {
+      if (jsonS.value.length > 5000) throw new Error('too large');
+      const o = JSON.parse(jsonS.value);
+      if (!o || typeof o !== 'object' || Array.isArray(o)) throw new Error('bad');
+      applySettings(o, true); note = t('ed.setLoaded'); refresh();
+    } catch (e) { note = t('ed.badSet'); refresh(); }
+  });
+  const panelR = h('div', { id: 'edr', class: 'edpanel', hidden: true },
     h('div', { class: 'btns tools' }, mkTool('s', 'ed.select'), mkTool('b', 'ed.building'), mkTool('c', 'ed.car'), mkTool('r', 'ed.road'), mkTool('p', 'ed.palace'), mkTool('x', 'ed.remove'), rotBtn, topBtn, cancelBtn),
-    W.el, D.el, H.el, RW.el, RL.el, scaleBox, underBox,
-    h('div', { class: 'btns' }, btn('ed.play', onPlay),
-      btn('ed.resetSettings', () => {
-        tool = 'b'; rot = 0; top = false;
-        for (const [k, s] of Object.entries(sliders)) { s.inp.value = DEF[k]; s.inp.dispatchEvent(new Event('input')); }
-        world.setCityOpacity(1); note = t('ed.settingsReset'); refresh();
-      }),
-      btn('ed.default', () => { moving = null; world.map.reset(); saveMap(); note = t('ed.restored'); refresh(); }),
-      btn('ed.export', async () => {
-        const txt = JSON.stringify(world.map.list());
-        json.hidden = false; json.value = txt;
-        let ok = false; try { await navigator.clipboard.writeText(txt); ok = true; } catch (e) { json.select(); }
-        note = t(ok ? 'ed.copied' : 'ed.selected'); refresh();
-      }),
-      btn('ed.import', () => {
-        cancelMove();
-        if (json.hidden) { json.hidden = false; json.value = ''; note = t('ed.pasteHint'); refresh(); return; }
-        try {
-          if (json.value.length > 300000) throw new Error('too large');
-          const n = world.map.set(JSON.parse(json.value));
-          saveMap(); note = t('ed.loaded', { n }); refresh();
-        } catch (e) { note = t('ed.badJson'); refresh(); }
-      })),
-    // Editor settings (sliders, tool, view) travel separately from the map contents.
-    h('div', { class: 'btns' },
-      btn('ed.exportSet', async () => {
-        const txt = JSON.stringify(settingsObj());
-        jsonS.hidden = false; jsonS.value = txt;
-        let ok = false; try { await navigator.clipboard.writeText(txt); ok = true; } catch (e) { jsonS.select(); }
-        note = t(ok ? 'ed.copiedSet' : 'ed.selected'); refresh();
-      }),
-      btn('ed.importSet', () => {
-        if (jsonS.hidden) { jsonS.hidden = false; jsonS.value = ''; note = t('ed.pasteHintSet'); refresh(); return; }
-        try {
-          if (jsonS.value.length > 5000) throw new Error('too large');
-          const o = JSON.parse(jsonS.value);
-          if (!o || typeof o !== 'object' || Array.isArray(o)) throw new Error('bad');
-          applySettings(o, true); note = t('ed.setLoaded'); refresh();
-        } catch (e) { note = t('ed.badSet'); refresh(); }
-      })),
-    json, jsonS, info);
+    W.el, D.el, H.el, RW.el, RL.el,
+    h('div', { class: 'btns' }, exportMap, importMap, defaultMapBtn),
+    json, info);
+  const panel = h('div', { id: 'ed', class: 'edpanel', hidden: true },
+    scaleBox, underBox,
+    h('div', { class: 'btns' }, btn('ed.play', onPlay), resetBtn),
+    h('div', { class: 'btns' }, exportSet, importSet),
+    jsonS);
   // Remember editor settings (tool, rotation, top view, sliders) between sessions; the underlay image itself is not saved.
   const DEF = { sp: 1, sv: 1, se: 1, w: 8, d: 8, h: 4, rw: 4, rl: 20, city: 1, uo: 0.6 };
   const sliders = { sp: SP, sv: SV, se: SE, w: W, d: D, h: H, rw: RW, rl: RL, city: uCity, uo: uO };
@@ -158,8 +163,8 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
     const o = settingsObj();
     const j = JSON.stringify(o); if (j !== saved) { saved = j; write(KEYS.editor, o); }
   };
-  panel.addEventListener('input', persist);
-  root.append(panel, bar);
+  panel.addEventListener('input', persist); panelR.addEventListener('input', persist);
+  root.append(panel, panelR, bar);
 
   function refresh() {
     persist();
@@ -207,8 +212,8 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
     get top() { return active && top; },
     toggleTop() { if (active) { top = !top; refresh(); } },
     rotate() { if (!active) return; if (moving) moving.orig = { ...moving.orig, ...turn(moving.orig) }; else rot ^= 1; refresh(); },
-    open() { active = true; applyScales(); under.setVisible(true); world.setCityOpacity(+uCity.inp.value); panel.hidden = false; pan.set(0, 0, 44); note = ''; refresh(); },
-    close() { cancelMove(); active = false; bar.hidden = true; hot = -1; barFor = ''; world.setPreview(false, 0, 0); under.setVisible(false); world.setCityOpacity(1); panel.hidden = true; world.setGhostBox(false, 0, 0, 0, 1, 1, 1, false); },
+    open() { active = true; applyScales(); under.setVisible(true); world.setCityOpacity(+uCity.inp.value); panel.hidden = false; panelR.hidden = false; pan.set(0, 0, 44); note = ''; refresh(); },
+    close() { cancelMove(); active = false; bar.hidden = true; hot = -1; barFor = ''; world.setPreview(false, 0, 0); under.setVisible(false); world.setCityOpacity(1); panel.hidden = true; panelR.hidden = true; world.setGhostBox(false, 0, 0, 0, 1, 1, 1, false); },
     // mv: camera-relative pan vector; zoom: current user zoom (pans slower when zoomed in)
     update(dt, mv, zoom) {
       if (!active) return;
