@@ -16,7 +16,7 @@ Implemented (see `CHANGELOG.md` for details): shooting and points, bank paying f
 Not implemented: multiplayer (plan in `docs/MULTIPLAYER.md`), sound, more enemy types, AI/API (explicitly last).
 
 ## 3. State (update me)
-- Current version: **0.17.0**. Last change: graphics style switch (Options > Graphics): Pixel art (default) / Realistic / Comic / Watercolour (from the Battle repo, 858b4e0) / Noir VHS (new). Post-process only — materials are identical in every style. Previous: docs + this handoff (0.16.4–0.16.5), editor polish (0.16.x).
+- Current version: **0.17.1** (= the 0.16.5 code; 0.17.0 added a graphics style switch and 0.17.1 rolled it back — the game is **pixel art only**). Last feature work: map editor polish (0.16.x), docs + this handoff (0.16.4–0.16.5).
 - Recent history (newest first): 0.16.x editor polish (Select by click, dev reset, Palace/overlap rules, Select bar with Move/Rotate/Delete/resize), 0.15.x size sliders for people/vehicles/enemies + right-hand panel, 0.14.x online underlay (OSM/Esri, opt-in) + city opacity + road tool + top view + remembered settings, 0.13.0 local-file underlay, 0.12.x a bigger map with a "fold" effect that the owner **asked to revert** (0.12.1 = back to 0.11.0), 0.11.0 modular code + start screen + menus.
 - Verified only with mocked tiles: real OpenStreetMap / Esri tile loading (the sandbox has no access to those hosts; Esri CORS for canvas use is unverified).
 - Known limitations: size sliders are global per group (people / vehicles / enemies), collision radii of people and enemies are not scaled; the underlay image is not persisted; JSON import does not check overlaps (so old maps still load); in the dense default city roads are often blocked by buildings (delete buildings first); no undo/redo.
@@ -74,4 +74,4 @@ Tips: tile loading can only be tested with `page.route('https://tile.openstreetm
 | 2026-10-14 | Palace of Culture is a normal editor object (movable, deletable, one at a time); objects may not overlap. |
 | 2026-10-14 | Object selection in the editor is by click (not hover); tool options appear in a floating bar. |
 | 2026-10-14 | "Dev reset" button wipes all browser data after two clicks. |
-| 2026-10-19 | Graphics styles come from the Battle repo (858b4e0, same owner) but only as post-process filters; they switch live and the default stays pixel art. A fifth style, Noir (VHS), was added at the owner's request ("one of your own proposal"). |
+| 2026-10-19 | A graphics style switch (realistic / comic / watercolour from the Battle repo 858b4e0 + a new noir style) was built in 0.17.0 and **rolled back in 0.17.1 at the owner's request: pixel art only**. Do not re-add without asking; the implementation is in commit 2d04f4e. |

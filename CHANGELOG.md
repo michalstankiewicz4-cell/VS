@@ -4,6 +4,10 @@ Versioning: `MAJOR.MINOR.PATCH`. Every push to the repository is a new version (
 The owner creates `vX.Y.Z` tags in GitHub Releases on commits from this history; pushing tags from a Claude session is blocked.
 Bug fix = PATCH, new feature = MINOR, big change to gameplay or the save format = MAJOR.
 
+## [0.17.1] - 2026-10-19
+### Removed
+- The graphics style switch from 0.17.0 (realistic / comic / watercolour / noir) was rolled back at the owner's request: the game keeps only the pixel-art look. Code, options and docs are back to the 0.16.5 state (the 0.17.0 entry below stays as history; the Battle styles remain available in that repo and in commit 2d04f4e here).
+
 ## [0.17.0] - 2026-10-19
 ### Added
 - Graphics style switch in Options > Graphics (applies instantly, saved): **Pixel art** (default, the original look), **Realistic** (full resolution, bloom, ACES tone mapping, vignette, grain), **Comic (cel)** (ink outlines, posterised colours), **Watercolour** (Kuwahara filter, paper grain, ink edges) and **Noir (VHS)** (a new style: high-contrast monochrome, red kept, scanlines, grain). Real / comic / watercolour are ported from the Battle repo (commit 858b4e0) and adapted to work with the driving (perspective) cameras.

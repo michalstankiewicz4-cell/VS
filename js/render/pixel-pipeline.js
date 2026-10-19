@@ -80,7 +80,7 @@ export class PixelPipeline {
   resize(w, h) {
     const ph = Math.round(this.params.pixelH);
     const pw = Math.max(2, Math.round(ph * w / h));
-    this.release();
+    if (this.rt) { this.rt.dispose(); this.rt.depthTexture.dispose(); }
     const depth = new THREE.DepthTexture(pw, ph);
     depth.minFilter = depth.magFilter = THREE.NearestFilter;
     this.rt = new THREE.WebGLRenderTarget(pw, ph, {
@@ -90,12 +90,6 @@ export class PixelPipeline {
     this.mat.uniforms.tColor.value = this.rt.texture;
     this.mat.uniforms.tDepth.value = depth;
     this.mat.uniforms.texel.value.set(1 / pw, 1 / ph);
-  }
-
-  // Frees the render target when another style takes over (resize() allocates it again).
-  release() {
-    if (!this.rt) return;
-    this.rt.dispose(); this.rt.depthTexture.dispose(); this.rt = null;
   }
 
   render(scene, camera) {
