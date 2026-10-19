@@ -32,6 +32,7 @@ export function createWorld(scene) {
   const base = createStructures({ scene, col });
   base.setBlockTest((x, z) => city.map.blocksSquare(x, z, 1));
   city.map.extra = (b) => base.overlapsBox(b);
+  city.setStartCar(() => ({ ...base.carSpot(base.spawn()), th: 0 }));
 
   let saved = null;   // player position stashed while the editor size preview borrows the player model
   function reset(mode) {
@@ -40,7 +41,8 @@ export function createWorld(scene) {
     S.mode = mode;
     const live = mode === 'play' || mode === 'menu';
     city.setLive(live); city.rebuild();                         // cars back to their parking spots
-    player.state.pos.set(live ? START.x : 0, 0, live ? START.z : 0);
+    const sp = base.spawn();
+    player.state.pos.set(live ? sp.x : 0, 0, live ? sp.z : 0);
     player.state.face = 0; player.setVisible(live); player.animate(false, 0);
     S.maxHp = 100 + 25 * base.count('crypt'); S.hp = S.maxHp;
     S.kills = 0; S.pts = 0; S.time = 0; S.night = 0; S.fireCd = 0; S.active = 0; S.driving = false; S.speed = 0; S.carNear = false;
@@ -113,6 +115,7 @@ export function createWorld(scene) {
     },
     setMode: (m) => { S.mode = m; },
     toggleCar: vehicles.toggle,
+    spawn: base.spawn, hq: base.hq,
     place: base.place, remove: base.remove, canPlace: base.canPlace, list: base.list, load: base.load, count: base.count,
     setGhost: base.setGhost, setGhostBox: base.setGhostBox,
   };

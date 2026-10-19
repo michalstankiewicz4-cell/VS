@@ -21,6 +21,13 @@ function makeObj(type) {
     box(1.9, 0.9, 0.7, 0x6b6860, 0, 0.45, 0);
     box(1.9, 0.16, 0.72, 0xc8682a, 0, 0.78, 0);
     box(0.3, 1.2, 0.3, 0x4a4036, -0.8, 0.6, 0.4);
+  } else if (type === 'hq') {       // starting bunker: bigger, with an orange roof and a beacon
+    box(2.2, 1.3, 2.2, 0x3a4232, 0, 0.65, 0);
+    box(2.3, 0.2, 2.3, 0xc8682a, 0, 1.4, 0);
+    box(0.6, 0.9, 0.1, 0x151513, 0, 0.45, 1.11);
+    box(0.12, 1.2, 0.12, 0x2d3328, -0.8, 2.0, -0.8);
+    const lamp = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.28, 0.28), new THREE.MeshBasicMaterial({ color: 0xff7a30 }));
+    lamp.position.set(-0.8, 2.7, -0.8); grp.add(lamp);
   } else {                          // bunker
     box(1.8, 1.1, 1.8, 0x3a4232, 0, 0.55, 0);
     box(0.6, 0.8, 0.1, 0x151513, 0, 0.4, 0.91);
@@ -38,19 +45,40 @@ export function createStructures({ scene, col }) {
   let blockTest = () => false;       // set by the world: true when a city object is in the way
   const inMap = (gx, gz) => Math.abs(gx * CELL) <= EDGE - 1 && Math.abs(gz * CELL) <= EDGE - 1;
   const validCell = (type, gx, gz) => COST[type] !== undefined && Number.isInteger(gx) && Number.isInteger(gz) && inMap(gx, gz) && !structs.has(key(gx, gz));
-  const nearStart = (x, z) => Math.hypot(x - START.x, z - START.z) < 4 || Math.hypot(x - START_CAR.x, z - START_CAR.z) < 4;
-  const canPlace = (type, gx, gz) => validCell(type, gx, gz) && !nearStart(gx * CELL, gz * CELL) &&
-    !blockTest(gx * CELL, gz * CELL) && (type !== 'crypt' || count('crypt') < CRYPT_MAX);
-  // Does any structure overlap this footprint ({x,z,hw,hd})? Used by the map editor.
-  const overlapsBox = (b) => { for (const v of structs.values()) if (Math.abs(v.gx * CELL - b.x) < b.hw + 1 && Math.abs(v.gz * CELL - b.z) < b.hd + 1) return true; return false; };
+  // Spawn point: in front of the starting bunker ('hq') when one is built, else the default start. The start car stands 3 units to the side.
+  const hqOf = () => { for (const v of structs.values()) if (v.type === 'hq') return v; return null; };
+  const spawnOf = (gx, gz) => ({ x: gx * CELL, z: gz * CELL + 2.8 });
+  const spawn = () => { const q = hqOf(); return q ? spawnOf(q.gx, q.gz) : { x: START.x, z: START.z }; };
+  const carSpot = (s) => (s.x === START.x && s.z === START.z ? START_CAR : { x: s.x + 3, z: s.z });
+  const nearStart = (x, z) => { const s = spawn(), c = carSpot(s); return Math.hypot(x - s.x, z - s.z) < 4 || Math.hypot(x - c.x, z - c.z) < 4; };
+  const canPlace = (type, gx, gz) => {
+    if (!validCell(type, gx, gz) || blockTest(gx * CELL, gz * CELL)) return false;
+    if (type === 'hq') {      // its spawn spot and car spot must be on the map and free of city objects
+      const s = spawnOf(gx, gz);
+      return Math.abs(s.x + 3) <= EDGE - 1 && Math.abs(s.z) <= EDGE - 1 && !blockTest(s.x, s.z) && !blockTest(s.x + 3, s.z);
+    }
+    return !nearStart(gx * CELL, gz * CELL) && (type !== 'crypt' || count('crypt') < CRYPT_MAX);
+  };
+  // Does any structure (or the reserved spawn / car spot of the starting bunker) overlap this footprint ({x,z,hw,hd})? Used by the map editor.
+  const overlapsBox = (b) => {
+    for (const v of structs.values()) if (Math.abs(v.gx * CELL - b.x) < b.hw + 1 && Math.abs(v.gz * CELL - b.z) < b.hd + 1) return true;
+    if (hqOf()) { const s = spawn(); if (Math.abs(s.x - b.x) < b.hw + 1.2 && Math.abs(s.z - b.z) < b.hd + 1.2) return true; if (Math.abs(s.x + 3 - b.x) < b.hw + 1.2 && Math.abs(s.z - b.z) < b.hd + 2.2) return true; }
+    return false;
+  };
 
   // force: used when loading a save (the map may have changed since); only the basic validity is checked.
   function place(type, gx, gz, force = false) {
+    if (type === 'hq' && hqOf()) {   // only one starting bunker: placing it again moves it (the old one stays if the new spot is refused)
+      const old = hqOf(), og = { gx: old.gx, gz: old.gz };
+      remove(og.gx, og.gz);
+      if (place(type, gx, gz, force)) return true;
+      place(type, og.gx, og.gz, true); return false;
+    }
     if (force ? !validCell(type, gx, gz) : !canPlace(type, gx, gz)) return false;
     const { grp, head } = makeObj(type), x = gx * CELL, z = gz * CELL;
     grp.position.set(x, 0, z);
     scene.add(grp);
-    const blk = { x, z, r: type === 'tower' ? 0.8 : type === 'wall' ? 0.9 : 1.0 };
+    const blk = { x, z, r: type === 'tower' ? 0.8 : type === 'wall' ? 0.9 : type === 'hq' ? 1.2 : 1.0 };
     col.blockers.push(blk);
     structs.set(key(gx, gz), { type, gx, gz, grp, head, blk, cd: 0 });
     return true;
@@ -102,5 +130,5 @@ export function createStructures({ scene, col }) {
       if (v.cd <= 0) { shoot(tx + dx / l, tz + dz / l, dx / l, dz / l); v.cd = 0.75; }
     }
   }
-  return { place, remove, canPlace, overlapsBox, setBlockTest: (fn) => { blockTest = fn; }, list, load, count, setGhost, setGhostBox, updateTowers };
+  return { place, remove, canPlace, overlapsBox, spawn, carSpot, hq: () => { const q = hqOf(); return q ? { gx: q.gx, gz: q.gz } : null; }, setBlockTest: (fn) => { blockTest = fn; }, list, load, count, setGhost, setGhostBox, updateTowers };
 }

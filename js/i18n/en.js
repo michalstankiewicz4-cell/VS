@@ -97,6 +97,8 @@ export default {
   'hud.hint': 'Move: {move} · fire: {fire} · camera: {cam} or {drag}-drag · zoom: wheel · {interact}: car · Esc: pause',
 
   'build.pan': 'Move the view with the movement keys; you can build anywhere on the map.',
+  'build.hq': 'Spawn bunker (free)',
+  'build.info.hq': 'Starting bunker: runs begin here and, after a death, the camera returns here. Only one — placing it again moves it. Free.',
   'build.bank': 'Bank: {bank} pts · bunkers: {n}/3',
   'build.tower': 'Sentry gun (25)',
   'build.wall': 'Barricade (8)',

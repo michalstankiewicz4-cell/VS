@@ -8,7 +8,7 @@ export const RANGE = 40;           // radius in which rubble wraps around the pl
 export const PN = 96;              // bullet pool size
 export const CELL = 2;             // base-building grid size
 
-export const COST = { tower: 25, wall: 8, crypt: 40 };
+export const COST = { tower: 25, wall: 8, crypt: 40, hq: 0 };   // hq = the free starting bunker (spawn point)
 export const CRYPT_MAX = 3;
 
 export const MAP_MAX = 380;        // max objects in the city map

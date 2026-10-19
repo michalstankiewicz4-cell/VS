@@ -44,6 +44,7 @@ export function createCity({ scene, dummy, col, vehicles, nightU }) {
   let items = [];
   const owner = [];            // instance index -> map object index (for picking in the editor)
   const cc = new THREE.Color();
+  let startCar = () => START_CAR;   // set by the world: the start car follows the spawn point
   let live = false;            // live = cars are drivable vehicles and the start car exists
 
   function rebuild() {
@@ -85,7 +86,7 @@ export function createCity({ scene, dummy, col, vehicles, nightU }) {
       const b = bounds(o);
       col.cityBlk.push({ x: b.x, z: b.z, hw: b.hw, hd: b.hd });
     });
-    if (live) vehicles.spawn({ ...START_CAR, hue: 0.58, sa: 0.38, l: 0.3 });     // the showcase / start car
+    if (live) vehicles.spawn({ ...startCar(), hue: 0.58, sa: 0.38, l: 0.3 });     // the showcase / start car
     vehicles.finish();
     mesh.count = n;
     mesh.instanceMatrix.needsUpdate = true; aK.needsUpdate = true;
@@ -157,6 +158,7 @@ export function createCity({ scene, dummy, col, vehicles, nightU }) {
   return {
     map, fade, rebuild,
     setLive(v) { live = v; },
+    setStartCar(fn) { startCar = fn; },
     // Editor only: see-through city so an underlay image shows through (restored to 1 afterwards).
     setOpacity(o) { material.opacity = o; material.transparent = o < 1; material.needsUpdate = true; },
     get live() { return live; },

@@ -4,6 +4,12 @@ Versioning: `MAJOR.MINOR.PATCH`. Every push to the repository is a new version (
 The owner creates `vX.Y.Z` tags in GitHub Releases on commits from this history; pushing tags from a Claude session is blocked.
 Bug fix = PATCH, new feature = MINOR, big change to gameplay or the save format = MAJOR.
 
+## [0.19.0] - 2026-10-19
+### Added
+- **Starting bunker** (`hq`, "Spawn bunker", free, only one): a new tool in the base builder. Once built, runs start in front of it (the start car stands next to it, the start-screen showcase camera follows) and, after a death, the build camera returns to it. Placing it again moves it; Remove deletes it (the spawn goes back to the Palace courtyard). Its spawn and car spots are kept free of city objects and editor objects. Building range is still the whole map.
+### Changed
+- After a death the build camera now starts **where you died** (saved as `dp` in the save) instead of flying to the spawn — unless a starting bunker exists, then it goes there.
+
 ## [0.18.0] - 2026-10-19
 ### Changed
 - **Base building opens after a death**: "Build base" is available on the death screen (and from Single Player until the next run starts); it is disabled otherwise. The unlock is saved (`pb` in the save) and cleared when a run starts.

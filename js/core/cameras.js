@@ -84,8 +84,9 @@ export function createCameraRig({ scene, settings, input }) {
       cockpit.visible = view === 'cockpit';
       if (view === 'showcase') {
         const sway = Math.sin(t * 0.12) * 1.2;
-        persp.position.set(START.x - 4.5 + sway, 1.5, START.z + 9.5);
-        persp.lookAt(START.x - 1.2 + sway * 0.5, 4.2, START.z - 10);
+        const sx = ctx.target.x, sz = ctx.target.z;   // the spawn point (start courtyard or the starting bunker)
+        persp.position.set(sx - 4.5 + sway, 1.5, sz + 9.5);
+        persp.lookAt(sx - 1.2 + sway * 0.5, 4.2, sz - 10);
         persp.up.copy(UP);
       } else {
         const c = Math.cos(car.th), s = Math.sin(car.th);

@@ -39,17 +39,18 @@ export function createApp({ appEl, uiEl }) {
 
   /* ---- persistent progress (points bank, best run, built structures) ---- */
   const progress = {
-    bank: 0, best: 0, pending: false,   // pending: base building is open (set by a death, cleared when a run starts)
-    save() { write(KEYS.save, { bank: this.bank, best: this.best, s: world.list(), pb: this.pending }); },
+    bank: 0, best: 0, pending: false, deathAt: null,   // pending: base building is open (set by a death, cleared when a run starts)
+    save() { write(KEYS.save, { bank: this.bank, best: this.best, s: world.list(), pb: this.pending, dp: this.deathAt }); },
     load() {
       const d = read(KEYS.save);
       if (!d || typeof d !== 'object') return;
       this.bank = Math.max(0, Math.floor(+d.bank) || 0);
       this.best = Math.max(0, Math.floor(+d.best) || 0);
       this.pending = d.pb === true;
+      this.deathAt = Array.isArray(d.dp) && d.dp.every((v) => Number.isFinite(+v)) ? [Math.max(-76, Math.min(76, +d.dp[0])), Math.max(-76, Math.min(76, +d.dp[1]))] : null;
       world.load(Array.isArray(d.s) ? d.s.slice(0, 200) : []);
     },
-    wipe() { this.bank = 0; this.best = 0; this.pending = false; world.load([]); this.save(); menu.refresh(); },
+    wipe() { this.bank = 0; this.best = 0; this.pending = false; this.deathAt = null; world.load([]); this.save(); menu.refresh(); },
   };
   progress.load();
   const savedMap = read(KEYS.map);
@@ -98,14 +99,21 @@ export function createApp({ appEl, uiEl }) {
   }
   function goMenu() { enter('menu', 'menu'); menu.show('main'); }
   function startRun() { if (progress.pending) { progress.pending = false; progress.save(); } enter('play', 'play'); }
-  function openBuild() { if (!progress.pending) return; enter('build', 'idle'); builder.open(); }
+  // The build camera starts at the starting bunker's spawn point if there is one, otherwise where the player died.
+  function openBuild() {
+    if (!progress.pending) return;
+    enter('build', 'idle');
+    const d = progress.deathAt, at = world.hq() ? world.spawn() : d ? { x: d[0], z: d[1] } : world.spawn();
+    builder.open(at);
+  }
   function openEdit() { enter('edit', 'idle'); editor.open(); }
   function pause() { paused = true; input.clear(); menu.show('pause'); }
   function resume() { paused = false; input.clear(); menu.hide(); }
   function die() {
     mode = 'dead';
     const bonus = Math.floor(S.time / 10), total = S.pts + bonus;
-    progress.bank += total; progress.best = Math.max(progress.best, total); progress.pending = true; progress.save();
+    progress.bank += total; progress.best = Math.max(progress.best, total); progress.pending = true;
+    progress.deathAt = [Math.round(world.player.pos.x * 10) / 10, Math.round(world.player.pos.z * 10) / 10]; progress.save();
     menu.setDeath({ kills: S.kills, time: Math.floor(S.time), pts: S.pts, bonus, total, bank: progress.bank });
     hud.showTop(false);
     menu.show('dead');
@@ -175,7 +183,7 @@ export function createApp({ appEl, uiEl }) {
     }
 
     rig.topDown = mode === 'edit' && editor.top;
-    const target = mode === 'play' || mode === 'dead' ? world.player.pos : mode === 'edit' ? editor.pan : mode === 'build' ? builder.pan : origin;
+    const target = mode === 'play' || mode === 'dead' || mode === 'menu' ? world.player.pos : mode === 'edit' ? editor.pan : mode === 'build' ? builder.pan : origin;
     const view = rig.update(sdt, t0, { mode, target, zoomT: ZOOM[mode], car: mode === 'play' ? world.driveState() : null });
     rig.camera.getWorldDirection(fwd);
     world.fade.fwd.copy(fwd);

@@ -97,6 +97,8 @@ export default {
   'hud.hint': 'Ruch: {move} · strzał: {fire} · kamera: {cam} lub {drag}+przeciągnięcie · zoom: kółko · {interact}: auto · Esc: pauza',
 
   'build.pan': 'Widok przesuwasz klawiszami ruchu; budować można na całej mapie.',
+  'build.hq': 'Bunkier startowy (darmowy)',
+  'build.info.hq': 'Bunkier startowy: tu zaczynają się podejścia, a po śmierci kamera wraca w to miejsce. Tylko jeden — postawienie go ponownie przenosi go. Darmowy.',
   'build.bank': 'Bank: {bank} pkt · schrony: {n}/3',
   'build.tower': 'Stanowisko (25)',
   'build.wall': 'Barykada (8)',

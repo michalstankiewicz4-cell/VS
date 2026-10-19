@@ -6,12 +6,12 @@ import { COST } from '../world/index.js';
 
 export function createBuilder({ root, canvas, world, progress, settings, groundAt, isPaused, onPlay }) {
   let active = false, sel = 'tower';
-  const pan = new THREE.Vector3(0, 0, -30);   // camera target: the whole map is buildable, so the view can be moved
+  const pan = new THREE.Vector3();   // camera target: the whole map is buildable, so the view can be moved
   const bank = h('div', { id: 'bank' }), info = h('p', { class: 'note' });
   const buttons = {};
   const mk = (id, key) => { const b = btn(key, () => { sel = id; refresh(); }); buttons[id] = b; return b; };
   const panel = h('div', { id: 'build', hidden: true }, bank,
-    h('div', { class: 'btns' }, mk('tower', 'build.tower'), mk('wall', 'build.wall'), mk('crypt', 'build.crypt'), mk('remove', 'build.remove'), btn('build.play', onPlay)), info);
+    h('div', { class: 'btns' }, mk('hq', 'build.hq'), mk('tower', 'build.tower'), mk('wall', 'build.wall'), mk('crypt', 'build.crypt'), mk('remove', 'build.remove'), btn('build.play', onPlay)), info);
   root.append(panel);
 
   function refresh() {
@@ -37,7 +37,7 @@ export function createBuilder({ root, canvas, world, progress, settings, groundA
 
   return {
     pan,
-    open() { active = true; panel.hidden = false; pan.set(0, 0, -30); refresh(); },
+    open(at) { active = true; panel.hidden = false; pan.set(at.x, 0, at.z); refresh(); },
     close() { active = false; panel.hidden = true; world.setGhost(false, 0, 0, true); },
     // mv: camera-relative pan vector; zoom: current user zoom (pans slower when zoomed in)
     update(dt, mv, zoom) {
