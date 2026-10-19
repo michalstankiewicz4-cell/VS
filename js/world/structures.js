@@ -1,5 +1,6 @@
 // Player-built base structures on a 2-unit grid: sentry gun (tower), barricade (wall), bunker (crypt).
 import * as THREE from '../../vendor/three.module.js';
+import { buildTurret, DEFAULTS as TURRET } from '../turretkit/turretkit.js';
 import { COST, CRYPT_MAX, CELL, EDGE, START, START_CAR } from './constants.js';
 
 const lam = (c) => new THREE.MeshLambertMaterial({ color: c });
@@ -7,16 +8,12 @@ const key = (gx, gz) => gx + ',' + gz;
 
 function makeObj(type) {
   const grp = new THREE.Group();
-  let head = null;
+  let head = null, turret = null;
   const box = (w, h, d, c, x, y, z, parent = grp) => {
     const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), lam(c)); m.position.set(x, y, z); parent.add(m); return m;
   };
-  if (type === 'tower') {           // machine-gun nest
-    box(1.7, 0.7, 1.7, 0x5d5a50, 0, 0.35, 0);
-    box(1.0, 0.5, 1.0, 0x3b4636, 0, 0.95, 0);
-    head = new THREE.Group(); head.position.set(0, 1.4, 0); grp.add(head);
-    box(0.22, 0.22, 1.1, 0x15171a, 0, 0, 0.5, head);
-    box(0.7, 0.45, 0.12, 0x2d3328, 0, 0, 0.1, head);
+  if (type === 'tower') {           // sentry gun: the model comes from TurretKit (tuned in labs/turret.html)
+    turret = buildTurret(TURRET); head = turret.head; grp.add(turret.group);
   } else if (type === 'wall') {     // barricade
     box(1.9, 0.9, 0.7, 0x6b6860, 0, 0.45, 0);
     box(1.9, 0.16, 0.72, 0xc8682a, 0, 0.78, 0);
@@ -35,7 +32,7 @@ function makeObj(type) {
     lamp.position.set(0.6, 0.9, 0.91); grp.add(lamp);
   }
   grp.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
-  return { grp, head };
+  return { grp, head, turret };
 }
 
 export function createStructures({ scene, col }) {
@@ -68,12 +65,12 @@ export function createStructures({ scene, col }) {
       place(type, og.gx, og.gz, true); return false;
     }
     if (force ? !validCell(type, gx, gz) : !canPlace(type, gx, gz)) return false;
-    const { grp, head } = makeObj(type), x = gx * CELL, z = gz * CELL;
+    const { grp, head, turret } = makeObj(type), x = gx * CELL, z = gz * CELL;
     grp.position.set(x, 0, z);
     scene.add(grp);
     const blk = { x, z, r: type === 'tower' ? 0.8 : type === 'wall' ? 0.9 : type === 'hq' ? 1.2 : 1.0 };
     col.blockers.push(blk);
-    structs.set(key(gx, gz), { type, gx, gz, grp, head, blk, cd: 0 });
+    structs.set(key(gx, gz), { type, gx, gz, grp, head, turret, blk, cd: 0 });
     return true;
   }
   function remove(gx, gz) {
@@ -110,7 +107,7 @@ export function createStructures({ scene, col }) {
   function updateTowers(dt, enemies, S, shoot) {
     for (const v of structs.values()) {
       if (v.type !== 'tower') continue;
-      v.cd -= dt;
+      v.cd -= dt; v.turret.update(dt);
       const tx = v.grp.position.x, tz = v.grp.position.z;
       let best = -1, bd = 100;
       for (let i = 0; i < S.active; i++) {
@@ -120,7 +117,7 @@ export function createStructures({ scene, col }) {
       if (best < 0) continue;
       const dx = enemies.ex[best] - tx, dz = enemies.ez[best] - tz, l = Math.hypot(dx, dz) || 1;
       v.head.rotation.y = Math.atan2(dx, dz);
-      if (v.cd <= 0) { shoot(tx + dx / l, tz + dz / l, dx / l, dz / l); v.cd = 0.75; }
+      if (v.cd <= 0) { shoot(tx + dx / l, tz + dz / l, dx / l, dz / l); v.turret.fire(); v.cd = 0.75; }
     }
   }
   return { place, remove, canPlace, spawn, carSpot, hq: () => { const q = hqOf(); return q ? { gx: q.gx, gz: q.gz } : null; }, setBlockTest: (fn) => { blockTest = fn; }, list, load, count, setGhost, setGhostBox, updateTowers };

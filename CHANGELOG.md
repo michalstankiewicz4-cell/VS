@@ -4,6 +4,13 @@ Versioning: `MAJOR.MINOR.PATCH`. Every push to the repository is a new version (
 The owner creates `vX.Y.Z` tags in GitHub Releases on commits from this history; pushing tags from a Claude session is blocked.
 Bug fix = PATCH, new feature = MINOR, big change to gameplay or the save format = MAJOR.
 
+## [0.28.0] - 2026-10-19
+### Added
+- Model labs: a start screen `labs.html` (a tile per lab, planned labs dimmed) and the first lab, `labs/turret.html`: the sentry gun on sliders (platform, sandbags, pedestal, head, shield, ammo box, sensor lamp, antenna, 1-4 barrels, jacket, muzzle brake, 4 palettes), presets, random, export / import JSON, the game's pixel filter and lighting (day / night), orbit camera, aim sweep / mouse / manual, fire test with recoil and muzzle flash, a player at the game's scale. Settings are remembered in `cq:lab:turret:v1`. The labs are not linked from the game; open `labs.html`.
+- `js/turretkit/turretkit.js` (TurretKit): the turret as a function of its parameters, shared by the lab and the game.
+### Changed
+- The base's sentry gun in the game is now built by TurretKit (new look: two-tier platform with sandbags, pedestal, shielded head, barrel jacket, blinking lamp; recoil and muzzle flash when it fires). Placement size and gameplay are unchanged.
+
 ## [0.27.1] - 2026-10-19
 ### Changed
 - Docs only: `docs/HANDOFF.md` no longer repeats the version history (the changelog has it); `CLAUDE.md` says small fixes need only the version bump and a changelog entry.

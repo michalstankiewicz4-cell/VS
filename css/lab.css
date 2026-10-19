@@ -1,0 +1,51 @@
+/* The model labs: the start screen (labs.html) and the lab pages (labs/*.html). A workshop look, not the game's. */
+:root{color-scheme:dark;--bg:#0d0f13;--card:#151820;--line:#252a34;--text:#c9ced8;--head:#eef1f6;--dim:#7d8494;--lab:#f2b84b;--game:#36d6b5}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font:14px/1.5 system-ui,Segoe UI,Roboto,sans-serif}
+body.hub{background:radial-gradient(1100px 500px at 10% -10%,rgba(91,140,255,.14),transparent 60%),radial-gradient(900px 500px at 100% 0%,rgba(54,214,181,.10),transparent 60%),var(--bg)}
+a{color:#9fb4ff}
+/* top bar on every lab page */
+.bar{position:fixed;left:0;right:0;top:0;height:36px;z-index:5;display:flex;align-items:center;gap:14px;padding:0 14px;background:rgba(13,15,19,.92);border-bottom:1px solid var(--line);font-size:13px}
+.bar a{color:var(--text);text-decoration:none}.bar a:hover{color:#fff}
+.bar b{color:var(--head)}.bar .sp{flex:1}.bar .ver{color:var(--dim);font-size:12px}
+/* start screen */
+main{max-width:1180px;margin:0 auto;padding:76px 24px 60px}
+h1{margin:0;font-size:38px;line-height:1.1;letter-spacing:-.5px;color:var(--head)}
+h1 span{background:linear-gradient(90deg,#5b8cff,#36d6b5 55%,#f2b84b);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{margin:10px 0 28px;max-width:640px;color:#9aa1b0;font-size:16px}
+h2{display:flex;align-items:center;gap:12px;margin:28px 0 14px;font-size:12px;letter-spacing:1.6px;text-transform:uppercase;color:var(--dim)}
+h2::after{content:"";flex:1;height:1px;background:var(--line)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.tile{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:14px;background:var(--card);color:inherit;text-decoration:none;overflow:hidden;transition:transform .18s,border-color .18s}
+a.tile:hover{transform:translateY(-3px);border-color:#3a4256}
+.tile.soon{opacity:.5}
+.art{aspect-ratio:16/8;position:relative;overflow:hidden}
+.art svg{position:absolute;inset:0;width:100%;height:100%}
+.art.turret{background:linear-gradient(135deg,#1e3a2c,#0b1611)}.art.soon{background:linear-gradient(135deg,#22242c,#101216)}
+.tbody{padding:12px 16px 16px;display:flex;flex-direction:column;gap:6px;flex:1}
+.tname{display:flex;justify-content:space-between;gap:8px;font-size:18px;font-weight:600;color:var(--head)}
+.tname small{font:12px ui-monospace,Consolas,monospace;color:var(--dim);align-self:center}
+.tdesc{font-size:13.5px;color:#a7adbb;flex:1}
+.tag{align-self:flex-start;font-size:11.5px;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:#a7adbb}
+.tag.game{color:var(--game);border-color:rgba(54,214,181,.4);background:rgba(54,214,181,.08)}
+.tag.lab{color:var(--lab);border-color:rgba(242,184,75,.4);background:rgba(242,184,75,.08)}
+footer{margin-top:40px;color:var(--dim);font-size:13px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+/* a lab page: the view fills the screen, the panel floats on the right */
+body.lab{overflow:hidden;height:100%}
+#view{position:fixed;left:0;right:0;top:36px;bottom:0}
+#view canvas{display:block;width:100%;height:100%}
+#panel{position:fixed;right:10px;top:46px;bottom:10px;width:min(330px,calc(100vw - 20px));overflow:auto;background:rgba(21,24,32,.93);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+#panel h3{margin:14px 0 6px;font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:var(--dim)}
+#panel h3:first-child{margin-top:0}
+.row{display:grid;grid-template-columns:118px 1fr 40px;gap:8px;align-items:center;margin:3px 0;font-size:12.5px}
+.row span:last-child{text-align:right;color:var(--dim)}
+.row.t{grid-template-columns:1fr auto}
+.btns{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+button{background:#1d212b;color:var(--text);border:1px solid #2c3240;border-radius:8px;padding:5px 10px;font:inherit;font-size:12.5px;cursor:pointer}
+button:hover{border-color:#5b8cff;color:#fff}button.on{border-color:var(--lab);color:var(--lab);background:#2a2415}
+input[type=range]{width:100%;accent-color:#f2b84b}
+textarea{width:100%;height:92px;background:#0f1218;color:#b9d0b9;border:1px solid var(--line);border-radius:8px;font:11px ui-monospace,Consolas,monospace;padding:6px}
+.stats{color:var(--dim);font:12px ui-monospace,Consolas,monospace;margin-top:8px;white-space:pre-line}
+.hint{color:var(--dim);font-size:12px;margin:4px 0}
+#msg{color:#9fe8de;font-size:12px;min-height:16px}
+@media (max-width:640px){#panel{top:auto;height:46vh}h1{font-size:30px}}

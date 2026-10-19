@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<title>Capital Quarantine — Model Labs</title>
+<meta name="description" content="The model labs of Capital Quarantine: the game's models built from code, with sliders, in your browser.">
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" href="assets/icon.png">
+<link rel="stylesheet" href="css/lab.css">
+</head>
+<body class="hub">
+<!-- The labs' start screen: a tile for every model lab. The labs and the game share the same kits (js/turretkit/ ...), so what is tuned here is what the game shows. Not part of the game. -->
+<main>
+  <h1>Capital Quarantine <span>Model Labs</span></h1>
+  <p class="lead">The workshops where the game's models are made. The labs and the game share the same kits, so what you tune here is what the game shows.</p>
+  <h2>Laboratories</h2>
+  <div class="grid" id="labs"></div>
+  <footer><span>Capital Quarantine · the labs are not part of the game</span><a href="index.html">Back to the game →</a></footer>
+</main>
+<script type="module" src="js/labs/hub.js"></script>
+</body>
+</html>
