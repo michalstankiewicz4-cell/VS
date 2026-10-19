@@ -4,7 +4,7 @@ import * as THREE from '../../vendor/three.module.js';
 
 export function createCityMaterial({ nightU }) {
   const fade = {
-    player: new THREE.Vector3(), fwd: new THREE.Vector3(0, -0.8, -0.6), on: { value: 0 },
+    player: new THREE.Vector3(), radius: { value: 2.8 }, occ: { value: new Float32Array(12) }, occN: { value: 0 }, fwd: new THREE.Vector3(0, -0.8, -0.6), on: { value: 0 },
     setOn(v) { this.on.value = v; },
   };
   const bmat = new THREE.MeshLambertMaterial({ color: 0xffffff });
@@ -13,18 +13,20 @@ export function createCityMaterial({ nightU }) {
     sh.uniforms.uPlayer = { value: fade.player };
     sh.uniforms.uFwd = { value: fade.fwd };
     sh.uniforms.uOn = fade.on;
-    sh.uniforms.uR = { value: 2.8 };
+    sh.uniforms.uR = fade.radius;      // size of the see-through hole; follows the size of the person / car
+    sh.uniforms.uOcc = fade.occ;       // ids of the map objects that really stand between the camera and the player
+    sh.uniforms.uOccN = fade.occN;
     sh.uniforms.uNight = nightU;
     sh.vertexShader = sh.vertexShader
-      .replace('#include <common>', '#include <common>\nvarying vec3 vWP, vC, vS, vN;\nvarying vec2 vK;\nattribute vec2 aK;')
+      .replace('#include <common>', '#include <common>\nvarying vec3 vWP, vC, vS, vN;\nvarying vec2 vK;\nvarying float vO;\nattribute vec2 aK;\nattribute float aO;')
       .replace('#include <project_vertex>', `#include <project_vertex>
       mat4 mI = modelMatrix * instanceMatrix;
       vWP = (mI * vec4(transformed, 1.0)).xyz;
-      vK = aK; vN = normal;
+      vK = aK; vN = normal; vO = aO;
       vC = (mI * vec4(0.0, 0.0, 0.0, 1.0)).xyz;
       vS = vec3(length(mI[0].xyz), length(mI[1].xyz), length(mI[2].xyz));`);
     sh.fragmentShader = sh.fragmentShader
-      .replace('#include <common>', '#include <common>\nvarying vec3 vWP, vC, vS, vN;\nvarying vec2 vK;\nuniform vec3 uPlayer, uFwd;\nuniform float uOn, uR, uNight;\nfloat hsh(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }')
+      .replace('#include <common>', '#include <common>\nvarying vec3 vWP, vC, vS, vN;\nvarying vec2 vK;\nvarying float vO;\nuniform vec3 uPlayer, uFwd;\nuniform float uOn, uR, uNight, uOccN;\nuniform float uOcc[12];\nfloat hsh(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }')
       .replace('#include <color_fragment>', `#include <color_fragment>
       float gW = 0.0;
       if (vK.x > 0.5 && abs(vN.y) < 0.5) {   // Palace facade: windows, arcades, clock drawn in the shader
@@ -59,7 +61,9 @@ export function createCityMaterial({ nightU }) {
       }`)
       .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += vec3(1.0, 0.62, 0.28) * gW * uNight * 1.8;')
       .replace('#include <clipping_planes_fragment>', `#include <clipping_planes_fragment>
-      if (uOn > 0.5) {
+      bool occ = false;
+      for (int q = 0; q < 12; q++) { if (float(q) < uOccN && abs(vO - uOcc[q]) < 0.5) occ = true; }
+      if (uOn > 0.5 && occ) {   // only objects that really block the view of the player are made see-through
         vec3 dd = vWP - uPlayer;
         float al = dot(dd, uFwd);
         if (al < -0.3) {

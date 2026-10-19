@@ -36,6 +36,8 @@ export function createCity({ scene, dummy, col, vehicles, nightU }) {
   // per-instance attribute: (facade kind, top y) for the Palace shader
   const aK = new THREE.InstancedBufferAttribute(new Float32Array(CAP * 2), 2);
   geo.setAttribute('aK', aK);
+  const aO = new THREE.InstancedBufferAttribute(new Float32Array(CAP), 1);   // per instance: index of the map object it belongs to
+  geo.setAttribute('aO', aO);
   const mesh = new THREE.InstancedMesh(geo, material, CAP);
   mesh.castShadow = mesh.receiveShadow = true; mesh.frustumCulled = false;
   scene.add(mesh);
@@ -49,7 +51,7 @@ export function createCity({ scene, dummy, col, vehicles, nightU }) {
   function rebuild() {
     let n = 0; owner.length = 0; col.cityBlk.length = 0; vehicles.clear();
     const add = (i, x, y, z, sx, sy, sz, ry, h, sa, l, kind = 0, top = 0) => {
-      aK.setXY(n, kind, top);
+      aK.setXY(n, kind, top); aO.setX(n, i);
       dummy.position.set(x, y, z); dummy.rotation.set(0, ry, 0); dummy.scale.set(sx, sy, sz); dummy.updateMatrix();
       mesh.setMatrixAt(n, dummy.matrix); mesh.setColorAt(n, cc.setHSL(h, sa, l)); owner[n] = i; n++;
     };
@@ -88,7 +90,7 @@ export function createCity({ scene, dummy, col, vehicles, nightU }) {
     if (live) vehicles.spawn({ ...startCar(), hue: 0.58, sa: 0.38, l: 0.3 });     // the showcase / start car
     vehicles.finish();
     mesh.count = n;
-    mesh.instanceMatrix.needsUpdate = true; aK.needsUpdate = true;
+    mesh.instanceMatrix.needsUpdate = true; aK.needsUpdate = true; aO.needsUpdate = true;
     if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
     mesh.boundingSphere = null; mesh.boundingBox = null;
   }
@@ -153,6 +155,26 @@ export function createCity({ scene, dummy, col, vehicles, nightU }) {
 
   return {
     map, fade, rebuild,
+    // See-through hole: finds the buildings that the ray from the player towards the camera (direction `up`, a unit vector)
+    // really passes through and hands their ids to the shader. Standing in front of or beside a building selects nothing.
+    updateFade(px, py, pz, up, eps) {
+      const out = fade.occ.value; let n = 0;
+      const hit = (cx, cy, cz, hx, hy, hz) => {
+        let t0 = 0, t1 = 80;
+        for (const [o, d, c, h] of [[px, up.x, cx, hx], [py, up.y, cy, hy], [pz, up.z, cz, hz]]) {
+          if (Math.abs(d) < 1e-6) { if (Math.abs(o - c) > h) return false; continue; }
+          let a = (c - h - o) / d, b = (c + h - o) / d; if (a > b) [a, b] = [b, a];
+          t0 = Math.max(t0, a); t1 = Math.min(t1, b); if (t0 > t1) return false;
+        }
+        return true;
+      };
+      for (let i = 0; i < items.length && n < 12; i++) {
+        const o = items[i];
+        if (o.t === 'b') { if (hit(o.x, (o.h + 0.6) / 2, o.z, o.w / 2 + eps, (o.h + 0.6) / 2 + eps, o.d / 2 + eps)) out[n++] = i; }
+        else if (o.t === 'p') { for (const [qx, qz, w, d, y1, , , y0 = 0] of PALACE) if (hit(o.x + qx, (y0 + y1) / 2, o.z + qz, w / 2 + eps, (y1 - y0) / 2 + eps, d / 2 + eps)) { out[n++] = i; break; } }
+      }
+      fade.occN.value = n;
+    },
     setLive(v) { live = v; },
     setStartCar(fn) { startCar = fn; },
     // Editor only: see-through city so an underlay image shows through (restored to 1 afterwards).

@@ -159,7 +159,7 @@ export function createApp({ appEl, uiEl }) {
   resize();
 
   /* ---- frame loop ---- */
-  const fwd = new THREE.Vector3(), origin = new THREE.Vector3();
+  const fwd = new THREE.Vector3(), up = new THREE.Vector3(), origin = new THREE.Vector3();
   let last = performance.now(), frames = 0, fpsT = last, hudT = 0;
 
   function frame(now) {
@@ -191,7 +191,9 @@ export function createApp({ appEl, uiEl }) {
     const view = rig.update(sdt, t0, { mode, target, zoomT: ZOOM[mode], car: mode === 'play' ? world.driveState() : null });
     rig.camera.getWorldDirection(fwd);
     world.fade.fwd.copy(fwd);
-    world.fade.player.set(world.player.pos.x, 1, world.player.pos.z);
+    const fk = (mode === 'play' && world.driveState()?.sc) || world.player.scale;   // size of whoever is hidden: person or car
+    world.fade.radius.value = 2.8 * fk; world.fade.player.set(world.player.pos.x, fk, world.player.pos.z);
+    if (mode === 'play' && view === 'iso') world.updateFade(world.player.pos.x, fk, world.player.pos.z, up.copy(fwd).negate(), 0.5 * fk);
     world.fade.setOn(mode === 'play' && view === 'iso' ? 1 : 0);
 
     pipe.render(scene, rig.camera);

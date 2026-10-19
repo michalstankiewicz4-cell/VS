@@ -99,7 +99,7 @@ export function createWorld(scene) {
   };
 
   return {
-    player: player.state, S, fade: city.fade, map: city.map, setCityOpacity: city.setOpacity, enemyCount: ENEMIES,
+    player: player.state, S, fade: city.fade, updateFade: city.updateFade, map: city.map, setCityOpacity: city.setOpacity, enemyCount: ENEMIES,
     nightAt: sky.nightAt, DAY_LEN,
     reset, update, driveState,
     // Editor size multipliers for people (player), vehicles and enemies.
