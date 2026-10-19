@@ -17,6 +17,8 @@ import { createDevReset } from '../ui/devreset.js';
 import { VERSION } from '../version.js';
 
 const ZERO = { x: 0, z: 0 };
+const MOVE_KEYS = ['moveUp', 'moveDown', 'moveLeft', 'moveRight', 'camLeft', 'camRight'];
+const KEYSETS = { play: new Set([...MOVE_KEYS, 'interact', 'cameraView']), build: new Set(MOVE_KEYS), edit: new Set([...MOVE_KEYS, 'editRotate', 'editTopView']) };
 const ZOOM = { menu: 1, play: 1.27, dead: 1.27, build: 0.55, edit: 0.55 };   // play/dead 1.27 = two default mouse-wheel steps closer than 1
 
 export function createApp({ appEl, uiEl }) {
@@ -93,7 +95,7 @@ export function createApp({ appEl, uiEl }) {
 
   function enter(m, worldMode) {
     mode = m; paused = false;
-    world.reset(worldMode); input.clear(); input.gameKeys = m !== 'menu';   // no game shortcuts (and no key statistics) in the main menu
+    world.reset(worldMode); input.clear();
     builder.close(); editor.close();
     hud.showTop(m === 'play'); menu.hide();
   }
@@ -166,6 +168,8 @@ export function createApp({ appEl, uiEl }) {
     const t0 = now / 1000;
     const sdt = paused ? 0 : dt;
     const running = !paused && (mode === 'play' || mode === 'edit' || mode === 'build');
+    const acts = running ? KEYSETS[mode] : null;   // only the keys that mean something in this mode are handled (none in menus, pause, the death screen)
+    if (input.acts !== acts) { input.acts = acts; input.clear(); }
     const raw = running ? input.moveVector() : ZERO;
     const yaw = rig.yaw, cy = Math.cos(yaw), sy = Math.sin(yaw);
     const mv = rig.camera.isOrthographicCamera ? { x: raw.x * cy + raw.z * sy, z: -raw.x * sy + raw.z * cy } : raw;

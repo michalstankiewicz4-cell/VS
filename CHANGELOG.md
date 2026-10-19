@@ -4,6 +4,10 @@ Versioning: `MAJOR.MINOR.PATCH`. Every push to the repository is a new version (
 The owner creates `vX.Y.Z` tags in GitHub Releases on commits from this history; pushing tags from a Claude session is blocked.
 Bug fix = PATCH, new feature = MINOR, big change to gameplay or the save format = MAJOR.
 
+## [0.22.10] - 2026-10-19
+### Fixed
+- Audit of key handling: game keys were still captured (blocked from the browser and counted in the local input statistics) on the pause menu, in Options opened from it and on the death screen, where they do nothing. They are now handled only while a run, the base builder or the map editor is live and not paused, and then only the keys that mean something in that mode: Rotate (R) and Top view (T) belong to the map editor only, F and C to a run only; movement and camera keys work in all three. Keys without a meaning in the current mode are no longer blocked or counted. Everything else (Esc, browser shortcuts, typing, rebinding keys in Options) is unchanged.
+
 ## [0.22.9] - 2026-10-19
 ### Changed
 - A run now starts slightly more zoomed in (×1.27, about two mouse-wheel steps); the wheel still zooms from there (the death screen keeps the same zoom so the view does not jump).
