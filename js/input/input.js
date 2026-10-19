@@ -18,6 +18,7 @@ export class Input {
     this.held = new Set();             // currently held key codes
     this.enabled = settings.data.privacy.stats;   // are statistics collected?
     this.suspended = false;            // true while a key is being rebound
+    this.gameKeys = false;             // game shortcuts work only outside the main menu (set by the app)
     this.buckets = [];
     this.cur = { a: 0, c: 0, m: 0 };
     this.acc = 0;
@@ -61,7 +62,9 @@ export class Input {
   }
 
   #key(e, down) {
-    if (this.suspended || typing(e.target)) return;
+    if (this.suspended || !this.gameKeys || typing(e.target)) return;
+    // Browser shortcuts (Ctrl+R, Ctrl+Shift+R, Ctrl+W, Alt+…) must keep working: the game does not swallow a key pressed with a modifier.
+    if (down && (e.ctrlKey || e.metaKey || e.altKey) && !/^(Control|Alt|Meta|Shift)/.test(e.code)) return;
     const act = this.codeMap.get(e.code);
     if (!act) return;
     e.preventDefault();

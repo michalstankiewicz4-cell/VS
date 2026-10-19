@@ -93,7 +93,7 @@ export function createApp({ appEl, uiEl }) {
 
   function enter(m, worldMode) {
     mode = m; paused = false;
-    world.reset(worldMode); input.clear();
+    world.reset(worldMode); input.clear(); input.gameKeys = m !== 'menu';   // no game shortcuts (and no key statistics) in the main menu
     builder.close(); editor.close();
     hud.showTop(m === 'play'); menu.hide();
   }

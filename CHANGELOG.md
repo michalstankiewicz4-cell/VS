@@ -4,6 +4,12 @@ Versioning: `MAJOR.MINOR.PATCH`. Every push to the repository is a new version (
 The owner creates `vX.Y.Z` tags in GitHub Releases on commits from this history; pushing tags from a Claude session is blocked.
 Bug fix = PATCH, new feature = MINOR, big change to gameplay or the save format = MAJOR.
 
+## [0.22.8] - 2026-10-19
+### Changed
+- Keyboard shortcuts of the game (movement, F, C, R, T, camera keys) are **off in the main menu** (and its sub-screens): they no longer react, are no longer blocked from normal browser use and are not counted in the local input statistics. Esc still goes back; they work again as soon as a run, the builder or the editor starts, and in the pause menu.
+### Fixed
+- Browser shortcuts such as **Ctrl+R / Ctrl+Shift+R** (reload) did nothing, because the game's R key (rotate) swallowed them. A key pressed together with Ctrl, Alt or Meta is now ignored by the game and left to the browser, in every mode.
+
 ## [0.22.7] - 2026-10-19
 ### Changed
 - Default map editor settings are now the owner's tuned setup: top view on, underlay opacity 1, underlay width 223, underlay rotation −110°; sizes of people / vehicles / enemies 0.5, building 8×8×4, road 4×20, city opacity 1, Building tool. Saved settings still win; "Reset settings" restores these.
