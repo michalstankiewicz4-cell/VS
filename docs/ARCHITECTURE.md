@@ -21,7 +21,7 @@ Published at: repo <https://github.com/michalstankiewicz4-cell/VS>, site <https:
 | `js/core/cameras.js` | Camera rig: isometric ortho, chase, cockpit, start-screen showcase |
 | `js/core/settings.js`, `storage.js`, `util.js` | Sanitised settings store, localStorage wrappers, small helpers |
 | `js/world/index.js` | World facade (`createWorld`) composing the modules below |
-| `js/world/{terrain,sky,city,city-material,default-map,player,vehicles,enemies,projectiles,structures,collision,constants}.js` | World systems (see below) |
+| `js/world/{terrain,sky,city,city-material,default-map,data/default-layout,player,vehicles,enemies,projectiles,structures,collision,constants}.js` | World systems (see below) |
 | `js/world/data/palace.js` | Palace of Culture boxes — simplified model from a SketchUp file, CC BY 4.0 |
 | `js/render/pixel-pipeline.js` | `PixelPipeline`: low-res target + final shader (palette, dither, depth outline, vignette) |
 | `js/input/bindings.js`, `input.js` | Rebindable actions and key labels; input + local action statistics |

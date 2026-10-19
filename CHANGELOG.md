@@ -4,6 +4,10 @@ Versioning: `MAJOR.MINOR.PATCH`. Every push to the repository is a new version (
 The owner creates `vX.Y.Z` tags in GitHub Releases on commits from this history; pushing tags from a Claude session is blocked.
 Bug fix = PATCH, new feature = MINOR, big change to gameplay or the save format = MAJOR.
 
+## [0.19.1] - 2026-10-19
+### Changed
+- **Default map** is now the owner's hand-tuned layout exported from the map editor (66 buildings, 30 cars, the Palace at its usual spot) instead of the generated one. Data lives in `js/world/data/default-layout.js`; `default-map.js` just returns a copy. Saved maps in the browser are not affected (use dev reset or the editor's reset to get the new default).
+
 ## [0.19.0] - 2026-10-19
 ### Added
 - **Starting bunker** (`hq`, "Spawn bunker", free, only one): a new tool in the base builder. Once built, runs start in front of it (the start car stands next to it, the start-screen showcase camera follows) and, after a death, the build camera returns to it. Placing it again moves it; Remove deletes it (the spawn goes back to the Palace courtyard). Its spawn and car spots are kept free of city objects and editor objects. Building range is still the whole map.
