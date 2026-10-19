@@ -4,6 +4,10 @@ Versioning: `MAJOR.MINOR.PATCH`. Every push to the repository is a new version (
 The owner creates `vX.Y.Z` tags in GitHub Releases on commits from this history; pushing tags from a Claude session is blocked.
 Bug fix = PATCH, new feature = MINOR, big change to gameplay or the save format = MAJOR.
 
+## [0.25.1] - 2026-10-19
+### Added
+- The flashlight can be switched on and off: key L (rebindable) or a click on its cell in the equipment panel (dimmed when off). It starts on every run.
+
 ## [0.25.0] - 2026-10-19
 ### Added
 - Grenades: 3 per run, in the backpack. Key 4 (rebindable) or a click on the cell throws one in an arc towards the cursor (up to 14 units); after 0.7 s it explodes, damaging and pushing back every zombie in the radius (about 3.2 units at the default size; it follows the player's size) and killing all of them (counted as kills/points), followed by a short fireball. On foot only; no damage to the player.

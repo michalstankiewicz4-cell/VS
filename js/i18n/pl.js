@@ -103,6 +103,7 @@ export default {
   'inv.water': 'Woda',
   'inv.bandage': 'Bandaż',
   'inv.grenade': 'Granat',
+  'act.toggleTorch': 'Latarka włącz / wyłącz',
   'act.useGrenade': 'Rzuć granat (w kursor)',
   'inv.packNote': 'Kliknij przedmiot lub naciśnij jego klawisz: jedzenie regeneruje głód, woda pragnienie, bandaże życie, granaty rozrywają zombie w miejscu kursora.',
   'act.useFood': 'Zjedz jedzenie (regeneruje głód)',

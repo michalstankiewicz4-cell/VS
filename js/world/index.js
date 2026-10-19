@@ -20,7 +20,7 @@ export { COST, DAY_LEN };
 export function createWorld(scene) {
   const rnd = mulberry32(1337);
   const dummy = new THREE.Object3D();
-  const S = { hp: 100, maxHp: 100, kills: 0, pts: 0, time: 0, mode: 'idle', fireCd: 0, active: 0, night: 0, driving: false, speed: 0, carNear: false, hunger: 100, thirst: 100, items: { food: 0, water: 0, bandage: 0, grenade: 0 } };
+  const S = { hp: 100, maxHp: 100, kills: 0, pts: 0, time: 0, mode: 'idle', fireCd: 0, active: 0, night: 0, driving: false, speed: 0, carNear: false, torch: true, hunger: 100, thirst: 100, items: { food: 0, water: 0, bandage: 0, grenade: 0 } };
   const survival = createSurvival(S);
 
   const col = createCollision();
@@ -47,7 +47,7 @@ export function createWorld(scene) {
     player.state.face = 0; player.setVisible(live); player.animate(false, 0);
     S.maxHp = 100 + 25 * base.count('crypt'); S.hp = S.maxHp;
     S.kills = 0; S.pts = 0; S.time = 0; S.night = 0; S.fireCd = 0; S.active = 0; S.driving = false; S.speed = 0; S.carNear = false;
-    survival.reset(); enemies.reset(); bullets.reset();
+    S.torch = true; survival.reset(); enemies.reset(); bullets.reset();
   }
 
   // inp: { mv: {x,z} walking vector, aim: {x,z}|null world point under the cursor, firing, drv: {thr, steer} }
@@ -85,7 +85,7 @@ export function createWorld(scene) {
       S.fireCd = 0.16;
     }
 
-    sky.follow(p.x, p.z, t, S.night, true);
+    sky.follow(p.x, p.z, t, S.night, S.torch);
     terrain.follow(p.x, p.z);
 
     const { touching, car } = enemies.update(dt, t);
@@ -105,6 +105,7 @@ export function createWorld(scene) {
     player: player.state, S, fade: city.fade, updateFade: city.updateFade, map: city.map, setCityOpacity: city.setOpacity, enemyCount: ENEMIES,
     nightAt: sky.nightAt, DAY_LEN,
     reset, update, driveState, use: survival.use,
+    toggleTorch: () => { if (S.mode === 'play') S.torch = !S.torch; },
     // Throws a grenade from the player towards `aim` ({x, z}); false when none are left, driving or no target.
     throwGrenade: (aim) => {
       if (S.mode !== 'play' || vehicles.driving || !aim || !(S.items.grenade > 0)) return false;

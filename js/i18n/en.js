@@ -75,6 +75,7 @@ export default {
   'inv.water': 'Water',
   'inv.bandage': 'Bandage',
   'inv.grenade': 'Grenade',
+  'act.toggleTorch': 'Flashlight on / off',
   'act.useGrenade': 'Throw a grenade (at the cursor)',
   'inv.packNote': 'Click an item or press its key: food restores hunger, water thirst, bandages health, grenades blow up zombies at the cursor.',
   'act.useFood': 'Eat food (restores hunger)',
