@@ -14,7 +14,7 @@ export const DRIVE_VIEWS = ['iso', 'chase', 'cockpit'];
 
 export function createCameraRig({ scene, settings, input }) {
   const ortho = new THREE.OrthographicCamera(-1, 1, 1, -1, -30, 90);
-  const persp = new THREE.PerspectiveCamera(70, 1, 0.1, 150);
+  const persp = new THREE.PerspectiveCamera(70, 1, 0.05, 150);
   scene.add(persp);                             // so the cockpit dash (child of the camera) renders
   let camera = ortho;
 
@@ -89,16 +89,16 @@ export function createCameraRig({ scene, settings, input }) {
         persp.lookAt(sx - 1.2 + sway * 0.5, 4.2, sz - 10);
         persp.up.copy(UP);
       } else {
-        const c = Math.cos(car.th), s = Math.sin(car.th);
+        const c = Math.cos(car.th), s = Math.sin(car.th), k = car.sc || 1;   // k: car size, so the chase and driver views scale with it
         if (view === 'chase') {
           chaseTh += wrapAngle(car.th - chaseTh) * Math.min(1, dt * 4);
           const a = chaseTh + lookYaw;
-          persp.position.set(car.x - Math.sin(a) * 7.5, 3.6 + lookPitch * 6, car.z - Math.cos(a) * 7.5);
-          const ahead = 3 * (1 - Math.min(1, Math.abs(lookYaw)));
-          persp.lookAt(tmp2.set(car.x + Math.sin(chaseTh) * ahead, 1.1, car.z + Math.cos(chaseTh) * ahead));
+          persp.position.set(car.x - Math.sin(a) * 7.5 * k, (3.6 + lookPitch * 6) * k, car.z - Math.cos(a) * 7.5 * k);
+          const ahead = 3 * k * (1 - Math.min(1, Math.abs(lookYaw)));
+          persp.lookAt(tmp2.set(car.x + Math.sin(chaseTh) * ahead, 1.1 * k, car.z + Math.cos(chaseTh) * ahead));
         } else {
-          chaseTh = car.th;
-          persp.position.set(car.x + SEAT.dx * c + SEAT.dz * s, SEAT.dy, car.z - SEAT.dx * s + SEAT.dz * c);
+          chaseTh = car.th; cockpit.scale.setScalar(k);
+          persp.position.set(car.x + (SEAT.dx * c + SEAT.dz * s) * k, SEAT.dy * k, car.z + (-SEAT.dx * s + SEAT.dz * c) * k);
           persp.rotation.order = 'YXZ';
           persp.rotation.set(-0.1 + lookPitch, car.th + Math.PI + lookYaw, 0);
           spin.rotation.z = -car.steer * 1.1;

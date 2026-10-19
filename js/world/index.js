@@ -27,7 +27,7 @@ export function createWorld(scene) {
   const player = createPlayer({ scene });
   const vehicles = createVehicles({ scene, dummy, col, S, player });
   const city = createCity({ scene, dummy, col, vehicles, nightU: sky.nightU });
-  const enemies = createEnemies({ scene, rnd, dummy, col, S, around: player.state.pos, vehicles });
+  const enemies = createEnemies({ scene, rnd, dummy, col, S, around: player.state.pos, vehicles, player: player.state });
   const bullets = createProjectiles({ scene, dummy, col, S, enemies });
   const base = createStructures({ scene, col });
   base.setBlockTest((x, z) => city.map.blocksSquare(x, z, 1));
@@ -63,15 +63,16 @@ export function createWorld(scene) {
       vehicles.step(dt, drv.thr, drv.steer);
       S.carNear = false;
     } else {
-      const nx = { v: p.x + mv.x * player.state.speed * dt }, nz = { v: p.z + mv.z * player.state.speed * dt };
-      col.push(nx, nz, 0.45);
+      const ps = player.state.speed * player.state.scale;   // walking speed follows the player's size
+      const nx = { v: p.x + mv.x * ps * dt }, nz = { v: p.z + mv.z * ps * dt };
+      col.push(nx, nz, 0.45 * player.state.scale);
       p.x = clamp(nx.v, -EDGE, EDGE); p.z = clamp(nz.v, -EDGE, EDGE);
       const moving = mv.x !== 0 || mv.z !== 0;
       let want = moving ? Math.atan2(mv.x, mv.z) : player.state.face;
       if (firing && aim) want = Math.atan2(aim.x - p.x, aim.z - p.z);
       player.state.face += wrapAngle(want - player.state.face) * Math.min(1, dt * 14);
       player.animate(moving, t);
-      S.carNear = !!vehicles.nearest(3.4);
+      S.carNear = !!vehicles.nearest();
     }
 
     // shooting (on foot only)
@@ -79,7 +80,7 @@ export function createWorld(scene) {
     if (!vehicles.driving && firing && aim && S.fireCd <= 0) {
       const a = Math.atan2(aim.x - p.x, aim.z - p.z) + (rnd() - 0.5) * 0.08;
       const dx = Math.sin(a), dz = Math.cos(a);
-      bullets.shoot(p.x + dx * 0.7, p.z + dz * 0.7, dx, dz);
+      bullets.shoot(p.x + dx * 0.7 * player.state.scale, p.z + dz * 0.7 * player.state.scale, dx, dz);
       S.fireCd = 0.16;
     }
 
@@ -95,7 +96,7 @@ export function createWorld(scene) {
 
   const driveState = () => {
     const v = vehicles.driving;
-    return v ? { x: v.x, z: v.z, th: v.th, vel: v.vel, steer: v.steer } : null;
+    return v ? { x: v.x, z: v.z, th: v.th, vel: v.vel, steer: v.steer, sc: vehicles.scale } : null;
   };
 
   return {
@@ -103,7 +104,7 @@ export function createWorld(scene) {
     nightAt: sky.nightAt, DAY_LEN,
     reset, update, driveState,
     // Editor size multipliers for people (player), vehicles and enemies.
-    setScales: ({ p, v, e }) => { player.setScale(p); vehicles.setScale(v); enemies.setScale(e); },
+    setScales: ({ p, v, e }) => { player.setScale(p); vehicles.setScale(v); enemies.setScale(e); bullets.setScale(p); },
     // Editor preview: shows the player and a zombie at (x, z) so sizes can be compared with buildings.
     setPreview: (on, x, z) => {
       enemies.preview(on, x + 1.6, z);

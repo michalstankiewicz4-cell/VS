@@ -5,6 +5,7 @@ import { t, onLang } from '../i18n/index.js';
 import { createUnderlay } from './underlay.js';
 import { read, write, KEYS } from '../core/storage.js';
 import { moveLabel, camLabel, firstKey } from '../input/bindings.js';
+import { SIZE_DEFAULT } from '../world/constants.js';
 
 export function createEditor({ scene, root, canvas, world, settings, groundAt, pickIndex, project, isPaused, onPlay, saveMap }) {
   let active = false, top = false, tool = 'b', hot = -1, grace = 0, barFor = '', barOver = false, moving = null, rot = 0, why = '', whyShown = '', note = '';
@@ -18,7 +19,7 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
   const W = slider('ed.width', 4, 14, 1, 8), D = slider('ed.depth', 4, 14, 1, 8), H = slider('ed.height', 2, 9, 0.5, 4);
   const RW = slider('ed.roadWidth', 2, 12, 1, 4), RL = slider('ed.roadLength', 4, 60, 2, 20);
   const applyScales = () => world.setScales({ p: +SP.inp.value, v: +SV.inp.value, e: +SE.inp.value });
-  const sc = (key) => { const s = slider(key, 0.5, 2, 0.05, 1); s.inp.addEventListener('input', () => { s.el.lastChild.textContent = (+s.inp.value).toFixed(2); applyScales(); }); return s; };
+  const sc = (key) => { const s = slider(key, 0.5, 2, 0.05, SIZE_DEFAULT); s.el.lastChild.textContent = SIZE_DEFAULT.toFixed(2); s.inp.addEventListener('input', () => { s.el.lastChild.textContent = (+s.inp.value).toFixed(2); applyScales(); }); return s; };
   const SP = sc('ed.scale.player'), SV = sc('ed.scale.car'), SE = sc('ed.scale.enemy');
   const scaleBox = h('details', { class: 'under' }, h('summary', {}, tx('ed.scale.title')), SP.el, SV.el, SE.el, h('p', { class: 'note' }, tx('ed.scale.hint')));
   const under = createUnderlay({ scene });
@@ -140,7 +141,7 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
     h('div', { class: 'btns' }, exportSet, importSet),
     jsonS);
   // Remember editor settings (tool, rotation, top view, sliders) between sessions; the underlay image itself is not saved.
-  const DEF = { sp: 1, sv: 1, se: 1, w: 8, d: 8, h: 4, rw: 4, rl: 20, city: 1, uo: 0.6 };
+  const DEF = { sp: SIZE_DEFAULT, sv: SIZE_DEFAULT, se: SIZE_DEFAULT, w: 8, d: 8, h: 4, rw: 4, rl: 20, city: 1, uo: 0.6 };
   const sliders = { sp: SP, sv: SV, se: SE, w: W, d: D, h: H, rw: RW, rl: RL, city: uCity, uo: uO };
   const clampN = (v, s) => Math.min(+s.inp.max, Math.max(+s.inp.min, +v));
   // Apply a settings object (from storage or an import); live = the editor is open, so the city opacity applies at once.
@@ -150,6 +151,7 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
     rot = sv.rot ? 1 : 0; top = !!sv.top;
     for (const [k, s] of Object.entries(sliders)) {
       if (!Number.isFinite(+sv[k]) || sv[k] === null) continue;
+      if (sv.ver !== 2 && (k === 'sp' || k === 'sv' || k === 'se')) continue;   // sizes saved before the 0.5 default are ignored
       s.inp.value = clampN(sv[k], s);
       if (s === SP || s === SV || s === SE) { s.inp.dispatchEvent(new Event('input')); continue; }
       if (s === uCity && !live) s.out.textContent = (+s.inp.value).toFixed(2);   // applied on open(), not now
@@ -157,7 +159,7 @@ export function createEditor({ scene, root, canvas, world, settings, groundAt, p
     }
   }
   applySettings(read(KEYS.editor), false);
-  const settingsObj = () => { const o = { tool, rot, top }; for (const [k, s] of Object.entries(sliders)) o[k] = +s.inp.value; return o; };
+  const settingsObj = () => { const o = { ver: 2, tool, rot, top }; for (const [k, s] of Object.entries(sliders)) o[k] = +s.inp.value; return o; };
   let saved = '';
   const persist = () => {
     const o = settingsObj();

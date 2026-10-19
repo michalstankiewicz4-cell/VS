@@ -1,6 +1,6 @@
 // Zombies: one instanced mesh, simple chase AI with separation and obstacle pushing.
 import * as THREE from '../../vendor/three.module.js';
-import { ENEMIES } from './constants.js';
+import { ENEMIES, SIZE_DEFAULT } from './constants.js';
 
 function mergeBoxes(list) {
   const pos = [], nor = [];
@@ -21,13 +21,13 @@ const zombieGeo = () => mergeBoxes([
   [0.22, 0.55, 0.26, -0.15, 0.28, 0], [0.22, 0.55, 0.26, 0.15, 0.28, 0],
 ]);
 
-export function createEnemies({ scene, rnd, dummy, col, S, around, vehicles }) {
+export function createEnemies({ scene, rnd, dummy, col, S, around, vehicles, player }) {
   const mesh = new THREE.InstancedMesh(zombieGeo(), new THREE.MeshLambertMaterial({ color: 0xffffff }), ENEMIES);
   mesh.castShadow = true; mesh.frustumCulled = false;
   const ex = new Float32Array(ENEMIES), ez = new Float32Array(ENEMIES), es = new Float32Array(ENEMIES);
   const ep = new Float32Array(ENEMIES), eh = new Float32Array(ENEMIES);
   const colr = new THREE.Color();
-  let sc = 1;   // editor-chosen size multiplier (visual)
+  let sc = SIZE_DEFAULT;   // size multiplier (1 = original): speed, contact and hit radii follow it
   const hpFor = () => S.time > 180 ? 4 : S.time > 90 ? 3 : 2;
   const spawn = (i) => {
     const a = rnd() * Math.PI * 2, r = 20 + rnd() * 6;
@@ -47,7 +47,7 @@ export function createEnemies({ scene, rnd, dummy, col, S, around, vehicles }) {
   }
   // A bullet hit: knock back, count the kill and respawn the zombie when it dies.
   function hit(j, dx, dz) {
-    eh[j] -= 1; ex[j] -= dx * 0.4; ez[j] -= dz * 0.4;
+    eh[j] -= 1; ex[j] -= dx * 0.4 * sc; ez[j] -= dz * 0.4 * sc;
     if (eh[j] <= 0) { S.kills++; S.pts++; spawn(j); }
   }
   // Advances all zombies; returns how many are touching the player.
@@ -58,23 +58,24 @@ export function createEnemies({ scene, rnd, dummy, col, S, around, vehicles }) {
     const px = around.x, pz = around.z, car = vehicles.driving;
     const sp = 1 + Math.min(S.time / 240, 0.8);
     let touching = 0;
+    const pk = (player.scale + sc) / 2, ck = (vehicles.scale + sc) / 2;   // contact distances scale with the sizes of both parties
     for (let i = 0; i < S.active; i++) {
       const dx = px - ex[i], dz = pz - ez[i];
       const dist = Math.hypot(dx, dz) || 1;
       if (dist > 34) { spawn(i); continue; }
       if (car && vehicles.runsOver(ex[i], ez[i])) { S.kills++; S.pts++; spawn(i); continue; }
       let vx = dx / dist, vz = dz / dist;
-      if (car ? (dist < 2.6 && Math.abs(car.vel) < 3) : dist < 1.1) touching++;
-      if (dist < 1.0) { vx = 0; vz = 0; }
+      if (car ? (dist < 2.6 * ck && Math.abs(car.vel) < 3 * vehicles.scale) : dist < 1.1 * pk) touching++;
+      if (dist < 1.0 * pk) { vx = 0; vz = 0; }
       for (let j = 0; j < S.active; j++) {
         if (j === i) continue;
         const sx = ex[i] - ex[j], sz = ez[i] - ez[j], sd = sx * sx + sz * sz;
-        if (sd < 0.8 && sd > 1e-4) { const k = 1 / Math.sqrt(sd); vx += sx * k * 0.9; vz += sz * k * 0.9; }
+        if (sd < 0.8 * sc * sc && sd > 1e-4) { const k = 1 / Math.sqrt(sd); vx += sx * k * 0.9; vz += sz * k * 0.9; }
       }
-      const nx = { v: ex[i] + vx * es[i] * sp * dt }, nz = { v: ez[i] + vz * es[i] * sp * dt };
-      col.push(nx, nz, 0.4);
+      const nx = { v: ex[i] + vx * es[i] * sp * sc * dt }, nz = { v: ez[i] + vz * es[i] * sp * sc * dt };
+      col.push(nx, nz, 0.4 * sc);
       ex[i] = nx.v; ez[i] = nz.v;
-      dummy.position.set(ex[i], Math.abs(Math.sin(t * 6 + ep[i])) * 0.06, ez[i]);
+      dummy.position.set(ex[i], Math.abs(Math.sin(t * 6 + ep[i])) * 0.06 * sc, ez[i]);
       dummy.rotation.set(0, Math.atan2(dx, dz), 0);
       dummy.scale.set(sc, sc, sc);
       dummy.updateMatrix();
@@ -89,5 +90,5 @@ export function createEnemies({ scene, rnd, dummy, col, S, around, vehicles }) {
     else hide(0);
     mesh.instanceMatrix.needsUpdate = true;
   }
-  return { ex, ez, reset, hit, update, preview, setScale: (k) => { sc = k; } };
+  return { ex, ez, reset, hit, update, preview, hitR2: () => 0.55 * sc * sc, setScale: (k) => { sc = k; } };
 }

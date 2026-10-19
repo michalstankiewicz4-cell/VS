@@ -7,6 +7,8 @@ export const GRAVES = 260;         // rubble instances
 export const RANGE = 40;           // radius in which rubble wraps around the player
 export const PN = 96;              // bullet pool size
 export const CELL = 2;             // base-building grid size
+// Default size multiplier of people, vehicles and zombies (1 = the original size). Speeds, reach, hit radii and the driver camera all follow it.
+export const SIZE_DEFAULT = 0.5;
 
 export const COST = { tower: 25, wall: 8, crypt: 40, hq: 0 };   // hq = the free starting bunker (spawn point)
 export const CRYPT_MAX = 3;

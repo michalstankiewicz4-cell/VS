@@ -4,6 +4,12 @@ Versioning: `MAJOR.MINOR.PATCH`. Every push to the repository is a new version (
 The owner creates `vX.Y.Z` tags in GitHub Releases on commits from this history; pushing tags from a Claude session is blocked.
 Bug fix = PATCH, new feature = MINOR, big change to gameplay or the save format = MAJOR.
 
+## [0.22.0] - 2026-10-19
+### Changed
+- **People, vehicles and zombies are now half size by default** (`SIZE_DEFAULT = 0.5` in `js/world/constants.js`; the editor sliders start at 0.5, and sizes saved by older versions are ignored once).
+- The sizes now drive gameplay, not just looks (1.0 = the old behaviour): walking speed, car top speed / acceleration / braking / steering saturation, zombie speed, contact and separation distances, collision radii, how close you must be to enter a car, the exit spot, the run-over speed threshold, bullet hit radius, bullet size and muzzle position.
+- Driver cameras follow the car size: chase distance and height, the cockpit seat position and the dashboard/wheel overlay. The HUD km/h is shown in original-size units, so it does not change with the size setting.
+
 ## [0.21.2] - 2026-10-19
 ### Changed
 - Map editor menu split in two panels. **Right** (`#edr`): everything placed on the map — tools (Select, Building, Car, Road, Palace, Remove, Rotate, Top view), object size sliders, map Export / Import / Default map. **Left** (`#ed`): the rest — Size of things, Map underlay (reference image), Play, Reset settings, settings Export / Import.

@@ -1,13 +1,13 @@
 // Bullet pool shared by the player and sentry guns.
 import * as THREE from '../../vendor/three.module.js';
-import { PN } from './constants.js';
+import { PN, SIZE_DEFAULT } from './constants.js';
 
 export function createProjectiles({ scene, dummy, col, S, enemies }) {
   const mesh = new THREE.InstancedMesh(new THREE.BoxGeometry(0.16, 0.16, 0.55), new THREE.MeshBasicMaterial({ color: 0xffd070 }), PN);
   mesh.frustumCulled = false;
   scene.add(mesh);
   const px = new Float32Array(PN), pz = new Float32Array(PN), vx = new Float32Array(PN), vz = new Float32Array(PN), life = new Float32Array(PN);
-  let next = 0;
+  let next = 0, sc = SIZE_DEFAULT;   // bullets are drawn at the player's size
   const hide = (i) => { dummy.position.set(0, -50, 0); dummy.scale.set(0, 0, 0); dummy.updateMatrix(); mesh.setMatrixAt(i, dummy.matrix); };
   for (let i = 0; i < PN; i++) hide(i);
 
@@ -27,16 +27,16 @@ export function createProjectiles({ scene, dummy, col, S, enemies }) {
       if (col.hitsAny(px[i], pz[i])) life[i] = 0;
       for (let j = 0; j < S.active && life[i] > 0; j++) {
         const dx = px[i] - ex[j], dz = pz[i] - ez[j];
-        if (dx * dx + dz * dz < 0.55) { life[i] = 0; enemies.hit(j, dx, dz); }
+        if (dx * dx + dz * dz < enemies.hitR2()) { life[i] = 0; enemies.hit(j, dx, dz); }
       }
       if (life[i] <= 0) { hide(i); continue; }
-      dummy.position.set(px[i], 1, pz[i]);
+      dummy.position.set(px[i], sc, pz[i]);
       dummy.rotation.set(0, Math.atan2(vx[i], vz[i]), 0);
-      dummy.scale.set(1, 1, 1);
+      dummy.scale.set(sc, sc, sc);
       dummy.updateMatrix();
       mesh.setMatrixAt(i, dummy.matrix);
     }
     mesh.instanceMatrix.needsUpdate = true;
   }
-  return { shoot, reset, update };
+  return { shoot, reset, update, setScale: (k) => { sc = k; } };
 }

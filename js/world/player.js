@@ -1,6 +1,6 @@
 // The player character: a soldier with a rifle, built from primitive boxes.
 import * as THREE from '../../vendor/three.module.js';
-import { START } from './constants.js';
+import { START, SIZE_DEFAULT } from './constants.js';
 
 export function createPlayer({ scene }) {
   const group = new THREE.Group();
@@ -27,7 +27,8 @@ export function createPlayer({ scene }) {
   group.position.set(START.x, 0, START.z);
   scene.add(group);
 
-  const state = { pos: group.position, face: 0, speed: 5.2 };
+  const state = { pos: group.position, face: 0, speed: 5.2, scale: SIZE_DEFAULT };   // speed = walking speed at scale 1; reach and speed follow `scale`
+  group.scale.setScalar(SIZE_DEFAULT);
 
   // Walking animation (moving) or a slow breathing idle.
   function animate(moving, t) {
@@ -41,5 +42,5 @@ export function createPlayer({ scene }) {
       legL.rotation.x = legR.rotation.x = 0;
     }
   }
-  return { state, group, animate, setScale: (k) => group.scale.setScalar(k), setVisible: (v) => { group.visible = v; } };
+  return { state, group, animate, setScale: (k) => { state.scale = k; group.scale.setScalar(k); }, setVisible: (v) => { group.visible = v; } };
 }
