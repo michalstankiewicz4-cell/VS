@@ -50,6 +50,17 @@ export function createEnemies({ scene, rnd, dummy, col, S, around, vehicles, pla
     eh[j] -= 1; ex[j] -= dx * 0.4 * sc; ez[j] -= dz * 0.4 * sc;
     if (eh[j] <= 0) { S.kills++; S.pts++; spawn(j); }
   }
+  // A blast: every zombie within r of (x, z) takes `dmg` damage and is thrown away from the centre.
+  function blast(x, z, r, dmg) {
+    for (let j = 0; j < S.active; j++) {
+      const dx = ex[j] - x, dz = ez[j] - z, d2 = dx * dx + dz * dz;
+      if (d2 > r * r) continue;
+      const d = Math.sqrt(d2) || 1;
+      ex[j] += dx / d * 0.8 * sc; ez[j] += dz / d * 0.8 * sc;
+      eh[j] -= dmg;
+      if (eh[j] <= 0) { S.kills++; S.pts++; spawn(j); }
+    }
+  }
   // Advances all zombies; returns how many are touching the player.
   function update(dt, t) {
     const act = Math.min(ENEMIES, 18 + Math.floor(S.time));    // the wave grows over time
@@ -90,5 +101,5 @@ export function createEnemies({ scene, rnd, dummy, col, S, around, vehicles, pla
     else hide(0);
     mesh.instanceMatrix.needsUpdate = true;
   }
-  return { ex, ez, reset, hit, update, preview, hitR2: () => 0.55 * sc * sc, setScale: (k) => { sc = k; } };
+  return { ex, ez, reset, hit, blast, update, preview, hitR2: () => 0.55 * sc * sc, setScale: (k) => { sc = k; } };
 }

@@ -12,6 +12,7 @@ export const ACTIONS = [
   { id: 'useFood', keys: ['Digit1', null], stat: null },
   { id: 'useBandage', keys: ['Digit2', null], stat: null },
   { id: 'useWater', keys: ['Digit3', null], stat: null },
+  { id: 'useGrenade', keys: ['Digit4', null], stat: null },
   { id: 'inventory', keys: ['KeyI', null], stat: null },
   { id: 'editRotate', keys: ['KeyR', null], stat: null },
   { id: 'editTopView', keys: ['KeyT', null], stat: null },

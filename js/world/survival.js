@@ -4,7 +4,7 @@ export const ITEMS = {
   water: { gain: 35, need: 'thirst' },       // restores thirst
   bandage: { gain: 30, need: 'hp' },         // restores health
 };
-const START = { food: 3, water: 3, bandage: 2 };
+const START = { food: 3, water: 3, bandage: 2, grenade: 3 };
 const DRAIN = { hunger: 100 / 480, thirst: 100 / 360 };   // per second: empty after 8 / 6 minutes
 const STARVE = 1.5;                                         // hp per second per empty need
 

@@ -25,7 +25,7 @@ export function createHud(root, onUse) {
     tx('inv.title', 'h4'),
     tx('inv.hands', 'h5'), grid(cell('inv.rifle', 'long', '#17181b'), cell('inv.light', 'tube', '#d9c46a')),
     tx('inv.clothes', 'h5'), grid(cell('inv.helmet', 'dome', '#2f3a2a'), cell('inv.jacket', 'box', '#4a5638'), cell('inv.trousers', 'legs', '#2a2d36')),
-    tx('inv.pack', 'h5'), grid(itemCell('food', 'box', '#b8843c'), itemCell('water', 'tube', '#4a8fd0'), itemCell('bandage', 'bandage', '#e8e0d0'), ...Array.from({ length: 5 }, () => cell(null))), tx('inv.packNote', 'div'), close);
+    tx('inv.pack', 'h5'), grid(itemCell('food', 'box', '#b8843c'), itemCell('water', 'tube', '#4a8fd0'), itemCell('bandage', 'bandage', '#e8e0d0'), itemCell('grenade', 'dome', '#3a4a2a'), ...Array.from({ length: 4 }, () => cell(null))), tx('inv.packNote', 'div'), close);
   root.append(top, hint, fps, inv);
   return {
     showTop: (on) => { top.hidden = !on; },

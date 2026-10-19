@@ -4,6 +4,12 @@ Versioning: `MAJOR.MINOR.PATCH`. Every push to the repository is a new version (
 The owner creates `vX.Y.Z` tags in GitHub Releases on commits from this history; pushing tags from a Claude session is blocked.
 Bug fix = PATCH, new feature = MINOR, big change to gameplay or the save format = MAJOR.
 
+## [0.25.0] - 2026-10-19
+### Added
+- Grenades: 3 per run, in the backpack. Key 4 (rebindable) or a click on the cell throws one in an arc towards the cursor (up to 14 units); after 0.7 s it explodes, damaging and pushing back every zombie in the radius (about 3.2 units at the default size; it follows the player's size) and killing all of them (counted as kills/points), followed by a short fireball. On foot only; no damage to the player.
+### Removed
+- Tab no longer pauses the game (added in 0.23.1 by mistake of scope; Esc is the only pause key again).
+
 ## [0.24.0] - 2026-10-19
 ### Added
 - Survival basics (`js/world/survival.js`): hunger and thirst fall over time (empty after about 8 and 6 minutes; an empty need drains 1.5 HP/s). A run starts with 3 food, 3 water and 2 bandages in the backpack, shown as item cells in the equipment panel. Click an item or press 1 (food, +35 hunger), 2 (bandage, +30 HP) or 3 (water, +35 thirst); keys are rebindable. Hunger and thirst are shown in the run line. An item is not used when its need is already full. There are no pickups in the world yet.

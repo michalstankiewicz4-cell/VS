@@ -20,7 +20,7 @@ export { COST, DAY_LEN };
 export function createWorld(scene) {
   const rnd = mulberry32(1337);
   const dummy = new THREE.Object3D();
-  const S = { hp: 100, maxHp: 100, kills: 0, pts: 0, time: 0, mode: 'idle', fireCd: 0, active: 0, night: 0, driving: false, speed: 0, carNear: false, hunger: 100, thirst: 100, items: { food: 0, water: 0, bandage: 0 } };
+  const S = { hp: 100, maxHp: 100, kills: 0, pts: 0, time: 0, mode: 'idle', fireCd: 0, active: 0, night: 0, driving: false, speed: 0, carNear: false, hunger: 100, thirst: 100, items: { food: 0, water: 0, bandage: 0, grenade: 0 } };
   const survival = createSurvival(S);
 
   const col = createCollision();
@@ -105,6 +105,13 @@ export function createWorld(scene) {
     player: player.state, S, fade: city.fade, updateFade: city.updateFade, map: city.map, setCityOpacity: city.setOpacity, enemyCount: ENEMIES,
     nightAt: sky.nightAt, DAY_LEN,
     reset, update, driveState, use: survival.use,
+    // Throws a grenade from the player towards `aim` ({x, z}); false when none are left, driving or no target.
+    throwGrenade: (aim) => {
+      if (S.mode !== 'play' || vehicles.driving || !aim || !(S.items.grenade > 0)) return false;
+      const p = player.state.pos;
+      if (!bullets.throwGrenade(p.x, p.z, aim.x, aim.z)) return false;
+      S.items.grenade--; return true;
+    },
     // Editor size multipliers for people (player), vehicles and enemies.
     setScales: ({ p, v, e }) => { player.setScale(p); vehicles.setScale(v); enemies.setScale(e); bullets.setScale(p); },
     // Editor preview: shows the player and a zombie at (x, z) so sizes can be compared with buildings.
